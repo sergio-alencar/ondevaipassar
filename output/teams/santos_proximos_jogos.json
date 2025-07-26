@@ -1,107 +1,97 @@
 {
   "time": "Santos",
   "timeId": "579",
-  "atualizadoEm": "2025-04-07T15:56:42.181Z",
+  "atualizadoEm": "2025-06-15T13:25:29.567Z",
   "proximosJogos": [
     {
-      "id": "match_1744583400_0",
-      "timeCasa": "Fluminense",
-      "timeVisitante": "Santos",
-      "startTimestamp": 1744583400,
-      "data": "2025-04-13T22:30:00.000Z",
-      "horario": "22:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Prime Video"
-    },
-    {
-      "id": "match_1744849800_1",
+      "id": "match_1752357600_0",
       "timeCasa": "Santos",
-      "timeVisitante": "Atletico Mineiro",
-      "startTimestamp": 1744849800,
-      "data": "2025-04-17T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
+      "timeVisitante": "Palmeiras",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
+      "horario": "22:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1745175600_2",
-      "timeCasa": "Sao Paulo",
-      "timeVisitante": "Santos",
-      "startTimestamp": 1745175600,
-      "data": "2025-04-20T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
-    },
-    {
-      "id": "match_1745796600_3",
+      "id": "match_1752429600_1",
       "timeCasa": "Santos",
-      "timeVisitante": "Bragantino",
-      "startTimestamp": 1745796600,
-      "data": "2025-04-27T23:30:00.000Z",
-      "horario": "23:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
+      "timeVisitante": "Palmeiras",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746385200_4",
-      "timeCasa": "Gremio",
-      "timeVisitante": "Santos",
-      "startTimestamp": 1746385200,
-      "data": "2025-05-04T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
-    },
-    {
-      "id": "match_1747090800_5",
+      "id": "match_1752688800_2",
       "timeCasa": "Santos",
-      "timeVisitante": "Ceara",
-      "startTimestamp": 1747090800,
-      "data": "2025-05-12T23:00:00.000Z",
-      "horario": "23:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
+      "timeVisitante": "Flamengo",
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1747594800_6",
-      "timeCasa": "Corinthians",
+      "id": "match_1753034400_3",
+      "timeCasa": "Mirassol",
       "timeVisitante": "Santos",
-      "startTimestamp": 1747594800,
-      "data": "2025-05-18T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1748208600_7",
-      "timeCasa": "Vitoria",
-      "timeVisitante": "Santos",
-      "startTimestamp": 1748208600,
-      "data": "2025-05-25T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1748804400_8",
+      "id": "match_1753293600_4",
       "timeCasa": "Santos",
-      "timeVisitante": "Botafogo",
-      "startTimestamp": 1748804400,
-      "data": "2025-06-01T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
+      "timeVisitante": "Internacional",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1749767400_9",
-      "timeCasa": "Fortaleza",
+      "id": "match_1753639200_5",
+      "timeCasa": "Sport Recife",
       "timeVisitante": "Santos",
-      "startTimestamp": 1749767400,
-      "data": "2025-06-12T22:30:00.000Z",
-      "horario": "22:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "CazéTV e Premiere e Record"
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754244000_6",
+      "timeCasa": "Santos",
+      "timeVisitante": "EC Juventude",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754848800_7",
+      "timeCasa": "Cruzeiro",
+      "timeVisitante": "Santos",
+      "startTimestamp": 1754848800,
+      "data": "2025-08-10T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1755453600_8",
+      "timeCasa": "Santos",
+      "timeVisitante": "Vasco da Gama",
+      "startTimestamp": 1755453600,
+      "data": "2025-08-17T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1756058400_9",
+      "timeCasa": "EC Bahia",
+      "timeVisitante": "Santos",
+      "startTimestamp": 1756058400,
+      "data": "2025-08-24T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     }
   ]
 }

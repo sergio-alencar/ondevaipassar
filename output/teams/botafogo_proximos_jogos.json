@@ -1,107 +1,107 @@
 {
   "time": "Botafogo",
   "timeId": "2051",
-  "atualizadoEm": "2025-04-07T15:55:29.944Z",
+  "atualizadoEm": "2025-06-15T19:21:48.513Z",
   "proximosJogos": [
     {
-      "id": "match_1744149600_0",
+      "id": "match_1750039200_0",
       "timeCasa": "Botafogo",
-      "timeVisitante": "Carabobo",
-      "startTimestamp": 1744149600,
-      "data": "2025-04-08T22:00:00.000Z",
-      "horario": "22:00",
-      "campeonato": "Copa Libertadores",
-      "canais": "Paramount+"
+      "timeVisitante": "Seattle Sounders FC",
+      "startTimestamp": 1750039200,
+      "data": "2025-06-16T02:00:00.000Z",
+      "horario": "02:00",
+      "campeonato": "FIFA Club World Cup",
+      "canais": []
     },
     {
-      "id": "match_1744484400_1",
-      "timeCasa": "Bragantino",
+      "id": "match_1750381200_1",
+      "timeCasa": "PSG",
       "timeVisitante": "Botafogo",
-      "startTimestamp": 1744484400,
-      "data": "2025-04-12T19:00:00.000Z",
+      "startTimestamp": 1750381200,
+      "data": "2025-06-20T01:00:00.000Z",
+      "horario": "01:00",
+      "campeonato": "FIFA Club World Cup",
+      "canais": []
+    },
+    {
+      "id": "match_1750705200_2",
+      "timeCasa": "Atletico Madrid",
+      "timeVisitante": "Botafogo",
+      "startTimestamp": 1750705200,
+      "data": "2025-06-23T19:00:00.000Z",
       "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "campeonato": "FIFA Club World Cup",
+      "canais": []
     },
     {
-      "id": "match_1744927200_2",
-      "timeCasa": "Botafogo",
-      "timeVisitante": "Sao Paulo",
-      "startTimestamp": 1744927200,
-      "data": "2025-04-17T22:00:00.000Z",
+      "id": "match_1752357600_3",
+      "timeCasa": "Vasco da Gama",
+      "timeVisitante": "Botafogo",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
       "horario": "22:00",
       "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "canais": []
     },
     {
-      "id": "match_1745175600_3",
-      "timeCasa": "Atletico Mineiro",
+      "id": "match_1752429600_4",
+      "timeCasa": "Vasco da Gama",
       "timeVisitante": "Botafogo",
-      "startTimestamp": 1745175600,
-      "data": "2025-04-20T19:00:00.000Z",
-      "horario": "19:00",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
       "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
+      "canais": []
     },
     {
-      "id": "match_1745454600_4",
-      "timeCasa": "Estudiantes LP",
-      "timeVisitante": "Botafogo",
-      "startTimestamp": 1745454600,
-      "data": "2025-04-24T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN e TV Globo"
-    },
-    {
-      "id": "match_1745712000_5",
+      "id": "match_1752688800_5",
       "timeCasa": "Botafogo",
-      "timeVisitante": "Fluminense",
-      "startTimestamp": 1745712000,
-      "data": "2025-04-27T00:00:00.000Z",
-      "horario": "00:00",
+      "timeVisitante": "Vitoria",
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
       "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
+      "canais": []
     },
     {
-      "id": "match_1746316800_6",
-      "timeCasa": "EC Bahia",
+      "id": "match_1753034400_6",
+      "timeCasa": "Sport Recife",
       "timeVisitante": "Botafogo",
-      "startTimestamp": 1746316800,
-      "data": "2025-05-04T00:00:00.000Z",
-      "horario": "00:00",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
       "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
+      "canais": []
     },
     {
-      "id": "match_1746568800_7",
-      "timeCasa": "Carabobo",
+      "id": "match_1753293600_7",
+      "timeCasa": "Gremio",
       "timeVisitante": "Botafogo",
-      "startTimestamp": 1746568800,
-      "data": "2025-05-06T22:00:00.000Z",
-      "horario": "22:00",
-      "campeonato": "Copa Libertadores",
-      "canais": "Paramount+"
-    },
-    {
-      "id": "match_1747004400_8",
-      "timeCasa": "Botafogo",
-      "timeVisitante": "Internacional",
-      "startTimestamp": 1747004400,
-      "data": "2025-05-11T23:00:00.000Z",
-      "horario": "23:00",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
       "campeonato": "Brazil Serie A",
-      "canais": "CazéTV e Premiere e Record"
+      "canais": []
     },
     {
-      "id": "match_1747269000_9",
+      "id": "match_1753639200_8",
       "timeCasa": "Botafogo",
-      "timeVisitante": "Estudiantes LP",
-      "startTimestamp": 1747269000,
-      "data": "2025-05-15T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN e TV Globo"
+      "timeVisitante": "Corinthians",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A",
+      "canais": []
+    },
+    {
+      "id": "match_1753909200_9",
+      "timeCasa": "Botafogo",
+      "timeVisitante": "Bragantino",
+      "startTimestamp": 1753909200,
+      "data": "2025-07-30T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil",
+      "canais": []
     }
   ]
 }

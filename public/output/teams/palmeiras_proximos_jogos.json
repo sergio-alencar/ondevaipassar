@@ -1,0 +1,97 @@
+{
+  "time": "Palmeiras",
+  "timeId": "1287",
+  "atualizadoEm": "2025-06-15T13:32:14.221Z",
+  "proximosJogos": [
+    {
+      "id": "match_1750024800_0",
+      "timeCasa": "Palmeiras",
+      "timeVisitante": "FC Porto",
+      "startTimestamp": 1750024800,
+      "data": "2025-06-15T22:00:00.000Z",
+      "horario": "22:00",
+      "campeonato": "FIFA Club World Cup"
+    },
+    {
+      "id": "match_1750348800_1",
+      "timeCasa": "Palmeiras",
+      "timeVisitante": "Al Ahly Cairo",
+      "startTimestamp": 1750348800,
+      "data": "2025-06-19T16:00:00.000Z",
+      "horario": "16:00",
+      "campeonato": "FIFA Club World Cup"
+    },
+    {
+      "id": "match_1750726800_2",
+      "timeCasa": "Inter Miami CF",
+      "timeVisitante": "Palmeiras",
+      "startTimestamp": 1750726800,
+      "data": "2025-06-24T01:00:00.000Z",
+      "horario": "01:00",
+      "campeonato": "FIFA Club World Cup"
+    },
+    {
+      "id": "match_1752357600_3",
+      "timeCasa": "Santos",
+      "timeVisitante": "Palmeiras",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
+      "horario": "22:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752429600_4",
+      "timeCasa": "Santos",
+      "timeVisitante": "Palmeiras",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752688800_5",
+      "timeCasa": "Palmeiras",
+      "timeVisitante": "Mirassol",
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753034400_6",
+      "timeCasa": "Palmeiras",
+      "timeVisitante": "Atletico Mineiro",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753293600_7",
+      "timeCasa": "Fluminense",
+      "timeVisitante": "Palmeiras",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753639200_8",
+      "timeCasa": "Palmeiras",
+      "timeVisitante": "Gremio",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753909200_9",
+      "timeCasa": "Corinthians",
+      "timeVisitante": "Palmeiras",
+      "startTimestamp": 1753909200,
+      "data": "2025-07-30T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
+    }
+  ]
+}

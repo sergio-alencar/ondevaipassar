@@ -1,107 +1,97 @@
 {
   "time": "Internacional",
   "timeId": "1422",
-  "atualizadoEm": "2025-04-07T15:56:20.460Z",
+  "atualizadoEm": "2025-06-15T13:25:07.673Z",
   "proximosJogos": [
     {
-      "id": "match_1744322400_0",
+      "id": "match_1752357600_0",
       "timeCasa": "Internacional",
-      "timeVisitante": "Atletico Nacional Medellin",
-      "startTimestamp": 1744322400,
-      "data": "2025-04-10T22:00:00.000Z",
+      "timeVisitante": "Vitoria",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
       "horario": "22:00",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN"
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1744585200_1",
-      "timeCasa": "Fortaleza",
-      "timeVisitante": "Internacional",
-      "startTimestamp": 1744585200,
-      "data": "2025-04-13T23:00:00.000Z",
-      "horario": "23:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1744842600_2",
+      "id": "match_1752429600_1",
       "timeCasa": "Internacional",
-      "timeVisitante": "Palmeiras",
-      "startTimestamp": 1744842600,
-      "data": "2025-04-16T22:30:00.000Z",
-      "horario": "22:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Prime Video"
+      "timeVisitante": "Vitoria",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1745107200_3",
-      "timeCasa": "Gremio",
+      "id": "match_1752688800_2",
+      "timeCasa": "EC Bahia",
       "timeVisitante": "Internacional",
-      "startTimestamp": 1745107200,
-      "data": "2025-04-20T00:00:00.000Z",
-      "horario": "00:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1745368200_4",
+      "id": "match_1753034400_3",
       "timeCasa": "Internacional",
-      "timeVisitante": "Nacional De Football",
-      "startTimestamp": 1745368200,
-      "data": "2025-04-23T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Paramount+"
+      "timeVisitante": "Ceara",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1745694000_5",
+      "id": "match_1753293600_4",
+      "timeCasa": "Santos",
+      "timeVisitante": "Internacional",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753639200_5",
       "timeCasa": "Internacional",
-      "timeVisitante": "EC Juventude",
-      "startTimestamp": 1745694000,
-      "data": "2025-04-26T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "timeVisitante": "Vasco da Gama",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746307800_6",
-      "timeCasa": "Corinthians",
-      "timeVisitante": "Internacional",
-      "startTimestamp": 1746307800,
-      "data": "2025-05-03T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Prime Video"
+      "id": "match_1753909200_6",
+      "timeCasa": "Internacional",
+      "timeVisitante": "Fluminense",
+      "startTimestamp": 1753909200,
+      "data": "2025-07-30T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
     },
     {
-      "id": "match_1746750600_7",
-      "timeCasa": "Atletico Nacional Medellin",
-      "timeVisitante": "Internacional",
-      "startTimestamp": 1746750600,
-      "data": "2025-05-09T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN"
+      "id": "match_1754244000_7",
+      "timeCasa": "Internacional",
+      "timeVisitante": "Sao Paulo",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1747004400_8",
-      "timeCasa": "Botafogo",
+      "id": "match_1754514000_8",
+      "timeCasa": "Fluminense",
       "timeVisitante": "Internacional",
-      "startTimestamp": 1747004400,
-      "data": "2025-05-11T23:00:00.000Z",
-      "horario": "23:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "CazéTV e Premiere e Record"
+      "startTimestamp": 1754514000,
+      "data": "2025-08-06T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
     },
     {
-      "id": "match_1747346400_9",
-      "timeCasa": "Nacional De Football",
+      "id": "match_1754848800_9",
+      "timeCasa": "Bragantino",
       "timeVisitante": "Internacional",
-      "startTimestamp": 1747346400,
-      "data": "2025-05-15T22:00:00.000Z",
-      "horario": "22:00",
-      "campeonato": "Copa Libertadores",
-      "canais": "Paramount+"
+      "startTimestamp": 1754848800,
+      "data": "2025-08-10T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     }
   ]
 }

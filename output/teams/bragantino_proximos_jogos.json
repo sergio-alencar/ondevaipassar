@@ -1,107 +1,97 @@
 {
   "time": "Bragantino",
   "timeId": "3165",
-  "atualizadoEm": "2025-04-07T15:55:35.742Z",
+  "atualizadoEm": "2025-06-15T13:24:22.990Z",
   "proximosJogos": [
     {
-      "id": "match_1744484400_0",
+      "id": "match_1752357600_0",
+      "timeCasa": "Corinthians",
+      "timeVisitante": "Bragantino",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
+      "horario": "22:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752429600_1",
+      "timeCasa": "Corinthians",
+      "timeVisitante": "Bragantino",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752688800_2",
+      "timeCasa": "Bragantino",
+      "timeVisitante": "Sao Paulo",
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753034400_3",
+      "timeCasa": "Vitoria",
+      "timeVisitante": "Bragantino",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753293600_4",
+      "timeCasa": "Bragantino",
+      "timeVisitante": "Flamengo",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753639200_5",
+      "timeCasa": "Fortaleza",
+      "timeVisitante": "Bragantino",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753909200_6",
+      "timeCasa": "Botafogo",
+      "timeVisitante": "Bragantino",
+      "startTimestamp": 1753909200,
+      "data": "2025-07-30T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
+    },
+    {
+      "id": "match_1754244000_7",
+      "timeCasa": "Atletico Mineiro",
+      "timeVisitante": "Bragantino",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754514000_8",
       "timeCasa": "Bragantino",
       "timeVisitante": "Botafogo",
-      "startTimestamp": 1744484400,
-      "data": "2025-04-12T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "startTimestamp": 1754514000,
+      "data": "2025-08-06T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
     },
     {
-      "id": "match_1744840800_1",
-      "timeCasa": "Sport Recife",
-      "timeVisitante": "Bragantino",
-      "startTimestamp": 1744840800,
-      "data": "2025-04-16T22:00:00.000Z",
-      "horario": "22:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1745191800_2",
+      "id": "match_1754848800_9",
       "timeCasa": "Bragantino",
-      "timeVisitante": "Cruzeiro",
-      "startTimestamp": 1745191800,
-      "data": "2025-04-20T23:30:00.000Z",
-      "horario": "23:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1745796600_3",
-      "timeCasa": "Santos",
-      "timeVisitante": "Bragantino",
-      "startTimestamp": 1745796600,
-      "data": "2025-04-27T23:30:00.000Z",
-      "horario": "23:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
-    },
-    {
-      "id": "match_1746482400_4",
-      "timeCasa": "Bragantino",
-      "timeVisitante": "Mirassol",
-      "startTimestamp": 1746482400,
-      "data": "2025-05-05T22:00:00.000Z",
-      "horario": "22:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1746912600_5",
-      "timeCasa": "Gremio",
-      "timeVisitante": "Bragantino",
-      "startTimestamp": 1746912600,
-      "data": "2025-05-10T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1747603800_6",
-      "timeCasa": "Bragantino",
-      "timeVisitante": "Palmeiras",
-      "startTimestamp": 1747603800,
-      "data": "2025-05-18T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1748300400_7",
-      "timeCasa": "Bragantino",
-      "timeVisitante": "EC Juventude",
-      "startTimestamp": 1748300400,
-      "data": "2025-05-26T23:00:00.000Z",
-      "horario": "23:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1748736000_8",
-      "timeCasa": "Vasco da Gama",
-      "timeVisitante": "Bragantino",
-      "startTimestamp": 1748736000,
-      "data": "2025-06-01T00:00:00.000Z",
-      "horario": "00:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
-    },
-    {
-      "id": "match_1749765600_9",
-      "timeCasa": "Bragantino",
-      "timeVisitante": "EC Bahia",
-      "startTimestamp": 1749765600,
-      "data": "2025-06-12T22:00:00.000Z",
-      "horario": "22:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "timeVisitante": "Internacional",
+      "startTimestamp": 1754848800,
+      "data": "2025-08-10T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     }
   ]
 }

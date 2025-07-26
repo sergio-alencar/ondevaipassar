@@ -1,107 +1,97 @@
 {
   "time": "Fortaleza",
   "timeId": "43589",
-  "atualizadoEm": "2025-04-07T15:56:09.595Z",
+  "atualizadoEm": "2025-06-15T13:24:56.743Z",
   "proximosJogos": [
     {
-      "id": "match_1744331400_0",
-      "timeCasa": "Colo Colo",
+      "id": "match_1752107400_0",
+      "timeCasa": "EC Bahia",
       "timeVisitante": "Fortaleza",
-      "startTimestamp": 1744331400,
-      "data": "2025-04-11T00:30:00.000Z",
+      "startTimestamp": 1752107400,
+      "data": "2025-07-10T00:30:00.000Z",
       "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN"
+      "campeonato": "Brazil Copa Nordeste"
     },
     {
-      "id": "match_1744585200_1",
+      "id": "match_1752357600_1",
       "timeCasa": "Fortaleza",
-      "timeVisitante": "Internacional",
-      "startTimestamp": 1744585200,
-      "data": "2025-04-13T23:00:00.000Z",
-      "horario": "23:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "timeVisitante": "Ceara",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
+      "horario": "22:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1744849800_2",
-      "timeCasa": "Vitoria",
-      "timeVisitante": "Fortaleza",
-      "startTimestamp": 1744849800,
-      "data": "2025-04-17T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
-    },
-    {
-      "id": "match_1745184600_3",
+      "id": "match_1752429600_2",
       "timeCasa": "Fortaleza",
-      "timeVisitante": "Palmeiras",
-      "startTimestamp": 1745184600,
-      "data": "2025-04-20T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "CazéTV e Premiere e Record"
-    },
-    {
-      "id": "match_1745460000_4",
-      "timeCasa": "Atletico Bucaramanga",
-      "timeVisitante": "Fortaleza",
-      "startTimestamp": 1745460000,
-      "data": "2025-04-24T02:00:00.000Z",
-      "horario": "02:00",
-      "campeonato": "Copa Libertadores",
-      "canais": "Paramount+"
-    },
-    {
-      "id": "match_1745708400_5",
-      "timeCasa": "Sport Recife",
-      "timeVisitante": "Fortaleza",
-      "startTimestamp": 1745708400,
-      "data": "2025-04-26T23:00:00.000Z",
-      "horario": "23:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1746381600_6",
-      "timeCasa": "Sao Paulo",
-      "timeVisitante": "Fortaleza",
-      "startTimestamp": 1746381600,
-      "data": "2025-05-04T18:00:00.000Z",
+      "timeVisitante": "Ceara",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
       "horario": "18:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746577800_7",
-      "timeCasa": "Fortaleza",
-      "timeVisitante": "Colo Colo",
-      "startTimestamp": 1746577800,
-      "data": "2025-05-07T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN"
+      "id": "match_1752688800_3",
+      "timeCasa": "Gremio",
+      "timeVisitante": "Fortaleza",
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746903600_8",
+      "id": "match_1753034400_4",
       "timeCasa": "Fortaleza",
-      "timeVisitante": "EC Juventude",
-      "startTimestamp": 1746903600,
-      "data": "2025-05-10T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "timeVisitante": "EC Bahia",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1747182600_9",
+      "id": "match_1753293600_5",
+      "timeCasa": "Atletico Mineiro",
+      "timeVisitante": "Fortaleza",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753639200_6",
       "timeCasa": "Fortaleza",
-      "timeVisitante": "Atletico Bucaramanga",
-      "startTimestamp": 1747182600,
-      "data": "2025-05-14T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Paramount+"
+      "timeVisitante": "Bragantino",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754244000_7",
+      "timeCasa": "Corinthians",
+      "timeVisitante": "Fortaleza",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754848800_8",
+      "timeCasa": "Fortaleza",
+      "timeVisitante": "Botafogo",
+      "startTimestamp": 1754848800,
+      "data": "2025-08-10T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1755036000_9",
+      "timeCasa": "Fortaleza",
+      "timeVisitante": "Velez Sarsfield",
+      "startTimestamp": 1755036000,
+      "data": "2025-08-12T22:00:00.000Z",
+      "horario": "22:00",
+      "campeonato": "Copa Libertadores"
     }
   ]
 }

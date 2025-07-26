@@ -1,107 +1,97 @@
 {
   "time": "Mirassol",
   "timeId": "8555",
-  "atualizadoEm": "2025-04-07T15:56:31.396Z",
+  "atualizadoEm": "2025-06-15T13:25:18.703Z",
   "proximosJogos": [
     {
-      "id": "match_1744570800_0",
-      "timeCasa": "Bahia",
-      "timeVisitante": "Mirassol",
-      "startTimestamp": 1744570800,
-      "data": "2025-04-13T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1744840800_1",
+      "id": "match_1752357600_0",
       "timeCasa": "Mirassol",
-      "timeVisitante": "Gremio",
-      "startTimestamp": 1744840800,
-      "data": "2025-04-16T22:00:00.000Z",
+      "timeVisitante": "Fluminense",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
       "horario": "22:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1745157600_2",
-      "timeCasa": "EC Juventude",
-      "timeVisitante": "Mirassol",
-      "startTimestamp": 1745157600,
-      "data": "2025-04-20T14:00:00.000Z",
-      "horario": "14:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1745703000_3",
+      "id": "match_1752429600_1",
       "timeCasa": "Mirassol",
-      "timeVisitante": "Atletico Mineiro",
-      "startTimestamp": 1745703000,
-      "data": "2025-04-26T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1746482400_4",
-      "timeCasa": "Bragantino",
-      "timeVisitante": "Mirassol",
-      "startTimestamp": 1746482400,
-      "data": "2025-05-05T22:00:00.000Z",
-      "horario": "22:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1746912600_5",
-      "timeCasa": "Mirassol",
-      "timeVisitante": "Corinthians",
-      "startTimestamp": 1746912600,
-      "data": "2025-05-10T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Prime Video"
-    },
-    {
-      "id": "match_1747611000_6",
-      "timeCasa": "Internacional",
-      "timeVisitante": "Mirassol",
-      "startTimestamp": 1747611000,
-      "data": "2025-05-18T23:30:00.000Z",
-      "horario": "23:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
-    },
-    {
-      "id": "match_1748122200_7",
-      "timeCasa": "Sao Paulo",
-      "timeVisitante": "Mirassol",
-      "startTimestamp": 1748122200,
-      "data": "2025-05-24T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1748786400_8",
-      "timeCasa": "Mirassol",
-      "timeVisitante": "Sport Recife",
-      "startTimestamp": 1748786400,
-      "data": "2025-06-01T14:00:00.000Z",
-      "horario": "14:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1749664800_9",
-      "timeCasa": "Botafogo",
-      "timeVisitante": "Mirassol",
-      "startTimestamp": 1749664800,
-      "data": "2025-06-11T18:00:00.000Z",
+      "timeVisitante": "Fluminense",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
       "horario": "18:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752688800_2",
+      "timeCasa": "Palmeiras",
+      "timeVisitante": "Mirassol",
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753034400_3",
+      "timeCasa": "Mirassol",
+      "timeVisitante": "Santos",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753293600_4",
+      "timeCasa": "Ceara",
+      "timeVisitante": "Mirassol",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753639200_5",
+      "timeCasa": "Mirassol",
+      "timeVisitante": "Vitoria",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754244000_6",
+      "timeCasa": "Mirassol",
+      "timeVisitante": "Vasco da Gama",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754848800_7",
+      "timeCasa": "Flamengo",
+      "timeVisitante": "Mirassol",
+      "startTimestamp": 1754848800,
+      "data": "2025-08-10T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1755453600_8",
+      "timeCasa": "Mirassol",
+      "timeVisitante": "Cruzeiro",
+      "startTimestamp": 1755453600,
+      "data": "2025-08-17T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1756058400_9",
+      "timeCasa": "Fortaleza",
+      "timeVisitante": "Mirassol",
+      "startTimestamp": 1756058400,
+      "data": "2025-08-24T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     }
   ]
 }

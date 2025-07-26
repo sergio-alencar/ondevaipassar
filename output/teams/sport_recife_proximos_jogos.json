@@ -1,104 +1,95 @@
 {
   "time": "Sport-Recife",
   "timeId": "1421",
-  "atualizadoEm": "2025-04-07T15:56:56.978Z",
+  "atualizadoEm": "2025-06-15T13:25:41.044Z",
   "proximosJogos": [
     {
-      "id": "match_1744502400_0",
-      "timeCasa": "Vasco da Gama",
-      "timeVisitante": "Sport Recife",
-      "startTimestamp": 1744502400,
-      "data": "2025-04-13T00:00:00.000Z",
-      "horario": "00:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
+      "id": "match_1752107400_0",
+      "timeCasa": "Sport Recife",
+      "timeVisitante": "Ceara",
+      "startTimestamp": 1752107400,
+      "data": "2025-07-10T00:30:00.000Z",
+      "horario": "00:30",
+      "campeonato": "Brazil Copa Nordeste"
     },
     {
-      "id": "match_1744840800_1",
-      "timeCasa": "Sport Recife",
-      "timeVisitante": "Bragantino",
-      "startTimestamp": 1744840800,
-      "data": "2025-04-16T22:00:00.000Z",
+      "id": "match_1752357600_1",
+      "timeCasa": "Juventude",
+      "timeVisitante": "Sport Recife",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
       "horario": "22:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1745089200_2",
-      "timeCasa": "Corinthians",
+      "id": "match_1752429600_2",
+      "timeCasa": "EC Juventude",
       "timeVisitante": "Sport Recife",
-      "startTimestamp": 1745089200,
-      "data": "2025-04-19T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1745708400_3",
-      "timeCasa": "Sport Recife",
-      "timeVisitante": "Fortaleza",
-      "startTimestamp": 1745708400,
-      "data": "2025-04-26T23:00:00.000Z",
-      "horario": "23:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1746307800_4",
-      "timeCasa": "Fluminense",
+      "id": "match_1752688800_3",
+      "timeCasa": "Atletico Mineiro",
       "timeVisitante": "Sport Recife",
-      "startTimestamp": 1746307800,
-      "data": "2025-05-03T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746990000_5",
+      "id": "match_1753034400_4",
       "timeCasa": "Sport Recife",
-      "timeVisitante": "Cruzeiro",
-      "startTimestamp": 1746990000,
-      "data": "2025-05-11T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "timeVisitante": "Botafogo",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1747508400_6",
-      "timeCasa": "Ceara",
+      "id": "match_1753293600_5",
+      "timeCasa": "Vitoria",
       "timeVisitante": "Sport Recife",
-      "startTimestamp": 1747508400,
-      "data": "2025-05-17T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1748199600_7",
+      "id": "match_1753639200_6",
       "timeCasa": "Sport Recife",
-      "timeVisitante": "Internacional",
-      "startTimestamp": 1748199600,
-      "data": "2025-05-25T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
+      "timeVisitante": "Santos",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1748786400_8",
-      "timeCasa": "Mirassol",
+      "id": "match_1754244000_7",
+      "timeCasa": "Sport Recife",
+      "timeVisitante": "EC Bahia",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754848800_8",
+      "timeCasa": "Gremio",
       "timeVisitante": "Sport Recife",
-      "startTimestamp": 1748786400,
-      "data": "2025-06-01T14:00:00.000Z",
-      "horario": "14:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "startTimestamp": 1754848800,
+      "data": "2025-08-10T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1749664800_9",
+      "id": "match_1755453600_9",
       "timeCasa": "Sport Recife",
-      "timeVisitante": "Flamengo",
-      "startTimestamp": 1749664800,
-      "data": "2025-06-11T18:00:00.000Z",
+      "timeVisitante": "Sao Paulo",
+      "startTimestamp": 1755453600,
+      "data": "2025-08-17T18:00:00.000Z",
       "horario": "18:00",
       "campeonato": "Brazil Serie A"
     }

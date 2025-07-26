@@ -1,107 +1,97 @@
 {
   "time": "Fluminense",
   "timeId": "1286",
-  "atualizadoEm": "2025-04-07T15:56:03.797Z",
+  "atualizadoEm": "2025-06-15T13:24:51.355Z",
   "proximosJogos": [
     {
-      "id": "match_1744331400_0",
+      "id": "match_1750176000_0",
       "timeCasa": "Fluminense",
-      "timeVisitante": "Gualberto Villarroel",
-      "startTimestamp": 1744331400,
-      "data": "2025-04-11T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Paramount+"
+      "timeVisitante": "Borussia Dortmund",
+      "startTimestamp": 1750176000,
+      "data": "2025-06-17T16:00:00.000Z",
+      "horario": "16:00",
+      "campeonato": "FIFA Club World Cup"
     },
     {
-      "id": "match_1744583400_1",
+      "id": "match_1750543200_1",
       "timeCasa": "Fluminense",
-      "timeVisitante": "Santos",
-      "startTimestamp": 1744583400,
-      "data": "2025-04-13T22:30:00.000Z",
-      "horario": "22:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Prime Video"
-    },
-    {
-      "id": "match_1744842600_2",
-      "timeCasa": "Corinthians",
-      "timeVisitante": "Fluminense",
-      "startTimestamp": 1744842600,
-      "data": "2025-04-16T22:30:00.000Z",
-      "horario": "22:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e Record"
-    },
-    {
-      "id": "match_1745184600_3",
-      "timeCasa": "Fluminense",
-      "timeVisitante": "Vitoria",
-      "startTimestamp": 1745184600,
-      "data": "2025-04-20T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1745368200_4",
-      "timeCasa": "Union Espanola",
-      "timeVisitante": "Fluminense",
-      "startTimestamp": 1745368200,
-      "data": "2025-04-23T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN"
-    },
-    {
-      "id": "match_1745712000_5",
-      "timeCasa": "Botafogo",
-      "timeVisitante": "Fluminense",
-      "startTimestamp": 1745712000,
-      "data": "2025-04-27T00:00:00.000Z",
-      "horario": "00:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
-    },
-    {
-      "id": "match_1746307800_6",
-      "timeCasa": "Fluminense",
-      "timeVisitante": "Sport Recife",
-      "startTimestamp": 1746307800,
-      "data": "2025-05-03T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1746750600_7",
-      "timeCasa": "San Jose de Oruro",
-      "timeVisitante": "Fluminense",
-      "startTimestamp": 1746750600,
-      "data": "2025-05-09T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Paramount+"
-    },
-    {
-      "id": "match_1746995400_8",
-      "timeCasa": "Atletico Mineiro",
-      "timeVisitante": "Fluminense",
-      "startTimestamp": 1746995400,
-      "data": "2025-05-11T20:30:00.000Z",
-      "horario": "20:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
-    },
-    {
-      "id": "match_1747260000_9",
-      "timeCasa": "Fluminense",
-      "timeVisitante": "Union Espanola",
-      "startTimestamp": 1747260000,
-      "data": "2025-05-14T22:00:00.000Z",
+      "timeVisitante": "Ulsan Hyundai",
+      "startTimestamp": 1750543200,
+      "data": "2025-06-21T22:00:00.000Z",
       "horario": "22:00",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN"
+      "campeonato": "FIFA Club World Cup"
+    },
+    {
+      "id": "match_1750878000_2",
+      "timeCasa": "Mamelodi Sundowns",
+      "timeVisitante": "Fluminense",
+      "startTimestamp": 1750878000,
+      "data": "2025-06-25T19:00:00.000Z",
+      "horario": "19:00",
+      "campeonato": "FIFA Club World Cup"
+    },
+    {
+      "id": "match_1752357600_3",
+      "timeCasa": "Mirassol",
+      "timeVisitante": "Fluminense",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
+      "horario": "22:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752429600_4",
+      "timeCasa": "Mirassol",
+      "timeVisitante": "Fluminense",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752688800_5",
+      "timeCasa": "Fluminense",
+      "timeVisitante": "Cruzeiro",
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753034400_6",
+      "timeCasa": "Flamengo",
+      "timeVisitante": "Fluminense",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753293600_7",
+      "timeCasa": "Fluminense",
+      "timeVisitante": "Palmeiras",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753639200_8",
+      "timeCasa": "Sao Paulo",
+      "timeVisitante": "Fluminense",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753909200_9",
+      "timeCasa": "Internacional",
+      "timeVisitante": "Fluminense",
+      "startTimestamp": 1753909200,
+      "data": "2025-07-30T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
     }
   ]
 }

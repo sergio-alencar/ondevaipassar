@@ -1,107 +1,97 @@
 {
   "time": "Gremio",
   "timeId": "1312",
-  "atualizadoEm": "2025-04-07T15:56:15.017Z",
+  "atualizadoEm": "2025-06-15T13:25:02.280Z",
   "proximosJogos": [
     {
-      "id": "match_1744149600_0",
-      "timeCasa": "Gremio",
-      "timeVisitante": "Atletico Grau",
-      "startTimestamp": 1744149600,
-      "data": "2025-04-08T22:00:00.000Z",
+      "id": "match_1752357600_0",
+      "timeCasa": "Cruzeiro",
+      "timeVisitante": "Gremio",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
       "horario": "22:00",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN"
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1744576200_1",
+      "id": "match_1752429600_1",
+      "timeCasa": "Cruzeiro",
+      "timeVisitante": "Gremio",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752688800_2",
       "timeCasa": "Gremio",
-      "timeVisitante": "Flamengo",
-      "startTimestamp": 1744576200,
-      "data": "2025-04-13T20:30:00.000Z",
-      "horario": "20:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
+      "timeVisitante": "Fortaleza",
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1744840800_2",
-      "timeCasa": "Mirassol",
+      "id": "match_1752712200_3",
+      "timeCasa": "Alianza Lima",
       "timeVisitante": "Gremio",
-      "startTimestamp": 1744840800,
-      "data": "2025-04-16T22:00:00.000Z",
-      "horario": "22:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1745107200_3",
-      "timeCasa": "Gremio",
-      "timeVisitante": "Internacional",
-      "startTimestamp": 1745107200,
-      "data": "2025-04-20T00:00:00.000Z",
-      "horario": "00:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
-    },
-    {
-      "id": "match_1745532000_4",
-      "timeCasa": "Godoy Cruz",
-      "timeVisitante": "Gremio",
-      "startTimestamp": 1745532000,
-      "data": "2025-04-24T22:00:00.000Z",
-      "horario": "22:00",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Paramount+"
-    },
-    {
-      "id": "match_1745789400_5",
-      "timeCasa": "Vitoria",
-      "timeVisitante": "Gremio",
-      "startTimestamp": 1745789400,
-      "data": "2025-04-27T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1746385200_6",
-      "timeCasa": "Gremio",
-      "timeVisitante": "Santos",
-      "startTimestamp": 1746385200,
-      "data": "2025-05-04T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
-    },
-    {
-      "id": "match_1746664200_7",
-      "timeCasa": "Atletico Grau",
-      "timeVisitante": "Gremio",
-      "startTimestamp": 1746664200,
-      "data": "2025-05-08T00:30:00.000Z",
+      "startTimestamp": 1752712200,
+      "data": "2025-07-17T00:30:00.000Z",
       "horario": "00:30",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN"
+      "campeonato": "Copa Sudamericana"
     },
     {
-      "id": "match_1746912600_8",
-      "timeCasa": "Gremio",
-      "timeVisitante": "Bragantino",
-      "startTimestamp": 1746912600,
-      "data": "2025-05-10T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "id": "match_1753034400_4",
+      "timeCasa": "Vasco da Gama",
+      "timeVisitante": "Gremio",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1747173600_9",
+      "id": "match_1753293600_5",
       "timeCasa": "Gremio",
-      "timeVisitante": "Godoy Cruz",
-      "startTimestamp": 1747173600,
-      "data": "2025-05-13T22:00:00.000Z",
-      "horario": "22:00",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Paramount+"
+      "timeVisitante": "Botafogo",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753317000_6",
+      "timeCasa": "Gremio",
+      "timeVisitante": "Alianza Lima",
+      "startTimestamp": 1753317000,
+      "data": "2025-07-24T00:30:00.000Z",
+      "horario": "00:30",
+      "campeonato": "Copa Sudamericana"
+    },
+    {
+      "id": "match_1753639200_7",
+      "timeCasa": "Palmeiras",
+      "timeVisitante": "Gremio",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754244000_8",
+      "timeCasa": "Fluminense",
+      "timeVisitante": "Gremio",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754848800_9",
+      "timeCasa": "Gremio",
+      "timeVisitante": "Sport Recife",
+      "startTimestamp": 1754848800,
+      "data": "2025-08-10T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     }
   ]
 }

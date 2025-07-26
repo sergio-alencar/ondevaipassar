@@ -1,107 +1,97 @@
 {
   "time": "Vasco-da-Gama",
   "timeId": "56101",
-  "atualizadoEm": "2025-04-07T15:57:02.457Z",
+  "atualizadoEm": "2025-06-15T13:25:46.498Z",
   "proximosJogos": [
     {
-      "id": "match_1744158600_0",
+      "id": "match_1752357600_0",
       "timeCasa": "Vasco da Gama",
-      "timeVisitante": "Academia Puerto Cabello",
-      "startTimestamp": 1744158600,
-      "data": "2025-04-09T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN"
-    },
-    {
-      "id": "match_1744502400_1",
-      "timeCasa": "Vasco da Gama",
-      "timeVisitante": "Sport Recife",
-      "startTimestamp": 1744502400,
-      "data": "2025-04-13T00:00:00.000Z",
-      "horario": "00:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
-    },
-    {
-      "id": "match_1744763400_2",
-      "timeCasa": "Ceara",
-      "timeVisitante": "Vasco da Gama",
-      "startTimestamp": 1744763400,
-      "data": "2025-04-16T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
-    },
-    {
-      "id": "match_1745098200_3",
-      "timeCasa": "Vasco da Gama",
-      "timeVisitante": "Flamengo",
-      "startTimestamp": 1745098200,
-      "data": "2025-04-19T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Prime Video"
-    },
-    {
-      "id": "match_1745368200_4",
-      "timeCasa": "Vasco da Gama",
-      "timeVisitante": "Lanus",
-      "startTimestamp": 1745368200,
-      "data": "2025-04-23T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN e SBT"
-    },
-    {
-      "id": "match_1745789400_5",
-      "timeCasa": "Cruzeiro",
-      "timeVisitante": "Vasco da Gama",
-      "startTimestamp": 1745789400,
-      "data": "2025-04-27T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "CazéTV e Premiere e Record"
-    },
-    {
-      "id": "match_1746385200_6",
-      "timeCasa": "Vasco da Gama",
-      "timeVisitante": "Palmeiras",
-      "startTimestamp": 1746385200,
-      "data": "2025-05-04T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
-    },
-    {
-      "id": "match_1746655200_7",
-      "timeCasa": "Academia Puerto Cabello",
-      "timeVisitante": "Vasco da Gama",
-      "startTimestamp": 1746655200,
-      "data": "2025-05-07T22:00:00.000Z",
+      "timeVisitante": "Botafogo",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
       "horario": "22:00",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN"
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746912600_8",
-      "timeCasa": "Vitoria",
-      "timeVisitante": "Vasco da Gama",
-      "startTimestamp": 1746912600,
-      "data": "2025-05-10T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "id": "match_1752429600_1",
+      "timeCasa": "Vasco da Gama",
+      "timeVisitante": "Botafogo",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1747182600_9",
-      "timeCasa": "Lanus",
+      "id": "match_1752625800_2",
+      "timeCasa": "Independiente del Valle",
       "timeVisitante": "Vasco da Gama",
-      "startTimestamp": 1747182600,
-      "data": "2025-05-14T00:30:00.000Z",
+      "startTimestamp": 1752625800,
+      "data": "2025-07-16T00:30:00.000Z",
       "horario": "00:30",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN e SBT"
+      "campeonato": "Copa Sudamericana"
+    },
+    {
+      "id": "match_1752688800_3",
+      "timeCasa": "EC Juventude",
+      "timeVisitante": "Vasco da Gama",
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753034400_4",
+      "timeCasa": "Vasco da Gama",
+      "timeVisitante": "Gremio",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753230600_5",
+      "timeCasa": "Vasco da Gama",
+      "timeVisitante": "Independiente del Valle",
+      "startTimestamp": 1753230600,
+      "data": "2025-07-23T00:30:00.000Z",
+      "horario": "00:30",
+      "campeonato": "Copa Sudamericana"
+    },
+    {
+      "id": "match_1753293600_6",
+      "timeCasa": "Vasco da Gama",
+      "timeVisitante": "EC Bahia",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753639200_7",
+      "timeCasa": "Internacional",
+      "timeVisitante": "Vasco da Gama",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753909200_8",
+      "timeCasa": "CSA",
+      "timeVisitante": "Vasco da Gama",
+      "startTimestamp": 1753909200,
+      "data": "2025-07-30T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
+    },
+    {
+      "id": "match_1754244000_9",
+      "timeCasa": "Mirassol",
+      "timeVisitante": "Vasco da Gama",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     }
   ]
 }

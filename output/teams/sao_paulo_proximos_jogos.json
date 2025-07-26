@@ -1,107 +1,97 @@
 {
   "time": "Sao Paulo",
   "timeId": "1314",
-  "atualizadoEm": "2025-04-07T15:56:47.590Z",
+  "atualizadoEm": "2025-06-15T13:25:34.989Z",
   "proximosJogos": [
     {
-      "id": "match_1744331400_0",
-      "timeCasa": "Sao Paulo",
-      "timeVisitante": "Alianza Lima",
-      "startTimestamp": 1744331400,
-      "data": "2025-04-11T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN"
-    },
-    {
-      "id": "match_1744576200_1",
-      "timeCasa": "Sao Paulo",
-      "timeVisitante": "Cruzeiro",
-      "startTimestamp": 1744576200,
-      "data": "2025-04-13T20:30:00.000Z",
-      "horario": "20:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
-    },
-    {
-      "id": "match_1744927200_2",
-      "timeCasa": "Botafogo",
+      "id": "match_1752357600_0",
+      "timeCasa": "Flamengo",
       "timeVisitante": "Sao Paulo",
-      "startTimestamp": 1744927200,
-      "data": "2025-04-17T22:00:00.000Z",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
       "horario": "22:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1745175600_3",
-      "timeCasa": "Sao Paulo",
-      "timeVisitante": "Santos",
-      "startTimestamp": 1745175600,
-      "data": "2025-04-20T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
-    },
-    {
-      "id": "match_1745454600_4",
-      "timeCasa": "Libertad Asuncion",
+      "id": "match_1752429600_1",
+      "timeCasa": "Flamengo",
       "timeVisitante": "Sao Paulo",
-      "startTimestamp": 1745454600,
-      "data": "2025-04-24T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN e TV Globo"
-    },
-    {
-      "id": "match_1745703000_5",
-      "timeCasa": "Ceara",
-      "timeVisitante": "Sao Paulo",
-      "startTimestamp": 1745703000,
-      "data": "2025-04-26T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Prime Video"
-    },
-    {
-      "id": "match_1746381600_6",
-      "timeCasa": "Sao Paulo",
-      "timeVisitante": "Fortaleza",
-      "startTimestamp": 1746381600,
-      "data": "2025-05-04T18:00:00.000Z",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
       "horario": "18:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746568800_7",
-      "timeCasa": "Alianza Lima",
+      "id": "match_1752688800_2",
+      "timeCasa": "Bragantino",
       "timeVisitante": "Sao Paulo",
-      "startTimestamp": 1746568800,
-      "data": "2025-05-06T22:00:00.000Z",
-      "horario": "22:00",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN"
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746995400_8",
-      "timeCasa": "Palmeiras",
-      "timeVisitante": "Sao Paulo",
-      "startTimestamp": 1746995400,
-      "data": "2025-05-11T20:30:00.000Z",
-      "horario": "20:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
-    },
-    {
-      "id": "match_1747269000_9",
+      "id": "match_1753034400_3",
       "timeCasa": "Sao Paulo",
-      "timeVisitante": "Libertad Asuncion",
-      "startTimestamp": 1747269000,
-      "data": "2025-05-15T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN e TV Globo"
+      "timeVisitante": "Corinthians",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753293600_4",
+      "timeCasa": "EC Juventude",
+      "timeVisitante": "Sao Paulo",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753639200_5",
+      "timeCasa": "Sao Paulo",
+      "timeVisitante": "Fluminense",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753909200_6",
+      "timeCasa": "Sao Paulo",
+      "timeVisitante": "Athletico Paranaense",
+      "startTimestamp": 1753909200,
+      "data": "2025-07-30T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
+    },
+    {
+      "id": "match_1754244000_7",
+      "timeCasa": "Internacional",
+      "timeVisitante": "Sao Paulo",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754514000_8",
+      "timeCasa": "Athletico Paranaense",
+      "timeVisitante": "Sao Paulo",
+      "startTimestamp": 1754514000,
+      "data": "2025-08-06T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
+    },
+    {
+      "id": "match_1754848800_9",
+      "timeCasa": "Sao Paulo",
+      "timeVisitante": "Vitoria",
+      "startTimestamp": 1754848800,
+      "data": "2025-08-10T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     }
   ]
 }

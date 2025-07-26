@@ -1,0 +1,97 @@
+{
+  "time": "Vitoria",
+  "timeId": "1419",
+  "atualizadoEm": "2025-06-15T13:32:41.567Z",
+  "proximosJogos": [
+    {
+      "id": "match_1752021000_0",
+      "timeCasa": "Vitoria",
+      "timeVisitante": "AD Confianca",
+      "startTimestamp": 1752021000,
+      "data": "2025-07-09T00:30:00.000Z",
+      "horario": "00:30",
+      "campeonato": "Brazil Copa Nordeste"
+    },
+    {
+      "id": "match_1752357600_1",
+      "timeCasa": "Internacional",
+      "timeVisitante": "Vitoria",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
+      "horario": "22:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752429600_2",
+      "timeCasa": "Internacional",
+      "timeVisitante": "Vitoria",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752688800_3",
+      "timeCasa": "Botafogo",
+      "timeVisitante": "Vitoria",
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753034400_4",
+      "timeCasa": "Vitoria",
+      "timeVisitante": "Bragantino",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753293600_5",
+      "timeCasa": "Vitoria",
+      "timeVisitante": "Sport Recife",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753639200_6",
+      "timeCasa": "Mirassol",
+      "timeVisitante": "Vitoria",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754244000_7",
+      "timeCasa": "Vitoria",
+      "timeVisitante": "Palmeiras",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754848800_8",
+      "timeCasa": "Sao Paulo",
+      "timeVisitante": "Vitoria",
+      "startTimestamp": 1754848800,
+      "data": "2025-08-10T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1755453600_9",
+      "timeCasa": "Vitoria",
+      "timeVisitante": "EC Juventude",
+      "startTimestamp": 1755453600,
+      "data": "2025-08-17T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "time": "Juventude",
+  "timeId": "45589",
+  "atualizadoEm": "2025-06-15T13:32:03.220Z",
+  "proximosJogos": [
+    {
+      "id": "match_1752357600_0",
+      "timeCasa": "Juventude",
+      "timeVisitante": "Sport Recife",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
+      "horario": "22:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752429600_1",
+      "timeCasa": "EC Juventude",
+      "timeVisitante": "Sport Recife",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1752688800_2",
+      "timeCasa": "EC Juventude",
+      "timeVisitante": "Vasco da Gama",
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753034400_3",
+      "timeCasa": "Cruzeiro",
+      "timeVisitante": "EC Juventude",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753293600_4",
+      "timeCasa": "EC Juventude",
+      "timeVisitante": "Sao Paulo",
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753639200_5",
+      "timeCasa": "EC Bahia",
+      "timeVisitante": "EC Juventude",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754244000_6",
+      "timeCasa": "Santos",
+      "timeVisitante": "EC Juventude",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754848800_7",
+      "timeCasa": "EC Juventude",
+      "timeVisitante": "Corinthians",
+      "startTimestamp": 1754848800,
+      "data": "2025-08-10T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1755453600_8",
+      "timeCasa": "Vitoria",
+      "timeVisitante": "EC Juventude",
+      "startTimestamp": 1755453600,
+      "data": "2025-08-17T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1756058400_9",
+      "timeCasa": "EC Juventude",
+      "timeVisitante": "Botafogo",
+      "startTimestamp": 1756058400,
+      "data": "2025-08-24T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    }
+  ]
+}

@@ -1,107 +1,97 @@
 {
   "time": "Cruzeiro",
   "timeId": "577",
-  "atualizadoEm": "2025-04-07T15:55:52.497Z",
+  "atualizadoEm": "2025-06-15T13:24:40.074Z",
   "proximosJogos": [
     {
-      "id": "match_1744245000_0",
+      "id": "match_1752357600_0",
       "timeCasa": "Cruzeiro",
-      "timeVisitante": "Mushuc Runa",
-      "startTimestamp": 1744245000,
-      "data": "2025-04-10T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN, globo, record, band, goat"
+      "timeVisitante": "Gremio",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
+      "horario": "22:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1744576200_1",
-      "timeCasa": "Sao Paulo",
-      "timeVisitante": "Cruzeiro",
-      "startTimestamp": 1744576200,
-      "data": "2025-04-13T20:30:00.000Z",
-      "horario": "20:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
-    },
-    {
-      "id": "match_1744936200_2",
+      "id": "match_1752429600_1",
       "timeCasa": "Cruzeiro",
-      "timeVisitante": "Bahia",
-      "startTimestamp": 1744936200,
-      "data": "2025-04-18T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
+      "timeVisitante": "Gremio",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1745191800_3",
-      "timeCasa": "Bragantino",
+      "id": "match_1752688800_2",
+      "timeCasa": "Fluminense",
       "timeVisitante": "Cruzeiro",
-      "startTimestamp": 1745191800,
-      "data": "2025-04-20T23:30:00.000Z",
-      "horario": "23:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1745541000_4",
-      "timeCasa": "Palestino",
-      "timeVisitante": "Cruzeiro",
-      "startTimestamp": 1745541000,
-      "data": "2025-04-25T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN"
-    },
-    {
-      "id": "match_1745789400_5",
+      "id": "match_1753034400_3",
       "timeCasa": "Cruzeiro",
-      "timeVisitante": "Vasco da Gama",
-      "startTimestamp": 1745789400,
-      "data": "2025-04-27T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "CazéTV e Premiere e Record"
+      "timeVisitante": "EC Juventude",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746394200_6",
-      "timeCasa": "Cruzeiro",
-      "timeVisitante": "Flamengo",
-      "startTimestamp": 1746394200,
-      "data": "2025-05-04T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "CazéTV e Premiere e Record"
-    },
-    {
-      "id": "match_1746664200_7",
-      "timeCasa": "Mushuc Runa",
+      "id": "match_1753293600_4",
+      "timeCasa": "Corinthians",
       "timeVisitante": "Cruzeiro",
-      "startTimestamp": 1746664200,
-      "data": "2025-05-08T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN"
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746990000_8",
-      "timeCasa": "Sport Recife",
-      "timeVisitante": "Cruzeiro",
-      "startTimestamp": 1746990000,
-      "data": "2025-05-11T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere"
-    },
-    {
-      "id": "match_1747269000_9",
+      "id": "match_1753639200_5",
       "timeCasa": "Cruzeiro",
-      "timeVisitante": "Palestino",
-      "startTimestamp": 1747269000,
-      "data": "2025-05-15T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Sudamericana",
-      "canais": "Disney+ e ESPN"
+      "timeVisitante": "Ceara",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753909200_6",
+      "timeCasa": "Cruzeiro",
+      "timeVisitante": "CRB",
+      "startTimestamp": 1753909200,
+      "data": "2025-07-30T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
+    },
+    {
+      "id": "match_1754244000_7",
+      "timeCasa": "Botafogo",
+      "timeVisitante": "Cruzeiro",
+      "startTimestamp": 1754244000,
+      "data": "2025-08-03T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1754514000_8",
+      "timeCasa": "CRB",
+      "timeVisitante": "Cruzeiro",
+      "startTimestamp": 1754514000,
+      "data": "2025-08-06T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
+    },
+    {
+      "id": "match_1754848800_9",
+      "timeCasa": "Cruzeiro",
+      "timeVisitante": "Santos",
+      "startTimestamp": 1754848800,
+      "data": "2025-08-10T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     }
   ]
 }

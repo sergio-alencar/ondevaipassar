@@ -1,107 +1,97 @@
 {
   "time": "Flamengo",
   "timeId": "1339",
-  "atualizadoEm": "2025-04-07T15:55:58.014Z",
+  "atualizadoEm": "2025-06-15T13:24:45.823Z",
   "proximosJogos": [
     {
-      "id": "match_1744245000_0",
+      "id": "match_1750122000_0",
       "timeCasa": "Flamengo",
-      "timeVisitante": "Central Cordoba SdE",
-      "startTimestamp": 1744245000,
-      "data": "2025-04-10T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Paramount+ e TV Globo"
+      "timeVisitante": "Esperance de Tunis",
+      "startTimestamp": 1750122000,
+      "data": "2025-06-17T01:00:00.000Z",
+      "horario": "01:00",
+      "campeonato": "FIFA Club World Cup"
     },
     {
-      "id": "match_1744576200_1",
-      "timeCasa": "Gremio",
-      "timeVisitante": "Flamengo",
-      "startTimestamp": 1744576200,
-      "data": "2025-04-13T20:30:00.000Z",
-      "horario": "20:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
-    },
-    {
-      "id": "match_1744849800_2",
+      "id": "match_1750442400_1",
       "timeCasa": "Flamengo",
-      "timeVisitante": "Juventude",
-      "startTimestamp": 1744849800,
-      "data": "2025-04-17T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
+      "timeVisitante": "Chelsea",
+      "startTimestamp": 1750442400,
+      "data": "2025-06-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "FIFA Club World Cup"
     },
     {
-      "id": "match_1745098200_3",
-      "timeCasa": "Vasco da Gama",
+      "id": "match_1750813200_2",
+      "timeCasa": "Los Angeles FC",
       "timeVisitante": "Flamengo",
-      "startTimestamp": 1745098200,
-      "data": "2025-04-19T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "Prime Video"
+      "startTimestamp": 1750813200,
+      "data": "2025-06-25T01:00:00.000Z",
+      "horario": "01:00",
+      "campeonato": "FIFA Club World Cup"
     },
     {
-      "id": "match_1745359200_4",
-      "timeCasa": "LDU Quito",
-      "timeVisitante": "Flamengo",
-      "startTimestamp": 1745359200,
-      "data": "2025-04-22T22:00:00.000Z",
+      "id": "match_1752357600_3",
+      "timeCasa": "Flamengo",
+      "timeVisitante": "Sao Paulo",
+      "startTimestamp": 1752357600,
+      "data": "2025-07-12T22:00:00.000Z",
       "horario": "22:00",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN"
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1745780400_5",
+      "id": "match_1752429600_4",
       "timeCasa": "Flamengo",
-      "timeVisitante": "Corinthians",
-      "startTimestamp": 1745780400,
-      "data": "2025-04-27T19:00:00.000Z",
-      "horario": "19:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Globo e Premiere"
+      "timeVisitante": "Sao Paulo",
+      "startTimestamp": 1752429600,
+      "data": "2025-07-13T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746394200_6",
-      "timeCasa": "Cruzeiro",
+      "id": "match_1752688800_5",
+      "timeCasa": "Santos",
       "timeVisitante": "Flamengo",
-      "startTimestamp": 1746394200,
-      "data": "2025-05-04T21:30:00.000Z",
-      "horario": "21:30",
-      "campeonato": "Brazil Serie A",
-      "canais": "CazéTV e Premiere e Record"
+      "startTimestamp": 1752688800,
+      "data": "2025-07-16T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746664200_7",
-      "timeCasa": "Central Cordoba",
+      "id": "match_1753034400_6",
+      "timeCasa": "Flamengo",
+      "timeVisitante": "Fluminense",
+      "startTimestamp": 1753034400,
+      "data": "2025-07-20T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
+    },
+    {
+      "id": "match_1753293600_7",
+      "timeCasa": "Bragantino",
       "timeVisitante": "Flamengo",
-      "startTimestamp": 1746664200,
-      "data": "2025-05-08T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Paramount+ e TV Globo"
+      "startTimestamp": 1753293600,
+      "data": "2025-07-23T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1746921600_8",
+      "id": "match_1753639200_8",
       "timeCasa": "Flamengo",
-      "timeVisitante": "EC Bahia",
-      "startTimestamp": 1746921600,
-      "data": "2025-05-11T00:00:00.000Z",
-      "horario": "00:00",
-      "campeonato": "Brazil Serie A",
-      "canais": "Premiere e SporTV"
+      "timeVisitante": "Atletico Mineiro",
+      "startTimestamp": 1753639200,
+      "data": "2025-07-27T18:00:00.000Z",
+      "horario": "18:00",
+      "campeonato": "Brazil Serie A"
     },
     {
-      "id": "match_1747355400_9",
+      "id": "match_1753909200_9",
       "timeCasa": "Flamengo",
-      "timeVisitante": "LDU Quito",
-      "startTimestamp": 1747355400,
-      "data": "2025-05-16T00:30:00.000Z",
-      "horario": "00:30",
-      "campeonato": "Copa Libertadores",
-      "canais": "Disney+ e ESPN"
+      "timeVisitante": "Atletico Mineiro",
+      "startTimestamp": 1753909200,
+      "data": "2025-07-30T21:00:00.000Z",
+      "horario": "21:00",
+      "campeonato": "Copa do Brasil"
     }
   ]
 }
