@@ -82,9 +82,18 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
             {broadcast.regionalCaveat && (
               <span
                 aria-hidden="true"
-                className="absolute -top-1 -right-1 flex items-center justify-center size-5 rounded-full bg-yellow-400 text-gray-900 text-xs font-bold shadow"
+                className="absolute -top-1 -right-1 flex items-center justify-center size-5 rounded-full bg-yellow-400 text-gray-900 shadow"
               >
-                *
+                <svg
+                  viewBox="0 0 24 24"
+                  className="size-3"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                >
+                  <path d="M12 4v16M5.07 8l13.86 8M18.93 8l-13.86 8" />
+                </svg>
               </span>
             )}
           </a>
