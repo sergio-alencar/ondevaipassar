@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { TEAMS, type Division } from "@ondevaipassar/shared";
 import DivisionTabs from "../Components/DivisionTabs";
 import TeamCrest from "../Components/TeamCrest";
 import { MatchesContext } from "../context/MatchesContext";
 import { findSourceCrestUrl } from "../lib/assets";
+import { useTeamsByDivision } from "../lib/useTeamsByDivision";
 import MatchCard from "./MatchCard";
 import type { SetSelectedTeam } from "../types";
 
@@ -22,14 +22,13 @@ function isTodayInBrasilia(kickoffUtc: string): boolean {
 
 const Home = ({ setSelectedTeam }: HomeProps) => {
   const { matches, loading, error } = useContext(MatchesContext);
-  const [division, setDivision] = useState<Division>("A");
+  const { division, setDivision, teamsInDivision } = useTeamsByDivision();
 
   useEffect(() => {
     setSelectedTeam(null);
   }, [setSelectedTeam]);
 
   const matchesToday = matches.filter((match) => isTodayInBrasilia(match.kickoffUtc));
-  const teamsInDivision = TEAMS.filter((team) => team.division === division);
 
   return (
     <main className="py-4 max-lg:grow container mx-auto px-4">

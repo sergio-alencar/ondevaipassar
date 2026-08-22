@@ -1,7 +1,8 @@
-import { forwardRef, useContext, useState } from "react";
-import { TEAMS, type Division, type Team } from "@ondevaipassar/shared";
+import { forwardRef, useContext } from "react";
+import type { Team } from "@ondevaipassar/shared";
 import { MatchesContext } from "../context/MatchesContext";
 import { findSourceCrestUrl } from "../lib/assets";
+import { useTeamsByDivision } from "../lib/useTeamsByDivision";
 import DivisionTabs from "./DivisionTabs";
 import DropdownMenuTeam from "./DropdownMenuTeam";
 import triangleIcon from "../assets/images/icones/triangulo.svg";
@@ -20,14 +21,12 @@ interface DropdownMenuProps {
 const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
   ({ setSelectedTeam, isVisible, setIsDropdownVisible }, ref) => {
     const { matches } = useContext(MatchesContext);
-    const [division, setDivision] = useState<Division>("A");
+    const { division, setDivision, teamsInDivision } = useTeamsByDivision();
 
     const handleSelectTeam = (team: Team) => {
       setSelectedTeam(team);
       setIsDropdownVisible(false);
     };
-
-    const teamsInDivision = TEAMS.filter((team) => team.division === division);
 
     return (
       <div
