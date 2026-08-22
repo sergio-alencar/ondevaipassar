@@ -5,7 +5,10 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  // deps/ is a stray local Vite cache artifact, not project source (see
+  // review.md) — untracked and gitignored, but still on disk for anyone
+  // who's run the dev server, so it needs excluding explicitly here too.
+  { ignores: ["dist", "deps"] },
   {
     files: ["**/*.{ts,tsx}"],
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
