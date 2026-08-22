@@ -19,10 +19,7 @@ const App = () => {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home setSelectedTeam={setSelectedTeam} />} />
-            <Route
-              path="time/:teamId"
-              element={<TeamPage selectedTeam={selectedTeam} setSelectedTeam={setSelectedTeam} />}
-            />
+            <Route path="time/:teamId" element={<TeamPage setSelectedTeam={setSelectedTeam} />} />
             <Route path="sobre" element={<Sobre setSelectedTeam={setSelectedTeam} />} />
           </Routes>
         </main>

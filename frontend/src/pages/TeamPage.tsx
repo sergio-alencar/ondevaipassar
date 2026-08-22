@@ -4,10 +4,9 @@ import { findTeamById } from "@ondevaipassar/shared";
 import { MatchesContext } from "../context/MatchesContext";
 import { textColorClass } from "../lib/colors";
 import MatchCard from "./MatchCard";
-import type { SelectedTeam, SetSelectedTeam } from "../types";
+import type { SetSelectedTeam } from "../types";
 
 interface TeamPageProps {
-  selectedTeam: SelectedTeam;
   setSelectedTeam: SetSelectedTeam;
 }
 
