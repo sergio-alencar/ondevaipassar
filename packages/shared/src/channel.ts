@@ -12,7 +12,7 @@ export interface Channel {
 // registry was already clean, just needed a home both sides could import.
 // Kept alphabetical by displayName (pt-BR collation) — re-sort if you add
 // or rename a channel, don't just append.
-export const CHANNELS: Channel[] = [
+const CHANNELS: Channel[] = [
   { id: "band", displayName: "Band", officialUrl: "https://www.band.uol.com.br/ao-vivo/" },
   { id: "goat", displayName: "Canal GOAT", officialUrl: "https://www.youtube.com/@canalgoatbr/" },
   { id: "cazetv", displayName: "CazéTV", officialUrl: "https://www.youtube.com/cazetv/" },
