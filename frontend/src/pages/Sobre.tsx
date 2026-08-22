@@ -11,7 +11,7 @@ const Sobre = ({ setSelectedTeam }: SobreProps) => {
   }, [setSelectedTeam]);
 
   return (
-    <main className="flex flex-col grow max-w-6xl px-4 py-12 self-center max-sm:px-4 max-xl:max-w-4xl">
+    <main className="flex flex-col grow max-w-6xl mx-auto px-4 py-12 max-sm:px-4 max-xl:max-w-4xl">
       <h1 className="text-4xl font-bold uppercase mb-6 max-sm:text-3xl">Sobre</h1>
       <h2 className="font-bold text-3xl mb-4 max-sm:text-2xl max-sm:mb-2">Quem sou eu?</h2>
       <p className="text-xl mb-10">
