@@ -8,7 +8,6 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1).default("file:./data/ondevaipassar.db"),
   DATABASE_AUTH_TOKEN: z.string().optional(),
   CORS_ORIGIN: z.string().min(1).default("http://localhost:5173"),
-  ADMIN_TOKEN: z.string().min(1).default("changeme"),
   // Vercel sets this automatically for cron-triggered requests
   // (Authorization: Bearer <CRON_SECRET>) — required in production so the
   // ingest endpoint can't be triggered by anyone who finds the URL.
