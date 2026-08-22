@@ -25,6 +25,14 @@ export interface Team {
   tracked: boolean;
   /** Which division this team plays in for the 2026 season — teams move between these every year (see review.md for how many of the original 20 already did). */
   division: Division;
+  /**
+   * A verified crest URL to use when there's no local asset AND no ingested
+   * match to borrow one from (e.g. a team whose agenda page we haven't
+   * found — see aliases.geGlobo === null). Manually sourced, not guessed:
+   * open the club's ge.globo team page (or any article mentioning them) and
+   * copy the actual <img> src from their badge.
+   */
+  knownCrestUrl?: string;
   aliases: TeamAliases;
 }
 
@@ -37,7 +45,7 @@ export interface Team {
 // re-sort if you add or rename a team, don't just append.
 export const TEAMS: Team[] = [
   { id: "america_mineiro", displayName: "América-MG", color: "green-900", crestFile: "america_mineiro.svg", tracked: true, division: "B", aliases: { geGlobo: "america-mg" } },
-  { id: "athletic", displayName: "Athletic", color: "black", crestFile: "athletic.svg", tracked: true, division: "B", aliases: { geGlobo: null } },
+  { id: "athletic", displayName: "Athletic", color: "black", crestFile: "athletic.svg", tracked: true, division: "B", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2025/01/22/Athletic_Club-mineiro.svg", aliases: { geGlobo: null } },
   { id: "athletico_paranaense", displayName: "Athletico-PR", color: "red-800", crestFile: "athletico_paranaense.svg", tracked: true, division: "A", aliases: { geGlobo: null } },
   { id: "atletico_goianiense", displayName: "Atlético-GO", color: "red-800", crestFile: "atletico_goianiense.svg", tracked: true, division: "B", aliases: { geGlobo: "atletico-go" } },
   { id: "atletico_mineiro", displayName: "Atlético-MG", color: "black", crestFile: "atletico_mineiro.svg", tracked: true, division: "A", aliases: { geGlobo: "atletico-mg" } },
