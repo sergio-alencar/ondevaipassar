@@ -18,7 +18,7 @@ export const CHANNELS: Channel[] = [
   { id: "cazetv", displayName: "CazéTV", officialUrl: "https://www.youtube.com/cazetv/" },
   { id: "disneyplus", displayName: "Disney+", officialUrl: "https://www.disneyplus.com/pt-br/" },
   { id: "espn", displayName: "ESPN", officialUrl: "https://www.espn.com.br/" },
-  { id: "getv", displayName: "ge TV", officialUrl: "https://ge.globo.com/" },
+  { id: "getv", displayName: "ge TV", officialUrl: "https://www.youtube.com/geglobo" },
   { id: "globo", displayName: "Globo", officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/", regionalCaveat: true },
   { id: "globoplay", displayName: "Globoplay", officialUrl: "https://globoplay.globo.com/" },
   { id: "nossofutebol", displayName: "Nosso Futebol", officialUrl: "https://www.nossofutebol.com/" },
