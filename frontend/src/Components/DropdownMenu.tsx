@@ -1,6 +1,8 @@
-import { forwardRef } from "react";
-import { TEAMS } from "@ondevaipassar/shared";
-import type { Team } from "@ondevaipassar/shared";
+import { forwardRef, useContext, useState } from "react";
+import { TEAMS, type Division, type Team } from "@ondevaipassar/shared";
+import { MatchesContext } from "../context/MatchesContext";
+import { findSourceCrestUrl } from "../lib/assets";
+import DivisionTabs from "./DivisionTabs";
 import DropdownMenuTime from "./DropdownMenuTime";
 import triangleIcon from "../assets/images/icones/triangulo.svg";
 
@@ -17,16 +19,21 @@ interface DropdownMenuProps {
 // mismatch would fail to typecheck instead of failing at click-time.
 const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
   ({ setSelectedTeam, isVisible, setIsDropdownVisible }, ref) => {
+    const { matches } = useContext(MatchesContext);
+    const [division, setDivision] = useState<Division>("A");
+
     const handleSelectTeam = (team: Team) => {
       setSelectedTeam(team);
       setIsDropdownVisible(false);
     };
 
+    const teamsInDivision = TEAMS.filter((team) => team.division === division);
+
     return (
       <div
         ref={ref}
         id="dropdownMenu"
-        className={`h-104 w-96 absolute inset-x top-19 right-12 ${
+        className={`w-96 absolute inset-x top-19 right-12 ${
           isVisible ? "block" : "hidden"
         } max-sm:-right-4 max-sm:w-full`}
       >
@@ -35,9 +42,17 @@ const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
           style={{ backgroundImage: `url(${triangleIcon})` }}
         ></div>
         <div className="bg-white shadow p-4 rounded-lg">
-          <ul className="grid grid-cols-4 gap-6">
-            {TEAMS.map((team) => (
-              <DropdownMenuTime key={team.id} team={team} setSelectedTeam={handleSelectTeam} />
+          <div className="mb-4">
+            <DivisionTabs active={division} onChange={setDivision} />
+          </div>
+          <ul className="grid grid-cols-4 gap-6 max-h-80 overflow-y-auto">
+            {teamsInDivision.map((team) => (
+              <DropdownMenuTime
+                key={team.id}
+                team={team}
+                setSelectedTeam={handleSelectTeam}
+                sourceCrestUrl={findSourceCrestUrl(team.id, matches)}
+              />
             ))}
           </ul>
         </div>

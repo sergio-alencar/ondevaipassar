@@ -10,6 +10,7 @@ const BACKGROUND_COLOR_CLASSES: Record<string, string> = {
   "red-800": "bg-red-800",
   "blue-800": "bg-blue-800",
   "green-900": "bg-green-900",
+  "yellow-500": "bg-yellow-500",
 };
 
 const TEXT_COLOR_CLASSES: Record<string, string> = {
@@ -19,6 +20,7 @@ const TEXT_COLOR_CLASSES: Record<string, string> = {
   "red-800": "text-red-800",
   "blue-800": "text-blue-800",
   "green-900": "text-green-900",
+  "yellow-500": "text-yellow-500",
   "gray-500": "text-gray-500",
   "gray-800": "text-gray-800",
 };

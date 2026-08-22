@@ -1,4 +1,4 @@
-import type { Team } from "@ondevaipassar/shared";
+import type { MatchView, Team } from "@ondevaipassar/shared";
 
 // import.meta.env.BASE_URL already ends with "/" (e.g. "/ondevaipassar/" in
 // prod, "/" in dev) — never prefix these with an extra leading slash, and
@@ -17,6 +17,21 @@ export const fallbackCrestUrl = FALLBACK_CREST;
  */
 export function crestUrl(team: Pick<Team, "crestFile"> | undefined, sourceCrestUrl = ""): string {
   return team ? `${import.meta.env.BASE_URL}images/times/${team.crestFile}` : sourceCrestUrl || FALLBACK_CREST;
+}
+
+/**
+ * A team-picker view (the home grid, the header dropdown) has no match of
+ * its own to pull a source crest from — so borrow one from any already-loaded
+ * match this team happens to appear in. Returns undefined if the team hasn't
+ * played (or isn't playing soon enough to be in the loaded set) — crestUrl
+ * then just falls through to the generic shield, same as before.
+ */
+export function findSourceCrestUrl(teamId: string, matches: MatchView[]): string | undefined {
+  for (const match of matches) {
+    if (match.homeTeamId === teamId) return match.homeTeamCrestUrl;
+    if (match.awayTeamId === teamId) return match.awayTeamCrestUrl;
+  }
+  return undefined;
 }
 
 /**

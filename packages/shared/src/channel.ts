@@ -10,15 +10,17 @@ export interface Channel {
 
 // Ported near-verbatim from the old frontend's Components/canais.jsx — that
 // registry was already clean, just needed a home both sides could import.
+// Kept alphabetical by displayName (pt-BR collation) — re-sort if you add
+// or rename a channel, don't just append.
 export const CHANNELS: Channel[] = [
   { id: "band", displayName: "Band", officialUrl: "https://www.band.uol.com.br/ao-vivo/" },
+  { id: "goat", displayName: "Canal GOAT", officialUrl: "https://www.youtube.com/@canalgoatbr/" },
   { id: "cazetv", displayName: "CazéTV", officialUrl: "https://www.youtube.com/cazetv/" },
   { id: "disneyplus", displayName: "Disney+", officialUrl: "https://www.disneyplus.com/pt-br/" },
   { id: "espn", displayName: "ESPN", officialUrl: "https://www.espn.com.br/" },
   { id: "getv", displayName: "ge TV", officialUrl: "https://ge.globo.com/" },
   { id: "globo", displayName: "Globo", officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/", regionalCaveat: true },
   { id: "globoplay", displayName: "Globoplay", officialUrl: "https://globoplay.globo.com/" },
-  { id: "goat", displayName: "Canal GOAT", officialUrl: "https://www.youtube.com/@canalgoatbr/" },
   { id: "nossofutebol", displayName: "Nosso Futebol", officialUrl: "https://www.nossofutebol.com/" },
   { id: "paramountplus", displayName: "Paramount Plus", officialUrl: "https://www.paramountplus.com/br/collections/sports-hub-br/" },
   { id: "premiere", displayName: "Premiere", officialUrl: "https://premiere.globo.com/" },
