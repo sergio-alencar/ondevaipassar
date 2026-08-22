@@ -4,7 +4,6 @@ import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import Home from "./pages/Home";
 import TeamPage from "./pages/TeamPage";
-import Contato from "./pages/Contato";
 import Sobre from "./pages/Sobre";
 import { MatchesProvider } from "./context/MatchesContext";
 import type { SelectedTeam } from "./types";
@@ -24,7 +23,6 @@ const App = () => {
               path="time/:teamId"
               element={<TeamPage selectedTeam={selectedTeam} setSelectedTeam={setSelectedTeam} />}
             />
-            <Route path="contato" element={<Contato setSelectedTeam={setSelectedTeam} />} />
             <Route path="sobre" element={<Sobre setSelectedTeam={setSelectedTeam} />} />
           </Routes>
         </main>

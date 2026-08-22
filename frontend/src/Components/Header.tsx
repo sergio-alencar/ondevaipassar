@@ -96,11 +96,6 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
               Sobre
             </Link>
           </li>
-          <li>
-            <Link to="/contato" onClick={() => setIsMenuVisible(false)}>
-              Contato
-            </Link>
-          </li>
         </ul>
       </div>
     </>
