@@ -7,6 +7,8 @@ interface MatchBroadcastsProps {
   fallbackColor?: string;
 }
 
+const REGIONAL_CAVEAT_TEXT = " — pode variar por região, confira a programação local";
+
 const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) => {
   if (broadcasts.length === 0) {
     return (
@@ -35,11 +37,15 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
             <img
               src={channelLogoUrl(broadcast.channelId)}
               alt={broadcast.displayName}
-              title={broadcast.displayName}
+              title={`${broadcast.displayName}${broadcast.regionalCaveat ? REGIONAL_CAVEAT_TEXT : ""}`}
               className="w-32 hover:scale-105 transition max-lg:w-24 max-sm:w-20"
               loading="lazy"
               onError={(event) => {
-                event.currentTarget.style.display = "none";
+                if (event.currentTarget.src !== broadcast.logoUrl) {
+                  event.currentTarget.src = broadcast.logoUrl;
+                } else {
+                  event.currentTarget.style.display = "none";
+                }
               }}
             />
           </a>

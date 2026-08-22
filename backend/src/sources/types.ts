@@ -2,17 +2,26 @@ import type { MatchStatus } from "@ondevaipassar/shared";
 
 export type { MatchStatus };
 
+export interface CanonicalBroadcast {
+  channelId: string;
+  /** Channel logo straight from the source — used when we don't have a local asset for this channel (e.g. Ge TV). */
+  logoUrl: string;
+}
+
 export interface CanonicalMatch {
   id: string;
   competitionId: string;
   homeTeamId: string | null;
   homeTeamNameRaw: string;
+  /** Crest straight from the source — covers any opponent, tracked or not. */
+  homeTeamCrestUrl: string;
   awayTeamId: string | null;
   awayTeamNameRaw: string;
+  awayTeamCrestUrl: string;
   kickoffUtc: string;
   round: number | null;
   status: MatchStatus;
-  broadcastChannelIds: string[];
+  broadcasts: CanonicalBroadcast[];
 }
 
 export interface FetchResult {

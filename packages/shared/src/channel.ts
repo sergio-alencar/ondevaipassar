@@ -4,6 +4,8 @@ export interface Channel {
   id: string;
   displayName: string;
   officialUrl: string;
+  /** True when the source can't tell us whether this actually airs in the viewer's specific region (true today only for "globo" — ge.globo's data has no region/UF field, every entry just says "check local listings"). */
+  regionalCaveat?: boolean;
 }
 
 // Ported near-verbatim from the old frontend's Components/canais.jsx — that
@@ -13,7 +15,8 @@ export const CHANNELS: Channel[] = [
   { id: "cazetv", displayName: "CazéTV", officialUrl: "https://www.youtube.com/cazetv/" },
   { id: "disneyplus", displayName: "Disney+", officialUrl: "https://www.disneyplus.com/pt-br/" },
   { id: "espn", displayName: "ESPN", officialUrl: "https://www.espn.com.br/" },
-  { id: "globo", displayName: "Globo", officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/" },
+  { id: "getv", displayName: "ge TV", officialUrl: "https://ge.globo.com/" },
+  { id: "globo", displayName: "Globo", officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/", regionalCaveat: true },
   { id: "globoplay", displayName: "Globoplay", officialUrl: "https://globoplay.globo.com/" },
   { id: "goat", displayName: "Canal GOAT", officialUrl: "https://www.youtube.com/@canalgoatbr/" },
   { id: "nossofutebol", displayName: "Nosso Futebol", officialUrl: "https://www.nossofutebol.com/" },
@@ -39,7 +42,12 @@ const CHANNEL_ALIASES: Record<string, string> = {
   "disney": "disneyplus", "disney+": "disneyplus", "star+": "disneyplus",
   espn: "espn", "espn brasil": "espn", "espn+": "espn",
   globo: "globo", "rede globo": "globo",
-  globoplay: "globoplay", "ge tv": "globoplay",
+  globoplay: "globoplay",
+  // ge TV is ge.globo's own free live-text/highlights product — distinct
+  // from Globoplay (paid, full match) even though both are Globo-owned.
+  // Verified as separate liveWatchSources entries with different
+  // description/url/transmissionId, not a naming variant of one another.
+  "ge tv": "getv",
   goat: "goat", "canal goat": "goat",
   "nosso futebol": "nossofutebol",
   paramount: "paramountplus", "paramount+": "paramountplus", "paramount plus": "paramountplus",

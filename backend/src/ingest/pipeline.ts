@@ -34,8 +34,10 @@ export async function runAdapter(adapter: FixtureSourceAdapter): Promise<void> {
           competitionId: match.competitionId,
           homeTeamId: match.homeTeamId,
           homeTeamNameRaw: match.homeTeamNameRaw,
+          homeTeamCrestUrl: match.homeTeamCrestUrl,
           awayTeamId: match.awayTeamId,
           awayTeamNameRaw: match.awayTeamNameRaw,
+          awayTeamCrestUrl: match.awayTeamCrestUrl,
           kickoffUtc: match.kickoffUtc,
           round: match.round,
           status: match.status,
@@ -48,7 +50,9 @@ export async function runAdapter(adapter: FixtureSourceAdapter): Promise<void> {
           set: {
             competitionId: match.competitionId,
             homeTeamId: match.homeTeamId,
+            homeTeamCrestUrl: match.homeTeamCrestUrl,
             awayTeamId: match.awayTeamId,
+            awayTeamCrestUrl: match.awayTeamCrestUrl,
             kickoffUtc: match.kickoffUtc,
             round: match.round,
             status: match.status,
@@ -57,10 +61,20 @@ export async function runAdapter(adapter: FixtureSourceAdapter): Promise<void> {
         })
         .run();
 
-      for (const channelId of match.broadcastChannelIds) {
+      for (const broadcast of match.broadcasts) {
         db.insert(broadcasts)
-          .values({ id: `${match.id}__${channelId}`, matchId: match.id, channelId, sourceId: adapter.id, createdAt: now })
-          .onConflictDoNothing()
+          .values({
+            id: `${match.id}__${broadcast.channelId}`,
+            matchId: match.id,
+            channelId: broadcast.channelId,
+            logoUrl: broadcast.logoUrl,
+            sourceId: adapter.id,
+            createdAt: now,
+          })
+          .onConflictDoUpdate({
+            target: broadcasts.id,
+            set: { logoUrl: broadcast.logoUrl },
+          })
           .run();
       }
     }

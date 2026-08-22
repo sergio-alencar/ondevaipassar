@@ -26,8 +26,10 @@ sqlite.exec(`
     competition_id TEXT NOT NULL,
     home_team_id TEXT,
     home_team_name_raw TEXT NOT NULL,
+    home_team_crest_url TEXT NOT NULL,
     away_team_id TEXT,
     away_team_name_raw TEXT NOT NULL,
+    away_team_crest_url TEXT NOT NULL,
     kickoff_utc TEXT NOT NULL,
     round INTEGER,
     status TEXT NOT NULL,
@@ -42,6 +44,7 @@ sqlite.exec(`
     id TEXT PRIMARY KEY,
     match_id TEXT NOT NULL,
     channel_id TEXT NOT NULL,
+    logo_url TEXT NOT NULL,
     source_id TEXT NOT NULL,
     created_at TEXT NOT NULL
   );

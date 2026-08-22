@@ -45,9 +45,19 @@ export async function matchesRoutes(app: FastifyInstance): Promise<void> {
         const competition = findCompetitionById(row.competitionId);
 
         const matchBroadcasts = (broadcastsByMatchId.get(row.id) ?? [])
-          .map((broadcast) => findChannelById(broadcast.channelId))
-          .filter((channel): channel is NonNullable<typeof channel> => channel !== undefined)
-          .map((channel) => ({ channelId: channel.id, displayName: channel.displayName, url: channel.officialUrl }));
+          .flatMap((broadcast) => {
+            const channel = findChannelById(broadcast.channelId);
+            if (!channel) return [];
+            return [
+              {
+                channelId: channel.id,
+                displayName: channel.displayName,
+                url: channel.officialUrl,
+                logoUrl: broadcast.logoUrl,
+                regionalCaveat: channel.regionalCaveat ?? false,
+              },
+            ];
+          });
 
         return {
           id: row.id,
@@ -55,8 +65,10 @@ export async function matchesRoutes(app: FastifyInstance): Promise<void> {
           competitionName: competition?.displayName ?? row.competitionId,
           homeTeamId: row.homeTeamId,
           homeTeamName: homeTeam?.displayName ?? row.homeTeamNameRaw,
+          homeTeamCrestUrl: row.homeTeamCrestUrl,
           awayTeamId: row.awayTeamId,
           awayTeamName: awayTeam?.displayName ?? row.awayTeamNameRaw,
+          awayTeamCrestUrl: row.awayTeamCrestUrl,
           kickoffUtc: row.kickoffUtc,
           round: row.round,
           status: row.status as MatchView["status"],

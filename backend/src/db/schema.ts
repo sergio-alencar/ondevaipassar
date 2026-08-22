@@ -18,8 +18,10 @@ export const matches = sqliteTable("matches", {
   competitionId: text("competition_id").notNull(),
   homeTeamId: text("home_team_id"),
   homeTeamNameRaw: text("home_team_name_raw").notNull(),
+  homeTeamCrestUrl: text("home_team_crest_url").notNull(),
   awayTeamId: text("away_team_id"),
   awayTeamNameRaw: text("away_team_name_raw").notNull(),
+  awayTeamCrestUrl: text("away_team_crest_url").notNull(),
   kickoffUtc: text("kickoff_utc").notNull(),
   round: integer("round"),
   status: text("status").notNull(),
@@ -34,6 +36,7 @@ export const broadcasts = sqliteTable("broadcasts", {
   id: text("id").primaryKey(),
   matchId: text("match_id").notNull(),
   channelId: text("channel_id").notNull(),
+  logoUrl: text("logo_url").notNull(),
   sourceId: text("source_id").notNull(),
   createdAt: text("created_at").notNull(),
 });

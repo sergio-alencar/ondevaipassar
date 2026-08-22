@@ -1,7 +1,7 @@
 import type { MatchView, Team } from "@ondevaipassar/shared";
 import { findTeamById } from "@ondevaipassar/shared";
 import versus from "../assets/images/icones/versus.svg";
-import { crestUrl, crestUrlForRawName, fallbackCrestUrl } from "../lib/assets";
+import { crestUrl, fallbackCrestUrl } from "../lib/assets";
 import MatchBroadcasts from "./MatchBroadcasts";
 
 interface MatchCardProps {
@@ -30,9 +30,9 @@ function formatKickoff(kickoffUtc: string): string {
   return `${dateLabel}, ${timeLabel}`;
 }
 
-function contestantCrestUrl(teamId: string | null, rawName: string): string {
+function contestantCrestUrl(teamId: string | null, sourceCrestUrl: string): string {
   const team = teamId ? findTeamById(teamId) : undefined;
-  return team ? crestUrl(team) : crestUrlForRawName(rawName);
+  return crestUrl(team, sourceCrestUrl);
 }
 
 const MatchCard = ({ match, team }: MatchCardProps) => {
@@ -42,7 +42,7 @@ const MatchCard = ({ match, team }: MatchCardProps) => {
         <div className="flex items-center justify-self-end gap-4 max-lg:gap-2 max-lg:justify-self-center">
           <img
             className="size-32 max-lg:size-20 max-sm:size-18"
-            src={contestantCrestUrl(match.homeTeamId, match.homeTeamName)}
+            src={contestantCrestUrl(match.homeTeamId, match.homeTeamCrestUrl)}
             alt={match.homeTeamName}
             title={match.homeTeamName}
             onError={(event) => {
@@ -54,7 +54,7 @@ const MatchCard = ({ match, team }: MatchCardProps) => {
           <img className="size-6 max-lg:size-4" src={versus} alt="versus" />
           <img
             className="size-32 max-lg:size-20 max-sm:size-18"
-            src={contestantCrestUrl(match.awayTeamId, match.awayTeamName)}
+            src={contestantCrestUrl(match.awayTeamId, match.awayTeamCrestUrl)}
             alt={match.awayTeamName}
             title={match.awayTeamName}
             onError={(event) => {

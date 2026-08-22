@@ -1,7 +1,7 @@
 import { TEAMS, resolveChannelId } from "@ondevaipassar/shared";
 import { resolveCompetitionId } from "../../ingest/competitionResolver.js";
 import { resolveTeamId } from "../../ingest/teamResolver.js";
-import type { CanonicalMatch, FetchResult, FixtureSourceAdapter } from "../types.js";
+import type { CanonicalBroadcast, CanonicalMatch, FetchResult, FixtureSourceAdapter } from "../types.js";
 import { fetchTeamAgenda } from "./client.js";
 import { parseSoccerEvent, type SoccerEvent } from "./schema.js";
 
@@ -24,21 +24,26 @@ function toCanonicalMatch(event: SoccerEvent): CanonicalMatch | null {
   const kickoffUtc = toKickoffUtcIso(match.startDate, match.startHour);
   if (!kickoffUtc) return null;
 
-  const broadcastChannelIds = (match.liveWatchSources ?? [])
-    .map((source) => resolveChannelId(source.name))
-    .filter((id): id is string => id !== null);
+  const broadcasts: CanonicalBroadcast[] = (match.liveWatchSources ?? [])
+    .map((source): CanonicalBroadcast | null => {
+      const channelId = resolveChannelId(source.name);
+      return channelId ? { channelId, logoUrl: source.officialLogoUrl } : null;
+    })
+    .filter((broadcast): broadcast is CanonicalBroadcast => broadcast !== null);
 
   return {
     id: `ge-globo:${match.id}`,
     competitionId: resolveCompetitionId(match.phase.championshipEdition.championship.name),
     homeTeamId: resolveTeamId(match.firstContestant.popularName),
     homeTeamNameRaw: match.firstContestant.popularName,
+    homeTeamCrestUrl: match.firstContestant.badgeSvg,
     awayTeamId: resolveTeamId(match.secondContestant.popularName),
     awayTeamNameRaw: match.secondContestant.popularName,
+    awayTeamCrestUrl: match.secondContestant.badgeSvg,
     kickoffUtc,
     round: match.round,
     status: "scheduled",
-    broadcastChannelIds,
+    broadcasts,
   };
 }
 

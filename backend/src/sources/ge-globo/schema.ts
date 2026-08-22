@@ -13,11 +13,17 @@ const geGloboTeamRefSchema = z.object({
   id: z.number(),
   name: z.string(),
   popularName: z.string(),
+  // Present on every one of 192 contestant objects sampled from a real
+  // fetch — the crest for ANY opponent, tracked or not (e.g. a continental
+  // club we'll never have a local asset for), straight from the source.
+  badgeSvg: z.string(),
+  badgePng: z.string(),
 });
 
 const liveWatchSourceSchema = z.object({
   name: z.string(),
   url: z.string(),
+  officialLogoUrl: z.string(),
 });
 
 export const soccerEventSchema = z.object({

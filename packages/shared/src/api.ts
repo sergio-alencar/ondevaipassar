@@ -4,6 +4,10 @@ export interface BroadcastView {
   channelId: string;
   displayName: string;
   url: string;
+  /** Prefer a local asset for this channel when we have one; this is the fallback (source-provided) logo, e.g. for channels like ge TV we don't have local art for. */
+  logoUrl: string;
+  /** True when the source can't confirm this actually airs in the viewer's region (see Channel.regionalCaveat). */
+  regionalCaveat: boolean;
 }
 
 /** Shape returned by GET /api/matches — shared so the backend route and the frontend fetch client can't drift apart. */
@@ -13,8 +17,11 @@ export interface MatchView {
   competitionName: string;
   homeTeamId: string | null;
   homeTeamName: string;
+  /** Crest straight from the source — covers any opponent, tracked or not. Prefer a local asset when homeTeamId resolves to a tracked team. */
+  homeTeamCrestUrl: string;
   awayTeamId: string | null;
   awayTeamName: string;
+  awayTeamCrestUrl: string;
   kickoffUtc: string;
   round: number | null;
   status: MatchStatus;
