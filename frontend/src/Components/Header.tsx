@@ -45,9 +45,9 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
         onClick={() => setIsMenuVisible(false)}
       ></div>
       <header
-        className={`${headerBgClass} sticky top-0 px-12 max-sm:px-2 z-30 transition-colors duration-300`}
+        className={`${headerBgClass} sticky top-0 z-30 transition-colors duration-300`}
       >
-        <div className="flex justify-between items-center mx-12 max-sm:mx-4">
+        <div className="flex justify-between items-center max-w-7xl mx-auto px-24 max-sm:px-6">
           <button
             id="menu-botao"
             onClick={() => setIsMenuVisible(true)}
