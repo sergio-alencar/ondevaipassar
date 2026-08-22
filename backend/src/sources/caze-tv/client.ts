@@ -14,15 +14,21 @@ const MARKER = "var ytInitialData = ";
  * *third* internal schema YouTube has used for channel grid items over the
  * years (videoRenderer, then gridVideoRenderer, now the lockupViewModel
  * shape schema.ts validates against), so it can change without notice.
+ * Split from the fetch below (same split as ge-globo's extractScheduleTeam)
+ * so this half can be tested against a saved fixture, no network needed.
  */
-export async function fetchCazeTvPageData(): Promise<unknown> {
-  const html = await fetchText(STREAMS_URL);
+export function extractYtInitialData(html: string): unknown {
   const markerIndex = html.indexOf(MARKER);
   if (markerIndex === -1) {
     throw new Error(`"${MARKER}" not found — YouTube's page structure may have changed`);
   }
   const openBraceIndex = markerIndex + MARKER.length;
   return JSON.parse(extractBalancedJsonObject(html, openBraceIndex));
+}
+
+export async function fetchCazeTvPageData(): Promise<unknown> {
+  const html = await fetchText(STREAMS_URL);
+  return extractYtInitialData(html);
 }
 
 /**
