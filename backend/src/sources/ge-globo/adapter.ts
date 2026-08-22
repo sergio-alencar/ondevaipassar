@@ -41,7 +41,7 @@ function toKickoffUtcIso(startDate: string | null, startHour: string | null): st
 // (the mismatch Sérgio caught). Dropped only when something else is already
 // in the list, so a genuinely standalone Globoplay offering (never observed
 // so far) would still show.
-function resolveBroadcasts(sources: SoccerEvent["match"]["liveWatchSources"]): CanonicalBroadcast[] {
+export function resolveBroadcasts(sources: SoccerEvent["match"]["liveWatchSources"]): CanonicalBroadcast[] {
   const resolved = (sources ?? [])
     .map((source): CanonicalBroadcast | null => {
       const channelId = resolveChannelId(source.name);
