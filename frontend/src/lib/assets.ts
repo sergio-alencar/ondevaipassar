@@ -7,16 +7,9 @@ const FALLBACK_CREST = `${import.meta.env.BASE_URL}images/icones/escudo-cinza.sv
 
 export const fallbackCrestUrl = FALLBACK_CREST;
 
-/**
- * Crest for a tracked team: local asset (fast, no external dependency).
- * For anyone else — a continental opponent, a promoted/relegated club we
- * haven't added yet — there's no slugify-and-guess anymore: the API already
- * hands back the source's own crest URL (sourceCrestUrl) for every
- * contestant, tracked or not, so that's the fallback, with the generic gray
- * shield as the last resort if even that 404s.
- */
-export function crestUrl(team: Pick<Team, "crestFile"> | undefined, sourceCrestUrl = ""): string {
-  return team ? `${import.meta.env.BASE_URL}images/times/${team.crestFile}` : sourceCrestUrl || FALLBACK_CREST;
+/** Local crest asset path for a tracked team — fast, no external dependency, but may 404 if we don't actually have art for this team yet (see TeamCrest's fallback cascade). */
+export function localCrestUrl(team: Pick<Team, "crestFile">): string {
+  return `${import.meta.env.BASE_URL}images/times/${team.crestFile}`;
 }
 
 /**
