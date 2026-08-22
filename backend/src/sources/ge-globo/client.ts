@@ -1,4 +1,5 @@
 import { fetchText } from "../../http/client.js";
+import { extractBalancedJsonObject } from "../../http/json.js";
 import { parseScheduleTeamStructure, type ScheduleTeamStructure } from "./schema.js";
 
 const SCHEDULE_MARKER = "scheduleTeam: {";
@@ -11,29 +12,6 @@ const SCHEDULE_MARKER = "scheduleTeam: {";
 // its value, which (unlike the outer object) is valid JSON on its own —
 // every key inside it is quoted. Confirmed against a real fetch; see
 // test/fixtures/ge-globo-flamengo.html for the saved evidence.
-function extractBalancedJsonObject(source: string, openBraceIndex: number): string {
-  let depth = 0;
-  let inString = false;
-  let escaped = false;
-
-  for (let i = openBraceIndex; i < source.length; i++) {
-    const char = source[i];
-    if (inString) {
-      if (escaped) escaped = false;
-      else if (char === "\\") escaped = true;
-      else if (char === '"') inString = false;
-      continue;
-    }
-    if (char === '"') inString = true;
-    else if (char === "{") depth++;
-    else if (char === "}") {
-      depth--;
-      if (depth === 0) return source.slice(openBraceIndex, i + 1);
-    }
-  }
-  throw new Error("Unbalanced braces while extracting ge.globo scheduleTeam JSON");
-}
-
 export function extractScheduleTeam(html: string): ScheduleTeamStructure {
   const markerIndex = html.indexOf(SCHEDULE_MARKER);
   if (markerIndex === -1) {
