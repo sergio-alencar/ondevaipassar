@@ -40,7 +40,7 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
         <div className="mb-8">
           <DivisionTabs active={division} onChange={setDivision} />
         </div>
-        <ul className="flex flex-wrap gap-10 justify-items-center max-w-275 mx-auto justify-center max-lg:max-w-3xl">
+        <ul className="flex flex-wrap gap-10 justify-items-center max-w-275 mx-auto justify-center max-lg:max-w-3xl max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
           {teamsInDivision.map((team) => (
             <li key={team.id} onClick={() => setSelectedTeam(team)}>
               <Link to={`/time/${team.id}`}>
