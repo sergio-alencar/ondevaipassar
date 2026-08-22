@@ -58,7 +58,8 @@ export async function matchesRoutes(app: FastifyInstance): Promise<void> {
                 regionalCaveat: channel.regionalCaveat ?? false,
               },
             ];
-          });
+          })
+          .sort((a, b) => a.displayName.localeCompare(b.displayName, "pt-BR"));
 
         return {
           id: row.id,
