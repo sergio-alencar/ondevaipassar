@@ -1,6 +1,7 @@
 import { TEAMS, resolveChannelId } from "@ondevaipassar/shared";
 import { resolveCompetitionId } from "../../ingest/competitionResolver.js";
 import { resolveTeamId } from "../../ingest/teamResolver.js";
+import { getErrorMessage } from "../../lib/errors.js";
 import type { CanonicalBroadcast, CanonicalMatch, FetchResult, FixtureSourceAdapter } from "../types.js";
 import { fetchTeamAgenda } from "./client.js";
 import { parseSoccerEvent, type SoccerEvent } from "./schema.js";
@@ -96,7 +97,7 @@ export const geGloboAdapter: FixtureSourceAdapter = {
               else unresolvedCount++;
             }
           } catch (error) {
-            console.error(`[ge-globo] failed to fetch agenda for ${team.id}:`, (error as Error).message);
+            console.error(`[ge-globo] failed to fetch agenda for ${team.id}:`, getErrorMessage(error));
             unresolvedCount++;
           }
         }),

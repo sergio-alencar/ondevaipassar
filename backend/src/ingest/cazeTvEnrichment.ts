@@ -1,5 +1,6 @@
 import { db } from "../db/client.js";
 import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
+import { getErrorMessage } from "../lib/errors.js";
 import { fetchCazeTvStreams } from "../sources/caze-tv/adapter.js";
 
 const CHANNEL_ID = "cazetv";
@@ -99,7 +100,7 @@ export async function runCazeTvEnrichment(): Promise<void> {
       status: "failed",
       matchesFound: 0,
       matchesUnresolved: 0,
-      errorMessage: error instanceof Error ? error.message : String(error),
+      errorMessage: getErrorMessage(error),
     });
     console.error(`[${SOURCE_ID}] run failed:`, error);
   }

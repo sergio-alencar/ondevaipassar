@@ -1,6 +1,7 @@
 import { COMPETITIONS, TEAMS } from "@ondevaipassar/shared";
 import { db } from "../db/client.js";
 import { broadcasts, competitions, matches, scrapeRuns, teams } from "../db/schema.js";
+import { getErrorMessage } from "../lib/errors.js";
 import type { FixtureSourceAdapter } from "../sources/types.js";
 
 /** Idempotently upserts the code-authoritative team/competition registries into the DB, so matches/broadcasts get real FK-shaped ids to join against. Registry data itself is never edited at runtime — renaming a team is a code change, not a DB write. Batched into one round-trip since the DB is a remote Turso instance in production, not a local file — per-row awaits would each pay real network latency. */
@@ -105,7 +106,7 @@ export async function runAdapter(adapter: FixtureSourceAdapter): Promise<void> {
       status: "failed",
       matchesFound: 0,
       matchesUnresolved: 0,
-      errorMessage: error instanceof Error ? error.message : String(error),
+      errorMessage: getErrorMessage(error),
     });
     console.error(`[${adapter.id}] run failed:`, error);
   }
