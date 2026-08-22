@@ -58,7 +58,7 @@ const MatchCard = ({ match, team }: MatchCardProps) => {
           <p>{formatKickoff(match.kickoffUtc)}</p>
         </div>
 
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-start max-sm:justify-center">
           <MatchBroadcasts broadcasts={match.broadcasts} fallbackColor={team?.color} />
         </div>
       </div>

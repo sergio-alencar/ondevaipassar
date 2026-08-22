@@ -28,8 +28,8 @@ const SQUARE_LOGO_CHANNEL_IDS = new Set([
   "tntsports",
 ]);
 
-const WIDE_LOGO_BOX = "w-28 h-28 max-lg:w-20 max-lg:h-10 max-sm:w-16 max-sm:h-9";
-const SQUARE_LOGO_BOX = "w-24 h-20 max-lg:w-18 max-lg:h-9 max-sm:w-14 max-sm:h-7";
+const WIDE_LOGO_BOX = "w-28 h-28 max-lg:w-20 max-lg:h-20 max-sm:w-18 max-sm:h-18";
+const SQUARE_LOGO_BOX = "w-24 h-20 max-lg:w-18 max-lg:h-18 max-sm:w-16 max-sm:h-16";
 
 const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) => {
   if (broadcasts.length === 0) {
@@ -45,7 +45,7 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
   }
 
   return (
-    <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 max-lg:gap-x-3">
+    <div className="flex flex-wrap justify-start items-center gap-x-6 gap-y-3 max-lg:gap-x-3 max-sm:justify-center">
       {broadcasts.map((broadcast) => (
         <a
           key={broadcast.channelId}
