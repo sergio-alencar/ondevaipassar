@@ -9,7 +9,11 @@ primary_region = "gru"
 
 [env]
   PORT = "3000"
-  DATABASE_PATH = "/data/ondevaipassar.sqlite"
+  # The app reads DATABASE_URL (libSQL file: scheme), not DATABASE_PATH —
+  # this must point inside the mounted volume below or data won't survive a
+  # restart. Add DATABASE_AUTH_TOKEN too if pointing at Turso instead of a
+  # local file.
+  DATABASE_URL = "file:/data/ondevaipassar.db"
 
 [[mounts]]
   source = "ondevaipassar_data"
@@ -18,9 +22,11 @@ primary_region = "gru"
 [http_service]
   internal_port = 3000
   force_https = true
-  # node-cron needs the process to stay alive continuously — auto-stop/idle
-  # behavior would silently break scheduled ingests. Never let this default
-  # back to Fly's usual scale-to-zero.
+  # Vercel Cron (the real scheduler in production) doesn't exist here — this
+  # fallback has no scheduler at all right now (node-cron was removed when
+  # the project moved to Vercel Cron). Whatever scheduler gets added back
+  # needs the process alive continuously, so keep auto-stop off; don't let
+  # this default back to Fly's usual scale-to-zero.
   auto_stop_machines = false
   auto_start_machines = true
   min_machines_running = 1

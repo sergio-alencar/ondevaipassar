@@ -2,28 +2,24 @@ FROM node:24-slim AS build
 
 WORKDIR /app
 
-# better-sqlite3 is a native addon: prebuild-install isn't guaranteed to have
-# a binary for whatever exact Node patch version this base image resolves to
-# (confirmed by testing — it doesn't, as of this build), so node-gyp falls
-# back to compiling from source, which needs these. Build-only stage, so
-# they never end up in the final image.
-RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ \
-  && rm -rf /var/lib/apt/lists/*
-
-# Package manifests first (better layer caching — the install layer only
-# invalidates when a package.json actually changes, not on every source edit).
-# frontend/package.json is copied too because it's a declared npm workspace;
-# without it "npm install" at the root fails to resolve the workspace list.
-# Its source is never copied in — it's not needed to run the backend.
+# backend/frontend manifests only (better layer caching — their install
+# layer only invalidates when a package.json actually changes, not on every
+# source edit). frontend/package.json is copied too because it's a declared
+# npm workspace; without it "npm install" at the root fails to resolve the
+# workspace list. frontend's source is never copied in — not needed to run
+# the backend. packages/shared needs its FULL source here already, not just
+# package.json: the root postinstall runs `tsc` inside it as part of `npm
+# install` itself, so tsconfig.json and src/*.ts must already exist by then
+# (confirmed by testing — installing with only package.json present makes
+# the postinstall's tsc invocation fail with no tsconfig found).
 COPY package.json package-lock.json ./
 COPY backend/package.json backend/package.json
 COPY frontend/package.json frontend/package.json
-COPY packages/shared/package.json packages/shared/package.json
+COPY packages/shared packages/shared
 
 RUN npm install
 
 COPY backend backend
-COPY packages/shared packages/shared
 
 FROM node:24-slim
 
