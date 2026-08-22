@@ -15,7 +15,7 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const escudoRef = useRef<HTMLImageElement>(null);
+  const escudoRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -50,7 +50,9 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
         <div className="flex justify-between items-center max-w-7xl mx-auto px-24 max-sm:px-6">
           <button
             id="menu-botao"
+            type="button"
             onClick={() => setIsMenuVisible(true)}
+            aria-label="Abrir menu"
             className="flex gap-4 items-center cursor-pointer"
           >
             <span className="h-5 w-7 flex flex-col justify-between *:h-0.5 *:rounded-md *:bg-white">
@@ -67,14 +69,16 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
             <p className="text-white text-xl uppercase font-bold select-none max-sm:!hidden">
               times
             </p>
-            <img
+            <button
               ref={escudoRef}
+              type="button"
               onClick={toggleDropdown}
-              className="size-7 cursor-pointer"
-              src={escudo}
-              alt="Escolha o time"
+              className="cursor-pointer"
+              aria-label="Escolha o time"
               title="Escolha o time"
-            />
+            >
+              <img className="size-7" src={escudo} alt="" />
+            </button>
             <DropdownMenu
               ref={dropdownRef}
               setSelectedTeam={setSelectedTeam}
