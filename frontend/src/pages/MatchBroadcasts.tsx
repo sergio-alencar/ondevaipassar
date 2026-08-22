@@ -28,14 +28,16 @@ const SQUARE_LOGO_CHANNEL_IDS = new Set([
   "tntsports",
 ]);
 
-const WIDE_LOGO_BOX = "w-28 h-14 max-lg:w-20 max-lg:h-10 max-sm:w-16 max-sm:h-9";
-const SQUARE_LOGO_BOX = "w-24 h-12 max-lg:w-18 max-lg:h-9 max-sm:w-14 max-sm:h-7";
+const WIDE_LOGO_BOX = "w-28 h-28 max-lg:w-20 max-lg:h-10 max-sm:w-16 max-sm:h-9";
+const SQUARE_LOGO_BOX = "w-24 h-20 max-lg:w-18 max-lg:h-9 max-sm:w-14 max-sm:h-7";
 
 const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) => {
   if (broadcasts.length === 0) {
     return (
       <div className="text-center">
-        <p className={`${textColorClass(fallbackColor)} uppercase font-bold text-lg max-lg:text-base`}>
+        <p
+          className={`${textColorClass(fallbackColor)} uppercase font-bold text-lg max-lg:text-base`}
+        >
           Transmissão a confirmar
         </p>
       </div>
