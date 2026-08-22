@@ -2,13 +2,13 @@ import { Link } from "react-router-dom";
 import type { Team } from "@ondevaipassar/shared";
 import TeamCrest from "./TeamCrest";
 
-interface DropdownMenuTimeProps {
+interface DropdownMenuTeamProps {
   team: Team;
   setSelectedTeam: (team: Team) => void;
   sourceCrestUrl?: string;
 }
 
-const DropdownMenuTime = ({ team, setSelectedTeam, sourceCrestUrl }: DropdownMenuTimeProps) => {
+const DropdownMenuTeam = ({ team, setSelectedTeam, sourceCrestUrl }: DropdownMenuTeamProps) => {
   return (
     <li>
       <Link to={`/time/${team.id}`} onClick={() => setSelectedTeam(team)}>
@@ -23,4 +23,4 @@ const DropdownMenuTime = ({ team, setSelectedTeam, sourceCrestUrl }: DropdownMen
   );
 };
 
-export default DropdownMenuTime;
+export default DropdownMenuTeam;

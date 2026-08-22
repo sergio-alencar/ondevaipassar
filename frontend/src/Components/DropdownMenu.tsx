@@ -3,7 +3,7 @@ import { TEAMS, type Division, type Team } from "@ondevaipassar/shared";
 import { MatchesContext } from "../context/MatchesContext";
 import { findSourceCrestUrl } from "../lib/assets";
 import DivisionTabs from "./DivisionTabs";
-import DropdownMenuTime from "./DropdownMenuTime";
+import DropdownMenuTeam from "./DropdownMenuTeam";
 import triangleIcon from "../assets/images/icones/triangulo.svg";
 
 interface DropdownMenuProps {
@@ -47,7 +47,7 @@ const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
           </div>
           <ul className="grid grid-cols-4 gap-6 max-h-80 overflow-y-auto">
             {teamsInDivision.map((team) => (
-              <DropdownMenuTime
+              <DropdownMenuTeam
                 key={team.id}
                 team={team}
                 setSelectedTeam={handleSelectTeam}
