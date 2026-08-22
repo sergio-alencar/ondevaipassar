@@ -31,7 +31,7 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
   const matchesToday = matches.filter((match) => isTodayInBrasilia(match.kickoffUtc));
 
   return (
-    <main className="py-4 max-lg:grow container mx-auto px-4">
+    <main className="py-4 max-lg:grow max-w-7xl mx-auto px-4">
       <div>
         <p className="text-4xl font-bold mb-8 pt-8 uppercase text-center max-sm:text-2xl text-gray-800">
           Escolha seu time
@@ -39,7 +39,7 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
         <div className="mb-8">
           <DivisionTabs active={division} onChange={setDivision} />
         </div>
-        <ul className="flex flex-wrap gap-10 justify-items-center max-w-275 mx-auto justify-center max-lg:max-w-3xl max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
+        <ul className="flex flex-wrap gap-10 justify-items-center justify-center max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
           {teamsInDivision.map((team) => (
             <li key={team.id} onClick={() => setSelectedTeam(team)}>
               <Link to={`/time/${team.id}`}>

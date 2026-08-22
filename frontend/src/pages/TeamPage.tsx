@@ -48,7 +48,7 @@ const TeamPage = ({ setSelectedTeam }: TeamPageProps) => {
   const visibleMatches = teamMatches.slice(0, visibleCount);
 
   return (
-    <div className="grid grid-cols-1 items-center container mx-auto px-4">
+    <div className="grid grid-cols-1 items-center max-w-7xl mx-auto px-4">
       <p
         className={`text-4xl max-sm:text-2xl font-bold uppercase justify-self-center pt-8 max-sm:py-4 ${textColorClass(team.color, "gray-800")}`}
       >
