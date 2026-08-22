@@ -8,6 +8,12 @@ interface MatchBroadcastsProps {
 }
 
 const REGIONAL_CAVEAT_TEXT = " — pode variar por região, confira a programação local";
+// The tooltip alone (title attribute) is easy to miss — it needs a hover
+// most people never try, and doesn't work at all on mobile without a long
+// press. This adds a visible marker on the logo itself plus an explicit
+// caption below the row, so the caveat doesn't depend on discovering a
+// hidden hover state.
+const REGIONAL_CAVEAT_CAPTION = "A transmissão pela Globo pode variar por região — confira a programação local";
 
 // Every logo SVG has the same square canvas, but what's actually drawn
 // inside varies for real: some are a wide band (a wordmark), others are a
@@ -44,34 +50,51 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
     );
   }
 
+  const hasRegionalCaveat = broadcasts.some((broadcast) => broadcast.regionalCaveat);
+
   return (
-    <div className="flex flex-wrap justify-start items-center gap-x-6 gap-y-3 max-lg:gap-x-3 max-sm:justify-center">
-      {broadcasts.map((broadcast) => (
-        <a
-          key={broadcast.channelId}
-          href={broadcast.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`flex items-center justify-center hover:scale-105 transition ${
-            SQUARE_LOGO_CHANNEL_IDS.has(broadcast.channelId) ? SQUARE_LOGO_BOX : WIDE_LOGO_BOX
-          }`}
-        >
-          <img
-            src={channelLogoUrl(broadcast.channelId)}
-            alt={broadcast.displayName}
-            title={`${broadcast.displayName}${broadcast.regionalCaveat ? REGIONAL_CAVEAT_TEXT : ""}`}
-            className="max-w-full max-h-full object-contain"
-            loading="lazy"
-            onError={(event) => {
-              if (event.currentTarget.src !== broadcast.logoUrl) {
-                event.currentTarget.src = broadcast.logoUrl;
-              } else {
-                event.currentTarget.style.display = "none";
-              }
-            }}
-          />
-        </a>
-      ))}
+    <div>
+      <div className="flex flex-wrap justify-start items-center gap-x-6 gap-y-3 max-lg:gap-x-3 max-sm:justify-center">
+        {broadcasts.map((broadcast) => (
+          <a
+            key={broadcast.channelId}
+            href={broadcast.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`relative flex items-center justify-center hover:scale-105 transition ${
+              SQUARE_LOGO_CHANNEL_IDS.has(broadcast.channelId) ? SQUARE_LOGO_BOX : WIDE_LOGO_BOX
+            }`}
+          >
+            <img
+              src={channelLogoUrl(broadcast.channelId)}
+              alt={broadcast.displayName}
+              title={`${broadcast.displayName}${broadcast.regionalCaveat ? REGIONAL_CAVEAT_TEXT : ""}`}
+              className="max-w-full max-h-full object-contain"
+              loading="lazy"
+              onError={(event) => {
+                if (event.currentTarget.src !== broadcast.logoUrl) {
+                  event.currentTarget.src = broadcast.logoUrl;
+                } else {
+                  event.currentTarget.style.display = "none";
+                }
+              }}
+            />
+            {broadcast.regionalCaveat && (
+              <span
+                aria-hidden="true"
+                className="absolute -top-1 -right-1 flex items-center justify-center size-5 rounded-full bg-yellow-400 text-gray-900 text-xs font-bold shadow"
+              >
+                *
+              </span>
+            )}
+          </a>
+        ))}
+      </div>
+      {hasRegionalCaveat && (
+        <p className="text-xs text-gray-500 mt-2 max-sm:text-center">
+          <span className="font-bold">*</span> {REGIONAL_CAVEAT_CAPTION}
+        </p>
+      )}
     </div>
   );
 };
