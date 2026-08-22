@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+      # Root postinstall builds packages/shared automatically — same as any
+      # local `npm install` (see CLAUDE.md).
+      - run: npm install
+      - name: Backend typecheck
+        run: npm run typecheck --workspace=backend
+      - name: Backend tests
+        run: npm test --workspace=backend
+      - name: Frontend lint
+        run: npm run lint --workspace=frontend
+      - name: Frontend typecheck + build
+        run: npm run build --workspace=frontend
