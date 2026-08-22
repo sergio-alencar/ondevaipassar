@@ -47,7 +47,19 @@ export function extractScheduleTeam(html: string): ScheduleTeamStructure {
   return parseScheduleTeamStructure(parsed);
 }
 
+// Bigger/national clubs live at the plain /futebol/times/{slug}/... path, but
+// smaller or regional clubs redirect to a state-prefixed sub-portal instead
+// (confirmed live: ge.globo.com/futebol/times/mirassol/ 404s, but
+// ge.globo.com/sp/tem-esporte/futebol/times/mirassol/ is the real page) —
+// no single consistent rule found across states, so these are looked up
+// individually as discovered rather than guessed.
+const NON_STANDARD_AGENDA_PATHS: Record<string, string> = {
+  mirassol: "sp/tem-esporte/futebol/times/mirassol/agenda-de-jogos-do-mirassol/",
+};
+
 export function buildTeamAgendaUrl(geGloboSlug: string): string {
+  const nonStandardPath = NON_STANDARD_AGENDA_PATHS[geGloboSlug];
+  if (nonStandardPath) return `https://ge.globo.com/${nonStandardPath}`;
   return `https://ge.globo.com/futebol/times/${geGloboSlug}/agenda-de-jogos-do-${geGloboSlug}/`;
 }
 

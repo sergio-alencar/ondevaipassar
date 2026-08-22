@@ -30,38 +30,55 @@ function formatKickoff(kickoffUtc: string): string {
   return `${dateLabel}, ${timeLabel}`;
 }
 
-function contestantCrestUrl(teamId: string | null, sourceCrestUrl: string): string {
-  const team = teamId ? findTeamById(teamId) : undefined;
-  return crestUrl(team, sourceCrestUrl);
+interface ContestantCrestProps {
+  teamId: string | null;
+  name: string;
+  sourceCrestUrl: string;
+  className: string;
 }
+
+// Many newly-tracked clubs (promoted/relegated this season) don't have a
+// local SVG yet — falls back local -> source-provided crest -> generic
+// shield, instead of jumping straight past the (often perfectly good)
+// source crest to the generic one.
+const ContestantCrest = ({ teamId, name, sourceCrestUrl, className }: ContestantCrestProps) => {
+  const team = teamId ? findTeamById(teamId) : undefined;
+  return (
+    <img
+      className={className}
+      src={crestUrl(team, sourceCrestUrl)}
+      alt={name}
+      title={name}
+      loading="lazy"
+      onError={(event) => {
+        const img = event.currentTarget;
+        if (team && img.src !== sourceCrestUrl && sourceCrestUrl) {
+          img.src = sourceCrestUrl;
+        } else if (img.src !== fallbackCrestUrl) {
+          img.src = fallbackCrestUrl;
+        }
+      }}
+    />
+  );
+};
 
 const MatchCard = ({ match, team }: MatchCardProps) => {
   return (
     <li className="py-6 max-sm:py-0">
       <div className="grid grid-cols-[1fr_400px_1fr] gap-2 py-8 px-4 max-lg:grid-cols-3 max-lg:py-2 max-lg:px-2 max-sm:flex max-sm:flex-col max-sm:items-center max-sm:gap-2 max-sm:py-4">
         <div className="flex items-center justify-self-end gap-4 max-lg:gap-2 max-lg:justify-self-center">
-          <img
+          <ContestantCrest
+            teamId={match.homeTeamId}
+            name={match.homeTeamName}
+            sourceCrestUrl={match.homeTeamCrestUrl}
             className="size-32 max-lg:size-20 max-sm:size-18"
-            src={contestantCrestUrl(match.homeTeamId, match.homeTeamCrestUrl)}
-            alt={match.homeTeamName}
-            title={match.homeTeamName}
-            onError={(event) => {
-              event.currentTarget.onerror = null;
-              event.currentTarget.src = fallbackCrestUrl;
-            }}
-            loading="lazy"
           />
           <img className="size-6 max-lg:size-4" src={versus} alt="versus" />
-          <img
+          <ContestantCrest
+            teamId={match.awayTeamId}
+            name={match.awayTeamName}
+            sourceCrestUrl={match.awayTeamCrestUrl}
             className="size-32 max-lg:size-20 max-sm:size-18"
-            src={contestantCrestUrl(match.awayTeamId, match.awayTeamCrestUrl)}
-            alt={match.awayTeamName}
-            title={match.awayTeamName}
-            onError={(event) => {
-              event.currentTarget.onerror = null;
-              event.currentTarget.src = fallbackCrestUrl;
-            }}
-            loading="lazy"
           />
         </div>
 
