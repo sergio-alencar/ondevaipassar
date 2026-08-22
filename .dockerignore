@@ -1,0 +1,10 @@
+node_modules
+**/node_modules
+.git
+frontend/dist
+backend/data
+**/*.sqlite
+**/*.sqlite3
+.env
+**/.env
+backend/test

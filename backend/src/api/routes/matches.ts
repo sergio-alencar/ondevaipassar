@@ -26,10 +26,11 @@ export async function matchesRoutes(app: FastifyInstance): Promise<void> {
     if (from) conditions.push(gte(matches.kickoffUtc, from));
     if (to) conditions.push(lte(matches.kickoffUtc, to));
 
-    const matchRows = conditions.length > 0 ? db.select().from(matches).where(and(...conditions)).all() : db.select().from(matches).all();
+    const matchRows =
+      conditions.length > 0 ? await db.select().from(matches).where(and(...conditions)) : await db.select().from(matches);
 
     const matchIds = matchRows.map((row) => row.id);
-    const broadcastRows = matchIds.length > 0 ? db.select().from(broadcasts).where(inArray(broadcasts.matchId, matchIds)).all() : [];
+    const broadcastRows = matchIds.length > 0 ? await db.select().from(broadcasts).where(inArray(broadcasts.matchId, matchIds)) : [];
 
     const broadcastsByMatchId = new Map<string, typeof broadcastRows>();
     for (const broadcast of broadcastRows) {

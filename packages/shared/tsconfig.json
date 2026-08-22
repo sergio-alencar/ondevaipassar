@@ -5,6 +5,7 @@
     "target": "ES2022",
     "strict": true,
     "declaration": true,
+    "outDir": "dist",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true

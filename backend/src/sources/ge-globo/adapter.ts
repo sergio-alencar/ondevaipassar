@@ -5,10 +5,16 @@ import type { CanonicalBroadcast, CanonicalMatch, FetchResult, FixtureSourceAdap
 import { fetchTeamAgenda } from "./client.js";
 import { parseSoccerEvent, type SoccerEvent } from "./schema.js";
 
-const BETWEEN_TEAM_REQUESTS_MS = 500;
+// Small concurrent batches, not fully sequential: this now runs as a
+// serverless function against a real duration limit (previously it was a
+// long-lived process where a slow sequential loop cost nothing but time).
+// Still polite to ge.globo — a handful of requests in flight, not all ~20 teams at once.
+const CONCURRENCY = 5;
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function chunk<T>(items: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += size) chunks.push(items.slice(i, i + size));
+  return chunks;
 }
 
 // ge.globo shows local Brasília time; Brazil has used a fixed UTC-3 offset
@@ -57,20 +63,23 @@ export const geGloboAdapter: FixtureSourceAdapter = {
     const byId = new Map<string, CanonicalMatch>();
     let unresolvedCount = 0;
 
-    for (const team of teamsWithSlug) {
-      try {
-        const schedule = await fetchTeamAgenda(team.aliases.geGlobo);
-        for (const rawEvent of schedule.teamAgenda.future) {
-          const event = parseSoccerEvent(rawEvent);
-          const canonical = event ? toCanonicalMatch(event) : null;
-          if (canonical) byId.set(canonical.id, canonical);
-          else unresolvedCount++;
-        }
-      } catch (error) {
-        console.error(`[ge-globo] failed to fetch agenda for ${team.id}:`, (error as Error).message);
-        unresolvedCount++;
-      }
-      await sleep(BETWEEN_TEAM_REQUESTS_MS);
+    for (const batch of chunk(teamsWithSlug, CONCURRENCY)) {
+      await Promise.all(
+        batch.map(async (team) => {
+          try {
+            const schedule = await fetchTeamAgenda(team.aliases.geGlobo);
+            for (const rawEvent of schedule.teamAgenda.future) {
+              const event = parseSoccerEvent(rawEvent);
+              const canonical = event ? toCanonicalMatch(event) : null;
+              if (canonical) byId.set(canonical.id, canonical);
+              else unresolvedCount++;
+            }
+          } catch (error) {
+            console.error(`[ge-globo] failed to fetch agenda for ${team.id}:`, (error as Error).message);
+            unresolvedCount++;
+          }
+        }),
+      );
     }
 
     return { matches: [...byId.values()], unresolvedCount };

@@ -1,0 +1,30 @@
+# App name must be globally unique on Fly.io — if "ondevaipassar-api" is
+# taken, `fly launch` will prompt for a different one; update this file to
+# match whatever you actually end up with.
+app = "ondevaipassar-api"
+primary_region = "gru"
+
+[build]
+  dockerfile = "backend/Dockerfile"
+
+[env]
+  PORT = "3000"
+  DATABASE_PATH = "/data/ondevaipassar.sqlite"
+
+[[mounts]]
+  source = "ondevaipassar_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  # node-cron needs the process to stay alive continuously — auto-stop/idle
+  # behavior would silently break scheduled ingests. Never let this default
+  # back to Fly's usual scale-to-zero.
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
