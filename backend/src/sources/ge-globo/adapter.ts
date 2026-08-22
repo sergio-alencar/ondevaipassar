@@ -25,17 +25,38 @@ function toKickoffUtcIso(startDate: string | null, startHour: string | null): st
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
-function toCanonicalMatch(event: SoccerEvent): CanonicalMatch | null {
-  const { match } = event;
-  const kickoffUtc = toKickoffUtcIso(match.startDate, match.startHour);
-  if (!kickoffUtc) return null;
-
-  const broadcasts: CanonicalBroadcast[] = (match.liveWatchSources ?? [])
+// ge.globo lists a bare "globoplay" entry alongside whichever real channel
+// (sportv, premiere, ...) is actually airing the match. Globoplay there is
+// the app SporTV subscribers can stream through, not an independent way to
+// gain access — confirmed live: the sportv entry's own description reads
+// "com Globoplay Premium", and across every match sampled with a
+// "globoplay" entry (Internacional x Atlético-MG and 11 others), it never
+// once appeared without sportv/premiere also present (Sérgio also confirmed
+// a plain Globoplay subscription doesn't by itself grant SporTV access).
+// Showing it as its own logo overstates the real options — someone with
+// Globoplay but no SporTV entitlement could click it expecting to watch and
+// be wrong. Matches ge.globo's own human-written "onde assistir" article
+// for Internacional x Atlético-MG, which names only sportv and premiere
+// (the mismatch Sérgio caught). Dropped only when something else is already
+// in the list, so a genuinely standalone Globoplay offering (never observed
+// so far) would still show.
+function resolveBroadcasts(sources: SoccerEvent["match"]["liveWatchSources"]): CanonicalBroadcast[] {
+  const resolved = (sources ?? [])
     .map((source): CanonicalBroadcast | null => {
       const channelId = resolveChannelId(source.name);
       return channelId ? { channelId, logoUrl: source.officialLogoUrl } : null;
     })
     .filter((broadcast): broadcast is CanonicalBroadcast => broadcast !== null);
+
+  return resolved.length > 1 ? resolved.filter((broadcast) => broadcast.channelId !== "globoplay") : resolved;
+}
+
+function toCanonicalMatch(event: SoccerEvent): CanonicalMatch | null {
+  const { match } = event;
+  const kickoffUtc = toKickoffUtcIso(match.startDate, match.startHour);
+  if (!kickoffUtc) return null;
+
+  const broadcasts = resolveBroadcasts(match.liveWatchSources);
 
   return {
     id: `ge-globo:${match.id}`,
