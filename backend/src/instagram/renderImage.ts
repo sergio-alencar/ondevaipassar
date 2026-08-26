@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import type { MatchView } from "@ondevaipassar/shared";
 import { Resvg } from "@resvg/resvg-js";
 import satori from "satori";
@@ -10,6 +12,20 @@ const HEIGHT = 1350;
 
 // Loaded once per cold start, reused across every match rendered in a run.
 const fonts = loadFonts();
+
+// satori (Yoga's layout engine) and harfbuzzjs (its text-shaping dependency)
+// each load a .wasm file from disk at runtime, via a dynamically-built path
+// their own compiled code constructs — not a static import/require, so
+// Vercel's file tracer never discovers them and they silently go missing
+// from the deployed function bundle (confirmed by inspecting a local
+// `vercel build` output: every other satori/harfbuzzjs file traced fine,
+// only these two didn't). The `new URL(literal, import.meta.url)` form
+// below is the one pattern the tracer *does* reliably follow — same trick
+// already relied on for this module's own local SVG/font assets — so
+// referencing them this way, even just to warm the read, is enough to pull
+// both into the bundle.
+readFileSync(fileURLToPath(new URL("../../../node_modules/harfbuzzjs/hb.wasm", import.meta.url)));
+readFileSync(fileURLToPath(new URL("../../../node_modules/satori/yoga.wasm", import.meta.url)));
 
 function formatKickoffLabel(kickoffUtc: string): string {
   const date = new Date(kickoffUtc);
