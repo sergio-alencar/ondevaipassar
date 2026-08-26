@@ -2,6 +2,7 @@ import { db } from "../db/client.js";
 import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
 import { getErrorMessage } from "../lib/errors.js";
 import { fetchCazeTvStreams } from "../sources/caze-tv/adapter.js";
+import type { CazeTvStream } from "../sources/caze-tv/adapter.js";
 
 const CHANNEL_ID = "cazetv";
 const SOURCE_ID = "caze-tv";
@@ -30,6 +31,48 @@ function daysBetween(a: CalendarDate, b: CalendarDate): number {
   return Math.abs(Date.UTC(a.year, a.month - 1, a.day) - Date.UTC(b.year, b.month - 1, b.day)) / msPerDay;
 }
 
+export interface MatchCandidate {
+  id: string;
+  homeTeamId: string | null;
+  awayTeamId: string | null;
+  kickoffUtc: string;
+}
+
+export interface MatchedStreams {
+  /** ids of already-ingested matches that should get a cazetv broadcast attached. */
+  matchIds: string[];
+  /** streams that didn't resolve to exactly one candidate match — zero (no fixture found yet) or 2+ (genuine ambiguity, e.g. a same-pair rematch within the date tolerance). */
+  unresolvedCount: number;
+}
+
+/**
+ * Pure matching core, split out from runCazeTvEnrichment so it's testable
+ * without a real database — everything here is "given these streams and
+ * these already-ingested matches, which matches should get a cazetv
+ * broadcast", no I/O.
+ */
+export function matchStreamsToBroadcasts(streams: CazeTvStream[], candidateMatches: MatchCandidate[]): MatchedStreams {
+  let unresolvedCount = 0;
+  const matchIds: string[] = [];
+
+  for (const stream of streams) {
+    const candidates = candidateMatches.filter((match) => {
+      const sameOrder = match.homeTeamId === stream.homeTeamId && match.awayTeamId === stream.awayTeamId;
+      const swappedOrder = match.homeTeamId === stream.awayTeamId && match.awayTeamId === stream.homeTeamId;
+      if (!sameOrder && !swappedOrder) return false;
+      return daysBetween(toBrtCalendarDate(match.kickoffUtc), stream.scheduledDate) <= DATE_TOLERANCE_DAYS;
+    });
+
+    if (candidates.length !== 1) {
+      unresolvedCount++;
+      continue;
+    }
+    matchIds.push(candidates[0].id);
+  }
+
+  return { matchIds, unresolvedCount };
+}
+
 /**
  * CazéTV doesn't have a fixtures API (see sources/caze-tv/adapter.ts) — it
  * only ever tells us "this team pair plays around this date". So unlike
@@ -47,37 +90,22 @@ export async function runCazeTvEnrichment(): Promise<void> {
     const allMatches = await db.select().from(matches);
     const now = new Date().toISOString();
 
-    let unresolved = unresolvedFromSource;
-    const broadcastUpserts = [];
+    const { matchIds, unresolvedCount } = matchStreamsToBroadcasts(streams, allMatches);
+    const unresolved = unresolvedFromSource + unresolvedCount;
 
-    for (const stream of streams) {
-      const candidates = allMatches.filter((match) => {
-        const sameOrder = match.homeTeamId === stream.homeTeamId && match.awayTeamId === stream.awayTeamId;
-        const swappedOrder = match.homeTeamId === stream.awayTeamId && match.awayTeamId === stream.homeTeamId;
-        if (!sameOrder && !swappedOrder) return false;
-        return daysBetween(toBrtCalendarDate(match.kickoffUtc), stream.scheduledDate) <= DATE_TOLERANCE_DAYS;
-      });
-
-      if (candidates.length !== 1) {
-        unresolved++;
-        continue;
-      }
-
-      const match = candidates[0];
-      broadcastUpserts.push(
-        db
-          .insert(broadcasts)
-          .values({
-            id: `${match.id}__${CHANNEL_ID}`,
-            matchId: match.id,
-            channelId: CHANNEL_ID,
-            logoUrl: channelLogoUrl,
-            sourceId: SOURCE_ID,
-            createdAt: now,
-          })
-          .onConflictDoUpdate({ target: broadcasts.id, set: { logoUrl: channelLogoUrl } }),
-      );
-    }
+    const broadcastUpserts = matchIds.map((matchId) =>
+      db
+        .insert(broadcasts)
+        .values({
+          id: `${matchId}__${CHANNEL_ID}`,
+          matchId,
+          channelId: CHANNEL_ID,
+          logoUrl: channelLogoUrl,
+          sourceId: SOURCE_ID,
+          createdAt: now,
+        })
+        .onConflictDoUpdate({ target: broadcasts.id, set: { logoUrl: channelLogoUrl } }),
+    );
 
     const [first, ...rest] = broadcastUpserts;
     if (first) await db.batch([first, ...rest]);
