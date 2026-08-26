@@ -1,6 +1,6 @@
 // Local dev entry point only — a long-lived process with app.listen().
 // Production runs through api/[...slug].ts as a Vercel serverless function
-// instead; scheduling there is Vercel Cron hitting /api/cron/ingest
+// instead; scheduling there is Vercel Cron hitting /api/cron-ingest
 // (see vercel.json), not anything in this file.
 import { buildApp } from "./api/app.js";
 import { env } from "./config/env.js";
@@ -12,7 +12,7 @@ async function main(): Promise<void> {
   await app.listen({ port: env.PORT, host: "0.0.0.0" });
 
   // Convenience for local dev only: don't wait for a manual curl of
-  // /api/cron/ingest to see real data.
+  // /api/cron-ingest to see real data.
   for (const adapter of ACTIVE_ADAPTERS) {
     void runAdapter(adapter);
   }

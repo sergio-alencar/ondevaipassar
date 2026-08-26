@@ -12,7 +12,11 @@ import { ACTIVE_ADAPTERS } from "../../sources/registry.js";
  * route can be curled manually there instead of waiting on a schedule).
  */
 export async function cronRoutes(app: FastifyInstance): Promise<void> {
-  app.get("/api/cron/ingest", async (request, reply) => {
+  // Single path segment, not "/api/cron/ingest" — Vercel's generated route
+  // for api/[...slug].ts on this project only matches one segment after
+  // /api/ (confirmed live: its regex is `^/api/([^/]+)$`, anything with an
+  // extra "/" 404s at the edge before ever reaching this function).
+  app.get("/api/cron-ingest", async (request, reply) => {
     if (env.CRON_SECRET && request.headers.authorization !== `Bearer ${env.CRON_SECRET}`) {
       return reply.status(401).send({ error: "unauthorized" });
     }

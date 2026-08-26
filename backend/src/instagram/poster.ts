@@ -44,7 +44,7 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
 
   for (const match of candidates) {
     const caption = buildCaption(match);
-    const imageUrl = `${env.PUBLIC_BASE_URL}/api/instagram/preview?matchId=${encodeURIComponent(match.id)}`;
+    const imageUrl = `${env.PUBLIC_BASE_URL}/api/instagram-preview?matchId=${encodeURIComponent(match.id)}`;
 
     if (env.INSTAGRAM_DRY_RUN) {
       // Exercises the real rendering path (catches template/asset errors)

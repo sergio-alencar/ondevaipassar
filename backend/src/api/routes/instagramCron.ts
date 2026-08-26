@@ -10,13 +10,14 @@ const querySchema = z.object({
 });
 
 /**
- * Triggered by Vercel Cron daily, shortly after /api/cron/ingest so the
+ * Triggered by Vercel Cron daily, shortly after /api/cron-ingest so the
  * day's matches are already fresh (see vercel.json). Same auth pattern as
  * the ingest cron: Vercel sends `Authorization: Bearer $CRON_SECRET` on
- * cron-triggered requests.
+ * cron-triggered requests. Single path segment, not "/api/cron/instagram-post"
+ * — see the comment on /api/cron-ingest in cron.ts for why.
  */
 export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
-  app.get("/api/cron/instagram-post", async (request, reply) => {
+  app.get("/api/cron-instagram-post", async (request, reply) => {
     if (env.CRON_SECRET && request.headers.authorization !== `Bearer ${env.CRON_SECRET}`) {
       return reply.status(401).send({ error: "unauthorized" });
     }

@@ -1,6 +1,6 @@
 {
   "crons": [
-    { "path": "/api/cron/ingest", "schedule": "0 10 * * *" },
-    { "path": "/api/cron/instagram-post", "schedule": "5 10 * * *" }
+    { "path": "/api/cron-ingest", "schedule": "0 10 * * *" },
+    { "path": "/api/cron-instagram-post", "schedule": "5 10 * * *" }
   ]
 }

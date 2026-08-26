@@ -10,12 +10,15 @@ const querySchema = z.object({ matchId: z.string() });
 // match data instead of writing to blob storage, avoiding new infra as long
 // as the render stays fast and match data doesn't change mid-flow.
 //
-// matchId is a query param, not a :matchId path segment — Vercel's edge
-// routing 404s on a raw ":" in a path segment (match ids look like
-// "ge-globo:356257"; confirmed live against production that the same
-// colon works fine in a query value but not in the path).
+// matchId is a query param, not a path segment, and the route is a single
+// segment ("/api/instagram-preview", not "/api/instagram/preview") — see
+// the comment on /api/cron-ingest in cron.ts: Vercel's generated route for
+// this project's api/[...slug].ts only matches one path segment after
+// /api/, so anything with an extra "/" 404s at the edge before reaching
+// this function at all (independent of, and originally mistaken for, the
+// ":" in match ids like "ge-globo:356257" — that part turned out fine).
 export async function instagramPreviewRoutes(app: FastifyInstance): Promise<void> {
-  app.get("/api/instagram/preview", async (request, reply) => {
+  app.get("/api/instagram-preview", async (request, reply) => {
     const parsedQuery = querySchema.safeParse(request.query);
     if (!parsedQuery.success) {
       return reply.status(400).send({ error: "invalid query params", details: parsedQuery.error.flatten() });
