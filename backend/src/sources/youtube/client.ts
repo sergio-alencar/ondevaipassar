@@ -26,6 +26,15 @@ export async function searchUpcomingVideos(youtubeChannelId: string, apiKey: str
     eventType: "upcoming",
     type: "video",
     maxResults: "25",
+    // Without this, the API infers a region from the caller's IP and
+    // silently returns zero items (a valid 200, real totalResults count,
+    // just an empty items array) for "upcoming" events it decides aren't
+    // relevant there — confirmed live: Vercel's US-based function IP got
+    // regionCode "US" back and 0 results for channels that have real
+    // upcoming Brazilian football streams; the exact same request with
+    // regionCode=BR returns them. These are Brazilian broadcasters, so BR
+    // is correct regardless of where the request happens to run from.
+    regionCode: "BR",
     key: apiKey,
   });
   const parsed = searchResponseSchema.parse(raw);
