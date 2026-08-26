@@ -1,0 +1,79 @@
+import { describe, expect, it } from "vitest";
+import { matchStreamsToBroadcasts, type MatchCandidate } from "../src/ingest/youtubeEnrichment.js";
+import type { YoutubeStream } from "../src/sources/youtube/adapter.js";
+
+function buildStream(overrides: Partial<YoutubeStream> = {}): YoutubeStream {
+  return {
+    videoId: "vid1",
+    homeTeamId: "botafogo",
+    awayTeamId: "palmeiras",
+    scheduledStartUtc: "2026-09-06T18:30:00.000Z",
+    ...overrides,
+  };
+}
+
+function buildMatch(overrides: Partial<MatchCandidate> = {}): MatchCandidate {
+  return {
+    id: "ge-globo:1",
+    homeTeamId: "botafogo",
+    awayTeamId: "palmeiras",
+    kickoffUtc: "2026-09-06T21:30:00.000Z",
+    ...overrides,
+  };
+}
+
+describe("matchStreamsToBroadcasts", () => {
+  it("attaches a broadcast when exactly one match fits the team pair and date", () => {
+    const result = matchStreamsToBroadcasts([buildStream()], [buildMatch()]);
+    expect(result.matchIds).toEqual(["ge-globo:1"]);
+    expect(result.unresolvedCount).toBe(0);
+  });
+
+  it("matches regardless of home/away order (a stream can list either team first)", () => {
+    const result = matchStreamsToBroadcasts(
+      [buildStream({ homeTeamId: "palmeiras", awayTeamId: "botafogo" })],
+      [buildMatch()],
+    );
+    expect(result.matchIds).toEqual(["ge-globo:1"]);
+  });
+
+  it("matches when the stream's scheduled start is hours before kickoff (pre-game show lead-in), same BRT day", () => {
+    // Real example: ge tv scheduled a stream 3h before a 21:30 BRT kickoff.
+    const result = matchStreamsToBroadcasts(
+      [buildStream({ scheduledStartUtc: "2026-09-06T18:30:00.000Z" })],
+      [buildMatch({ kickoffUtc: "2026-09-06T21:30:00.000Z" })],
+    );
+    expect(result.matchIds).toEqual(["ge-globo:1"]);
+  });
+
+  it("tolerates a 1-day gap (late BRT kickoff rolling into the next UTC day)", () => {
+    const result = matchStreamsToBroadcasts(
+      [buildStream({ scheduledStartUtc: "2026-09-05T23:00:00.000Z" })],
+      [buildMatch({ kickoffUtc: "2026-09-06T21:30:00.000Z" })],
+    );
+    expect(result.matchIds).toEqual(["ge-globo:1"]);
+  });
+
+  it("does not attach anything when no ingested match fits (counts as unresolved)", () => {
+    const result = matchStreamsToBroadcasts([buildStream()], []);
+    expect(result.matchIds).toEqual([]);
+    expect(result.unresolvedCount).toBe(1);
+  });
+
+  it("skips rather than guesses when 2+ matches fit the same team pair and date window", () => {
+    const result = matchStreamsToBroadcasts(
+      [buildStream()],
+      [buildMatch({ id: "a" }), buildMatch({ id: "b", kickoffUtc: "2026-09-07T00:00:00.000Z" })],
+    );
+    expect(result.matchIds).toEqual([]);
+    expect(result.unresolvedCount).toBe(1);
+  });
+
+  it("does not match a different team pair even on the same date", () => {
+    const result = matchStreamsToBroadcasts(
+      [buildStream({ homeTeamId: "flamengo", awayTeamId: "vasco" })],
+      [buildMatch()],
+    );
+    expect(result.unresolvedCount).toBe(1);
+  });
+});

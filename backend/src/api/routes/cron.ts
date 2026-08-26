@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { env } from "../../config/env.js";
-import { runCazeTvEnrichment } from "../../ingest/cazeTvEnrichment.js";
 import { runAdapter } from "../../ingest/pipeline.js";
+import { runYoutubeEnrichment } from "../../ingest/youtubeEnrichment.js";
 import { ACTIVE_ADAPTERS } from "../../sources/registry.js";
 
 /**
@@ -26,7 +26,7 @@ export async function cronRoutes(app: FastifyInstance): Promise<void> {
     }
     // Runs after the loop above on purpose: it only attaches a broadcast to
     // a match ge.globo already ingested this run, never creates one itself.
-    await runCazeTvEnrichment();
+    await runYoutubeEnrichment();
 
     return { status: "ok", ranAt: new Date().toISOString() };
   });

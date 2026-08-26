@@ -32,6 +32,13 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform((value) => value === "true"),
+  // YouTube Data API v3 key (console.cloud.google.com, "YouTube Data API v3"
+  // enabled, no OAuth needed — all reads here are public data). Used to find
+  // upcoming/scheduled livestreams on tracked broadcasters' channels; see
+  // ingest/youtubeEnrichment.ts. Unset locally just means that enrichment
+  // step is skipped, same "degrade gracefully" pattern as the other optional
+  // integrations above.
+  YOUTUBE_API_KEY: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);
