@@ -67,6 +67,7 @@ async function buildMatchViews(conditions: (SQL | undefined)[]): Promise<MatchVi
               channelId: channel.id,
               displayName: channel.displayName,
               url: channel.officialUrl,
+              alternateUrl: channel.alternateUrl,
               logoUrl: broadcast.logoUrl,
               regionalCaveat: channel.regionalCaveat ?? false,
             },

@@ -4,6 +4,8 @@ export interface Channel {
   id: string;
   displayName: string;
   officialUrl: string;
+  /** A second, equally valid place to find this channel's programming (e.g. a channel with two separate YouTube destinations) — shown as a secondary link alongside officialUrl, not a fallback for it. */
+  alternateUrl?: string;
   /** True when the source can't tell us whether this actually airs in the viewer's specific region (true today only for "globo" — ge.globo's data has no region/UF field, every entry just says "check local listings"). */
   regionalCaveat?: boolean;
 }
@@ -14,20 +16,32 @@ export interface Channel {
 // or rename a channel, don't just append.
 const CHANNELS: Channel[] = [
   { id: "band", displayName: "Band", officialUrl: "https://www.band.uol.com.br/ao-vivo/" },
-  { id: "goat", displayName: "Canal GOAT", officialUrl: "https://www.youtube.com/@canalgoatbr/" },
+  { id: "goat", displayName: "Canal GOAT", officialUrl: "https://www.youtube.com/@canalgoatbr/streams" },
   { id: "cazetv", displayName: "CazéTV", officialUrl: "https://www.youtube.com/cazetv/" },
   { id: "disneyplus", displayName: "Disney+", officialUrl: "https://www.disneyplus.com/pt-br/" },
   { id: "espn", displayName: "ESPN", officialUrl: "https://www.espn.com.br/" },
-  { id: "getv", displayName: "ge TV", officialUrl: "https://www.youtube.com/geglobo" },
+  { id: "getv", displayName: "ge TV", officialUrl: "https://www.youtube.com/@getv" },
   { id: "globo", displayName: "Globo", officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/", regionalCaveat: true },
   { id: "globoplay", displayName: "Globoplay", officialUrl: "https://globoplay.globo.com/" },
-  { id: "nossofutebol", displayName: "Nosso Futebol", officialUrl: "https://www.nossofutebol.com/" },
   { id: "paramountplus", displayName: "Paramount Plus", officialUrl: "https://www.paramountplus.com/br/collections/sports-hub-br/" },
-  { id: "premiere", displayName: "Premiere", officialUrl: "https://premiere.globo.com/" },
+  { id: "premiere", displayName: "Premiere", officialUrl: "https://globoplay.globo.com/canais/premiere/" },
   { id: "primevideo", displayName: "Prime Video", officialUrl: "https://www.primevideo.com/sports/" },
   { id: "record", displayName: "Record", officialUrl: "https://assine.playplus.com/" },
-  { id: "sbt", displayName: "SBT", officialUrl: "https://www.sbt.com.br/ao-vivo/" },
+  {
+    id: "sbt",
+    displayName: "SBT",
+    officialUrl: "https://www.youtube.com/@SBTSports/streams",
+    alternateUrl: "https://www.youtube.com/@sbt/streams",
+  },
   { id: "sportv", displayName: "SporTV", officialUrl: "https://globoplay.globo.com/sportv/ao-vivo/" },
+  {
+    id: "nossofutebol",
+    // Same underlying broadcaster, renamed — kept its original id (used as a
+    // DB foreign key and local-asset filename already) to avoid orphaning
+    // already-ingested broadcast rows; only the display name/URL changed.
+    displayName: "SportyNet",
+    officialUrl: "https://www.youtube.com/@SportyNetBrasil/streams",
+  },
   { id: "tntsports", displayName: "TNT Sports", officialUrl: "https://play.max.com/tnt-sports/" },
   { id: "youtube", displayName: "YouTube", officialUrl: "https://youtube.com/" },
 ];
@@ -51,7 +65,7 @@ const CHANNEL_ALIASES: Record<string, string> = {
   // description/url/transmissionId, not a naming variant of one another.
   "ge tv": "getv",
   goat: "goat", "canal goat": "goat",
-  "nosso futebol": "nossofutebol",
+  "nosso futebol": "nossofutebol", sportynet: "nossofutebol", "sporty net": "nossofutebol",
   paramount: "paramountplus", "paramount+": "paramountplus", "paramount plus": "paramountplus",
   premiere: "premiere",
   prime: "primevideo", "prime video": "primevideo", "prime vídeo": "primevideo", "amazon prime video": "primevideo",

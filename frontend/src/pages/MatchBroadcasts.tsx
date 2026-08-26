@@ -56,47 +56,58 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
     <div>
       <div className="flex flex-wrap justify-start items-center gap-x-6 gap-y-3 max-lg:gap-x-3 max-sm:justify-center">
         {broadcasts.map((broadcast) => (
-          <a
-            key={broadcast.channelId}
-            href={broadcast.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`relative flex items-center justify-center hover:scale-105 transition ${
-              SQUARE_LOGO_CHANNEL_IDS.has(broadcast.channelId) ? SQUARE_LOGO_BOX : WIDE_LOGO_BOX
-            }`}
-          >
-            <img
-              src={channelLogoUrl(broadcast.channelId)}
-              alt={broadcast.displayName}
-              title={`${broadcast.displayName}${broadcast.regionalCaveat ? REGIONAL_CAVEAT_TEXT : ""}`}
-              className="max-w-full max-h-full object-contain"
-              loading="lazy"
-              onError={(event) => {
-                if (event.currentTarget.src !== broadcast.logoUrl) {
-                  event.currentTarget.src = broadcast.logoUrl;
-                } else {
-                  event.currentTarget.style.display = "none";
-                }
-              }}
-            />
-            {broadcast.regionalCaveat && (
-              <span
-                aria-hidden="true"
-                className="absolute -top-1 -right-1 flex items-center justify-center size-5 rounded-full bg-yellow-400 text-gray-900 shadow"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="size-3"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
+          <div key={broadcast.channelId} className="flex flex-col items-center gap-1">
+            <a
+              href={broadcast.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`relative flex items-center justify-center hover:scale-105 transition ${
+                SQUARE_LOGO_CHANNEL_IDS.has(broadcast.channelId) ? SQUARE_LOGO_BOX : WIDE_LOGO_BOX
+              }`}
+            >
+              <img
+                src={channelLogoUrl(broadcast.channelId)}
+                alt={broadcast.displayName}
+                title={`${broadcast.displayName}${broadcast.regionalCaveat ? REGIONAL_CAVEAT_TEXT : ""}`}
+                className="max-w-full max-h-full object-contain"
+                loading="lazy"
+                onError={(event) => {
+                  if (event.currentTarget.src !== broadcast.logoUrl) {
+                    event.currentTarget.src = broadcast.logoUrl;
+                  } else {
+                    event.currentTarget.style.display = "none";
+                  }
+                }}
+              />
+              {broadcast.regionalCaveat && (
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-1 -right-1 flex items-center justify-center size-5 rounded-full bg-yellow-400 text-gray-900 shadow"
                 >
-                  <path d="M12 4v16M5.07 8l13.86 8M18.93 8l-13.86 8" />
-                </svg>
-              </span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="size-3"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  >
+                    <path d="M12 4v16M5.07 8l13.86 8M18.93 8l-13.86 8" />
+                  </svg>
+                </span>
+              )}
+            </a>
+            {broadcast.alternateUrl && (
+              <a
+                href={broadcast.alternateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-500 underline hover:text-gray-700"
+              >
+                outro link
+              </a>
             )}
-          </a>
+          </div>
         ))}
       </div>
       {hasRegionalCaveat && (
