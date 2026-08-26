@@ -13,11 +13,14 @@ const envSchema = z.object({
   // ingest and instagram-post endpoints can't be triggered by anyone who
   // finds the URL.
   CRON_SECRET: z.string().optional(),
-  // Long-lived Instagram Graph API token + the Business Account id it posts
-  // as. Both unset in local dev — the poster runs in dry-run mode without
-  // them (see INSTAGRAM_DRY_RUN below).
+  // "Instagram API with Instagram Login" (graph.instagram.com) — the app
+  // dashboard hands out an already-long-lived (60-day) token directly, no
+  // exchange step needed. INSTAGRAM_USER_ID is the account's own numeric id
+  // (IG_ID), read via GET https://graph.instagram.com/v25.0/me?fields=user_id
+  // with that same token. Both unset in local dev — the poster runs in
+  // dry-run mode without them (see INSTAGRAM_DRY_RUN below).
   INSTAGRAM_ACCESS_TOKEN: z.string().optional(),
-  INSTAGRAM_BUSINESS_ACCOUNT_ID: z.string().optional(),
+  INSTAGRAM_USER_ID: z.string().optional(),
   // Public origin of this backend deployment — needed to build the image
   // URL Instagram's servers fetch from when creating a media container.
   PUBLIC_BASE_URL: z.string().optional(),
