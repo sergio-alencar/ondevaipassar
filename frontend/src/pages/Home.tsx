@@ -1,3 +1,4 @@
+import { isTodayInBrasilia } from "@ondevaipassar/shared";
 import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DivisionTabs from "../Components/DivisionTabs";
@@ -10,14 +11,6 @@ import type { SetSelectedTeam } from "../types";
 
 interface HomeProps {
   setSelectedTeam: SetSelectedTeam;
-}
-
-// Compares calendar day in Brasília time, not the visitor's local timezone —
-// a match near midnight BRT could otherwise show up as "today" a day early
-// or late for anyone outside Brazil (or even inside, near the boundary).
-function isTodayInBrasilia(kickoffUtc: string): boolean {
-  const format = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
-  return format.format(new Date()) === format.format(new Date(kickoffUtc));
 }
 
 const Home = ({ setSelectedTeam }: HomeProps) => {

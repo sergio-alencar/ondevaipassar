@@ -72,6 +72,16 @@ export function ensureSchema(): Promise<unknown> {
         matches_unresolved INTEGER NOT NULL DEFAULT 0,
         error_message TEXT
       );
+
+      CREATE TABLE IF NOT EXISTS instagram_posts (
+        id TEXT PRIMARY KEY,
+        match_id TEXT NOT NULL,
+        status TEXT NOT NULL,
+        ig_media_id TEXT,
+        posted_at TEXT,
+        error_message TEXT,
+        created_at TEXT NOT NULL
+      );
     `);
   }
   return ready;

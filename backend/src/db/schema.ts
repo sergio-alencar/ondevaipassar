@@ -51,3 +51,15 @@ export const scrapeRuns = sqliteTable("scrape_runs", {
   matchesUnresolved: integer("matches_unresolved").notNull().default(0),
   errorMessage: text("error_message"),
 });
+
+export const instagramPosts = sqliteTable("instagram_posts", {
+  // Same id as the match's own id — one post per match, so no separate
+  // lookup/uniqueness handling needed to guard against double-posting.
+  id: text("id").primaryKey(),
+  matchId: text("match_id").notNull(),
+  status: text("status").notNull(), // "published" | "failed"
+  igMediaId: text("ig_media_id"),
+  postedAt: text("posted_at"),
+  errorMessage: text("error_message"),
+  createdAt: text("created_at").notNull(),
+});

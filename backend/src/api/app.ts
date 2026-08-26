@@ -6,6 +6,8 @@ import { seedRegistry } from "../ingest/pipeline.js";
 import { competitionsRoutes } from "./routes/competitions.js";
 import { cronRoutes } from "./routes/cron.js";
 import { healthRoutes } from "./routes/health.js";
+import { instagramCronRoutes } from "./routes/instagramCron.js";
+import { instagramPreviewRoutes } from "./routes/instagramPreview.js";
 import { matchesRoutes } from "./routes/matches.js";
 import { teamsRoutes } from "./routes/teams.js";
 
@@ -23,6 +25,8 @@ export async function buildApp() {
   await app.register(teamsRoutes);
   await app.register(competitionsRoutes);
   await app.register(cronRoutes);
+  await app.register(instagramCronRoutes);
+  await app.register(instagramPreviewRoutes);
 
   return app;
 }
