@@ -44,7 +44,13 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
 
   for (const match of candidates) {
     const caption = buildCaption(match);
-    const imageUrl = `${env.PUBLIC_BASE_URL}/api/instagram-preview?matchId=${encodeURIComponent(match.id)}`;
+    // The cache-busting `v` param isn't read by the route — it's there so
+    // a *re*-post of the same match (e.g. after fixing a rendering bug and
+    // manually deleting/redoing a bad post) gets a URL Instagram has never
+    // fetched before. Confirmed live: a same-day repost of an
+    // already-fixed match still went out with the old broken art, because
+    // Instagram's own fetch of the identical previous URL was cached.
+    const imageUrl = `${env.PUBLIC_BASE_URL}/api/instagram-preview?matchId=${encodeURIComponent(match.id)}&v=${Date.now()}`;
 
     if (env.INSTAGRAM_DRY_RUN) {
       // Exercises the real rendering path (catches template/asset errors)
