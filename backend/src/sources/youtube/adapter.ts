@@ -6,7 +6,7 @@ export interface YoutubeStream {
   videoId: string;
   homeTeamId: string;
   awayTeamId: string;
-  scheduledStartUtc: string;
+  streamDateUtc: string;
 }
 
 export interface YoutubeChannelFetchResult {
@@ -43,14 +43,14 @@ export async function fetchUpcomingStreams(youtubeChannelId: string, apiKey: str
 
   const streams: YoutubeStream[] = [];
   for (const candidate of candidates) {
-    const scheduledStartUtc = scheduledStartTimes.get(candidate.videoId);
-    if (!scheduledStartUtc) continue; // "upcoming" in search but no scheduledStartTime — inconsistent response, skip rather than guess
+    const streamDateUtc = scheduledStartTimes.get(candidate.videoId);
+    if (!streamDateUtc) continue; // "upcoming" in search but no scheduledStartTime — inconsistent response, skip rather than guess
 
     const homeTeamId = resolveTeamId(candidate.homeTeamNameRaw);
     const awayTeamId = resolveTeamId(candidate.awayTeamNameRaw);
     if (!homeTeamId || !awayTeamId) continue; // a real match, just not one involving a team we track
 
-    streams.push({ videoId: candidate.videoId, homeTeamId, awayTeamId, scheduledStartUtc });
+    streams.push({ videoId: candidate.videoId, homeTeamId, awayTeamId, streamDateUtc });
   }
 
   return { streams, channelLogoUrl };

@@ -1,13 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { matchStreamsToBroadcasts, type MatchCandidate } from "../src/ingest/youtubeEnrichment.js";
-import type { YoutubeStream } from "../src/sources/youtube/adapter.js";
+import { matchStreamsToBroadcasts, type MatchCandidate, type TeamPairStream } from "../src/ingest/broadcastMatching.js";
 
-function buildStream(overrides: Partial<YoutubeStream> = {}): YoutubeStream {
+function buildStream(overrides: Partial<TeamPairStream> = {}): TeamPairStream {
   return {
-    videoId: "vid1",
     homeTeamId: "botafogo",
     awayTeamId: "palmeiras",
-    scheduledStartUtc: "2026-09-06T18:30:00.000Z",
+    streamDateUtc: "2026-09-06T18:30:00.000Z",
     ...overrides,
   };
 }
@@ -37,10 +35,10 @@ describe("matchStreamsToBroadcasts", () => {
     expect(result.matchIds).toEqual(["ge-globo:1"]);
   });
 
-  it("matches when the stream's scheduled start is hours before kickoff (pre-game show lead-in), same BRT day", () => {
+  it("matches when the stream's date is hours before kickoff (pre-game show lead-in), same BRT day", () => {
     // Real example: ge tv scheduled a stream 3h before a 21:30 BRT kickoff.
     const result = matchStreamsToBroadcasts(
-      [buildStream({ scheduledStartUtc: "2026-09-06T18:30:00.000Z" })],
+      [buildStream({ streamDateUtc: "2026-09-06T18:30:00.000Z" })],
       [buildMatch({ kickoffUtc: "2026-09-06T21:30:00.000Z" })],
     );
     expect(result.matchIds).toEqual(["ge-globo:1"]);
@@ -48,7 +46,7 @@ describe("matchStreamsToBroadcasts", () => {
 
   it("tolerates a 1-day gap (late BRT kickoff rolling into the next UTC day)", () => {
     const result = matchStreamsToBroadcasts(
-      [buildStream({ scheduledStartUtc: "2026-09-05T23:00:00.000Z" })],
+      [buildStream({ streamDateUtc: "2026-09-05T23:00:00.000Z" })],
       [buildMatch({ kickoffUtc: "2026-09-06T21:30:00.000Z" })],
     );
     expect(result.matchIds).toEqual(["ge-globo:1"]);

@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { env } from "../../config/env.js";
 import { runAdapter } from "../../ingest/pipeline.js";
+import { runPremiereEnrichment } from "../../ingest/premiereEnrichment.js";
 import { runYoutubeEnrichment } from "../../ingest/youtubeEnrichment.js";
 import { ACTIVE_ADAPTERS } from "../../sources/registry.js";
 
@@ -24,9 +25,11 @@ export async function cronRoutes(app: FastifyInstance): Promise<void> {
     for (const adapter of ACTIVE_ADAPTERS) {
       await runAdapter(adapter);
     }
-    // Runs after the loop above on purpose: it only attaches a broadcast to
-    // a match ge.globo already ingested this run, never creates one itself.
+    // Both run after the loop above on purpose: they only attach a
+    // broadcast to a match ge.globo already ingested this run, never
+    // create one themselves.
     await runYoutubeEnrichment();
+    await runPremiereEnrichment();
 
     return { status: "ok", ranAt: new Date().toISOString() };
   });
