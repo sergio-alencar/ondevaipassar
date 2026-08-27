@@ -14,6 +14,7 @@ function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
     awayTeamName: "Atlético-MG",
     awayTeamCrestUrl: "https://example.com/atletico.png",
     kickoffUtc: "2026-08-25T19:00:00.000Z",
+    kickoffTimeConfirmed: true,
     round: 20,
     status: "scheduled",
     broadcasts: [{ channelId: "globo", displayName: "Globo", url: "https://globo.com", logoUrl: "", regionalCaveat: true }],

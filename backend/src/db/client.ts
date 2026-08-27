@@ -19,10 +19,28 @@ const client = createClient({
 
 let ready: Promise<unknown> | null = null;
 
+// SQLite has no `ADD COLUMN IF NOT EXISTS` — the CREATE TABLE above only
+// covers a fresh database. A table that already existed before this column
+// was added (i.e. production, with real rows) needs this instead; it fails
+// with "duplicate column name" once the column is there, which is exactly
+// the steady state after the first cold start post-deploy, so that specific
+// error is swallowed. No migration tool exists in this project (see
+// ensureSchema's own doc comment) — this is the same "detect and skip"
+// spirit applied to a column instead of a table.
+async function addColumnIfMissing(table: string, columnDdl: string): Promise<void> {
+  try {
+    await client.execute(`ALTER TABLE ${table} ADD COLUMN ${columnDdl}`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!message.includes("duplicate column name")) throw error;
+  }
+}
+
 /** Idempotent DDL, safe to call on every cold start (serverless has no persistent "boot" moment to run this once). */
 export function ensureSchema(): Promise<unknown> {
   if (!ready) {
-    ready = client.executeMultiple(`
+    ready = client
+      .executeMultiple(`
       CREATE TABLE IF NOT EXISTS teams (
         id TEXT PRIMARY KEY,
         display_name TEXT NOT NULL
@@ -43,6 +61,7 @@ export function ensureSchema(): Promise<unknown> {
         away_team_name_raw TEXT NOT NULL,
         away_team_crest_url TEXT NOT NULL,
         kickoff_utc TEXT NOT NULL,
+        kickoff_time_confirmed INTEGER NOT NULL DEFAULT 1,
         round INTEGER,
         status TEXT NOT NULL,
         source_id TEXT NOT NULL,
@@ -82,7 +101,8 @@ export function ensureSchema(): Promise<unknown> {
         error_message TEXT,
         created_at TEXT NOT NULL
       );
-    `);
+    `)
+      .then(() => addColumnIfMissing("matches", "kickoff_time_confirmed INTEGER NOT NULL DEFAULT 1"));
   }
   return ready;
 }

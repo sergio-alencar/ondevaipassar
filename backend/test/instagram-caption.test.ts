@@ -14,6 +14,7 @@ function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
     awayTeamName: "Atlético-MG",
     awayTeamCrestUrl: "https://example.com/atletico.png",
     kickoffUtc: "2026-08-25T19:00:00.000Z",
+    kickoffTimeConfirmed: true,
     round: 20,
     status: "scheduled",
     broadcasts: [
@@ -39,5 +40,10 @@ describe("buildCaption", () => {
       buildMatch({ broadcasts: [{ channelId: "cazetv", displayName: "CazéTV", url: "https://youtube.com", logoUrl: "", regionalCaveat: false }] }),
     );
     expect(caption).toContain("Transmissão: CazéTV");
+  });
+
+  it("shows 'horário a confirmar' instead of a fake time when the broadcaster hasn't confirmed one", () => {
+    const caption = buildCaption(buildMatch({ kickoffTimeConfirmed: false }));
+    expect(caption).toContain("25 de agosto, horário a confirmar");
   });
 });

@@ -18,12 +18,28 @@ function chunk<T>(items: T[], size: number): T[][] {
   return chunks;
 }
 
+interface Kickoff {
+  kickoffUtc: string;
+  kickoffTimeConfirmed: boolean;
+}
+
 // ge.globo shows local Brasília time; Brazil has used a fixed UTC-3 offset
 // (no DST) since 2019, so this fixed-offset conversion is safe.
-function toKickoffUtcIso(startDate: string | null, startHour: string | null): string | null {
-  if (!startDate || !startHour) return null; // kickoff not yet announced — skip until it is
-  const date = new Date(`${startDate}T${startHour}-03:00`);
-  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+//
+// CBF/broadcasters confirm a round's exact kickoff *time* much closer to
+// matchday than the *date* (tied to TV rights negotiations) — a live check
+// against Corinthians' real agenda found startDate populated for all of the
+// season's remaining rounds but startHour null past the next 1-2, so
+// requiring both used to make a team's future fixtures vanish from the site
+// for weeks at a time. A date with no confirmed hour still gets a row (at a
+// midnight-BRT placeholder, for sorting/day-filtering) with
+// kickoffTimeConfirmed: false, so callers can show "horário a confirmar"
+// instead of just disappearing the match.
+function toKickoff(startDate: string | null, startHour: string | null): Kickoff | null {
+  if (!startDate) return null; // not even a date yet — nothing usable to show
+  const confirmed = new Date(`${startDate}T${startHour ?? "00:00:00"}-03:00`);
+  if (Number.isNaN(confirmed.getTime())) return null;
+  return { kickoffUtc: confirmed.toISOString(), kickoffTimeConfirmed: Boolean(startHour) };
 }
 
 // ge.globo lists a bare "globoplay" entry alongside whichever real channel
@@ -52,10 +68,10 @@ export function resolveBroadcasts(sources: SoccerEvent["match"]["liveWatchSource
   return resolved.length > 1 ? resolved.filter((broadcast) => broadcast.channelId !== "globoplay") : resolved;
 }
 
-function toCanonicalMatch(event: SoccerEvent): CanonicalMatch | null {
+export function toCanonicalMatch(event: SoccerEvent): CanonicalMatch | null {
   const { match } = event;
-  const kickoffUtc = toKickoffUtcIso(match.startDate, match.startHour);
-  if (!kickoffUtc) return null;
+  const kickoff = toKickoff(match.startDate, match.startHour);
+  if (!kickoff) return null;
 
   const broadcasts = resolveBroadcasts(match.liveWatchSources);
 
@@ -68,7 +84,8 @@ function toCanonicalMatch(event: SoccerEvent): CanonicalMatch | null {
     awayTeamId: resolveTeamId(match.secondContestant.popularName),
     awayTeamNameRaw: match.secondContestant.popularName,
     awayTeamCrestUrl: match.secondContestant.badgeSvg,
-    kickoffUtc,
+    kickoffUtc: kickoff.kickoffUtc,
+    kickoffTimeConfirmed: kickoff.kickoffTimeConfirmed,
     round: match.round,
     status: "scheduled",
     broadcasts,

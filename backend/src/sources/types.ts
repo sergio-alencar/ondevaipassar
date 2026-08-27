@@ -19,6 +19,8 @@ export interface CanonicalMatch {
   awayTeamNameRaw: string;
   awayTeamCrestUrl: string;
   kickoffUtc: string;
+  /** False when the source only knows the match's date (round scheduled) but the broadcaster hasn't confirmed an exact kickoff time yet — kickoffUtc is then a midnight-BRT placeholder for sorting/day-filtering purposes, not a real time to display. */
+  kickoffTimeConfirmed: boolean;
   round: number | null;
   status: MatchStatus;
   broadcasts: CanonicalBroadcast[];

@@ -86,6 +86,7 @@ async function buildMatchViews(conditions: (SQL | undefined)[]): Promise<MatchVi
         awayTeamName: awayTeam?.displayName ?? row.awayTeamNameRaw,
         awayTeamCrestUrl: row.awayTeamCrestUrl,
         kickoffUtc: row.kickoffUtc,
+        kickoffTimeConfirmed: row.kickoffTimeConfirmed,
         round: row.round,
         status: row.status as MatchView["status"],
         broadcasts: matchBroadcasts,

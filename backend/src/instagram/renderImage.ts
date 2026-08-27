@@ -5,6 +5,7 @@ import { Resvg } from "@resvg/resvg-js";
 import satori from "satori";
 import type { ReactNode } from "react";
 import { channelLogoDataUri, crestDataUri, loadFonts, VERSUS_ICON, WORDMARK } from "./assets.js";
+import { formatKickoffLabel } from "./kickoffLabel.js";
 import { buildMatchImageTree } from "./template.js";
 
 const WIDTH = 1080;
@@ -27,21 +28,6 @@ const fonts = loadFonts();
 readFileSync(fileURLToPath(new URL("../../../node_modules/harfbuzzjs/hb.wasm", import.meta.url)));
 readFileSync(fileURLToPath(new URL("../../../node_modules/satori/yoga.wasm", import.meta.url)));
 
-function formatKickoffLabel(kickoffUtc: string): string {
-  const date = new Date(kickoffUtc);
-  const dateLabel = new Intl.DateTimeFormat("pt-BR", {
-    day: "numeric",
-    month: "long",
-    timeZone: "America/Sao_Paulo",
-  }).format(date);
-  const timeLabel = date.toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "America/Sao_Paulo",
-  });
-  return `${dateLabel}, ${timeLabel}`;
-}
-
 export async function renderMatchImage(match: MatchView): Promise<Buffer> {
   const tree = buildMatchImageTree({
     homeTeamName: match.homeTeamName,
@@ -49,7 +35,7 @@ export async function renderMatchImage(match: MatchView): Promise<Buffer> {
     homeCrestDataUri: crestDataUri(match.homeTeamId),
     awayCrestDataUri: crestDataUri(match.awayTeamId),
     competitionName: match.competitionName,
-    kickoffLabel: formatKickoffLabel(match.kickoffUtc),
+    kickoffLabel: formatKickoffLabel(match.kickoffUtc, match.kickoffTimeConfirmed),
     channels: match.broadcasts.map((broadcast) => ({
       displayName: broadcast.displayName,
       logoDataUri: channelLogoDataUri(broadcast.channelId),

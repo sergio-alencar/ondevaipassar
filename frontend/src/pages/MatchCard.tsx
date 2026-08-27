@@ -11,7 +11,7 @@ interface MatchCardProps {
 
 // A visitor's browser timezone shouldn't change what date/time a Brazilian
 // match shows as — always format in Brasília time explicitly.
-function formatKickoff(kickoffUtc: string): string {
+function formatKickoff(kickoffUtc: string, kickoffTimeConfirmed: boolean): string {
   const date = new Date(kickoffUtc);
   const dateLabel = new Intl.DateTimeFormat("pt-BR", {
     weekday: "short",
@@ -22,6 +22,7 @@ function formatKickoff(kickoffUtc: string): string {
     .format(date)
     .replace(/\./g, "")
     .replace(" de ", "-");
+  if (!kickoffTimeConfirmed) return `${dateLabel}, horário a confirmar`;
   const timeLabel = date.toLocaleTimeString("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
@@ -55,7 +56,7 @@ const MatchCard = ({ match, team }: MatchCardProps) => {
             {match.homeTeamName} x {match.awayTeamName}
           </p>
           <p>{match.competitionName}</p>
-          <p>{formatKickoff(match.kickoffUtc)}</p>
+          <p>{formatKickoff(match.kickoffUtc, match.kickoffTimeConfirmed)}</p>
         </div>
 
         <div className="flex items-center justify-start max-sm:justify-center">

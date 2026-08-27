@@ -25,6 +25,8 @@ export interface MatchView {
   awayTeamName: string;
   awayTeamCrestUrl: string;
   kickoffUtc: string;
+  /** False = only the date is known so far (round scheduled, broadcaster hasn't confirmed an exact kickoff time yet) — kickoffUtc is then a midnight-BRT placeholder, not a real time to display as-is. */
+  kickoffTimeConfirmed: boolean;
   round: number | null;
   status: MatchStatus;
   broadcasts: BroadcastView[];

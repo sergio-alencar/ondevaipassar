@@ -23,6 +23,10 @@ export const matches = sqliteTable("matches", {
   awayTeamNameRaw: text("away_team_name_raw").notNull(),
   awayTeamCrestUrl: text("away_team_crest_url").notNull(),
   kickoffUtc: text("kickoff_utc").notNull(),
+  // False = only the match's date is known (round scheduled, broadcaster
+  // hasn't confirmed an exact kickoff time yet) — kickoffUtc is then a
+  // midnight-BRT placeholder, not a real time. See ge-globo/adapter.ts.
+  kickoffTimeConfirmed: integer("kickoff_time_confirmed", { mode: "boolean" }).notNull(),
   round: integer("round"),
   status: text("status").notNull(),
   sourceId: text("source_id").notNull(),
