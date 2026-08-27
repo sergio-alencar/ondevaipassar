@@ -68,6 +68,7 @@ async function buildMatchViews(conditions: (SQL | undefined)[]): Promise<MatchVi
               displayName: channel.displayName,
               url: channel.officialUrl,
               alternateUrl: channel.alternateUrl,
+              instagramHandle: channel.instagramHandle,
               logoUrl: broadcast.logoUrl,
               regionalCaveat: channel.regionalCaveat ?? false,
             },

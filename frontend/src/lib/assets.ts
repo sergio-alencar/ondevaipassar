@@ -27,11 +27,39 @@ export function findSourceCrestUrl(teamId: string, matches: MatchView[]): string
   return undefined;
 }
 
+// Every channel now ships curated square icon art (each channel's real app
+// icon or Instagram profile picture) instead of a brand wordmark SVG — see
+// packages/shared's Channel history for why. Extension varies per file
+// (whatever format it was actually sourced in), and a browser can't probe
+// the filesystem the way the backend's channelLogoDataUri does, so it's a
+// small lookup instead. Falls back to .svg (the older wordmark art) for any
+// channel not in this map yet.
+const RASTER_EXTENSION: Record<string, string> = {
+  band: "png",
+  cazetv: "png",
+  disneyplus: "png",
+  espn: "png",
+  getv: "png",
+  globo: "png",
+  globoplay: "png",
+  goat: "png",
+  nossofutebol: "jpeg",
+  paramountplus: "png",
+  premiere: "png",
+  primevideo: "png",
+  record: "png",
+  sbt: "png",
+  sportv: "png",
+  tntsports: "png",
+  youtube: "png",
+};
+
 /**
  * Channel logo: local asset when we have one, else the source-provided logo
- * (e.g. ge TV, which we don't ship local art for). Caller's onError should
- * fall back to sourceLogoUrl once, then hide the image.
+ * (e.g. a brand-new channel we haven't sourced art for). Caller's onError
+ * should fall back to sourceLogoUrl once, then hide the image.
  */
 export function channelLogoUrl(channelId: string): string {
-  return `${import.meta.env.BASE_URL}images/canais/${channelId}.svg`;
+  const ext = RASTER_EXTENSION[channelId] ?? "svg";
+  return `${import.meta.env.BASE_URL}images/canais/${channelId}.${ext}`;
 }

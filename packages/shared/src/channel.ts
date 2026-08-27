@@ -8,6 +8,8 @@ export interface Channel {
   alternateUrl?: string;
   /** True when the source can't tell us whether this actually airs in the viewer's specific region (true today only for "globo" — ge.globo's data has no region/UF field, every entry just says "check local listings"). */
   regionalCaveat?: boolean;
+  /** Handle (no "@"), for tagging the broadcaster in the Instagram poster's caption — manually verified against each channel's real profile, not guessed. */
+  instagramHandle?: string;
 }
 
 // Ported near-verbatim from the old frontend's Components/canais.jsx — that
@@ -15,25 +17,82 @@ export interface Channel {
 // Kept alphabetical by displayName (pt-BR collation) — re-sort if you add
 // or rename a channel, don't just append.
 const CHANNELS: Channel[] = [
-  { id: "band", displayName: "Band", officialUrl: "https://www.band.uol.com.br/ao-vivo/" },
-  { id: "goat", displayName: "Canal GOAT", officialUrl: "https://www.youtube.com/@canalgoatbr/streams" },
-  { id: "cazetv", displayName: "CazéTV", officialUrl: "https://www.youtube.com/cazetv/" },
-  { id: "disneyplus", displayName: "Disney+", officialUrl: "https://www.disneyplus.com/pt-br/" },
-  { id: "espn", displayName: "ESPN", officialUrl: "https://www.espn.com.br/" },
-  { id: "getv", displayName: "ge TV", officialUrl: "https://www.youtube.com/@getv" },
-  { id: "globo", displayName: "Globo", officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/", regionalCaveat: true },
-  { id: "globoplay", displayName: "Globoplay", officialUrl: "https://globoplay.globo.com/" },
-  { id: "paramountplus", displayName: "Paramount Plus", officialUrl: "https://www.paramountplus.com/br/collections/sports-hub-br/" },
-  { id: "premiere", displayName: "Premiere", officialUrl: "https://globoplay.globo.com/canais/premiere/" },
-  { id: "primevideo", displayName: "Prime Video", officialUrl: "https://www.primevideo.com/sports/" },
-  { id: "record", displayName: "Record", officialUrl: "https://assine.playplus.com/" },
+  { id: "band", displayName: "Band", officialUrl: "https://www.band.uol.com.br/ao-vivo/", instagramHandle: "esportenaband" },
+  {
+    id: "goat",
+    displayName: "Canal GOAT",
+    officialUrl: "https://www.youtube.com/@canalgoatbr/streams",
+    instagramHandle: "canalgoatbr",
+  },
+  {
+    id: "cazetv",
+    displayName: "CazéTV",
+    officialUrl: "https://www.youtube.com/cazetv/",
+    instagramHandle: "cazetv",
+  },
+  {
+    id: "disneyplus",
+    displayName: "Disney+",
+    officialUrl: "https://www.disneyplus.com/pt-br/",
+    instagramHandle: "disneyplusbr",
+  },
+  { id: "espn", displayName: "ESPN", officialUrl: "https://www.espn.com.br/", instagramHandle: "espnbrasil" },
+  {
+    id: "getv",
+    displayName: "ge TV",
+    officialUrl: "https://www.youtube.com/@getv",
+    instagramHandle: "getv",
+  },
+  {
+    id: "globo",
+    displayName: "Globo",
+    officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/",
+    regionalCaveat: true,
+    instagramHandle: "tvglobo",
+  },
+  {
+    id: "globoplay",
+    displayName: "Globoplay",
+    officialUrl: "https://globoplay.globo.com/",
+    instagramHandle: "globoplay",
+  },
+  {
+    id: "paramountplus",
+    displayName: "Paramount Plus",
+    officialUrl: "https://www.paramountplus.com/br/collections/sports-hub-br/",
+    instagramHandle: "paramountplusesportes",
+  },
+  {
+    id: "premiere",
+    displayName: "Premiere",
+    officialUrl: "https://globoplay.globo.com/canais/premiere/",
+    instagramHandle: "premiere",
+  },
+  {
+    id: "primevideo",
+    displayName: "Prime Video",
+    officialUrl: "https://www.primevideo.com/sports/",
+    instagramHandle: "primevideosportbr",
+  },
+  {
+    id: "record",
+    displayName: "Record",
+    officialUrl: "https://assine.playplus.com/",
+    instagramHandle: "sigarecord",
+  },
   {
     id: "sbt",
     displayName: "SBT",
     officialUrl: "https://www.youtube.com/@SBTSports/streams",
     alternateUrl: "https://www.youtube.com/@sbt/streams",
+    instagramHandle: "sbt",
   },
-  { id: "sportv", displayName: "SporTV", officialUrl: "https://globoplay.globo.com/sportv/ao-vivo/" },
+  {
+    id: "sportv",
+    displayName: "SporTV",
+    officialUrl: "https://globoplay.globo.com/sportv/ao-vivo/",
+    instagramHandle: "sportv",
+  },
   {
     id: "nossofutebol",
     // Same underlying broadcaster, renamed — kept its original id (used as a
@@ -41,9 +100,15 @@ const CHANNELS: Channel[] = [
     // already-ingested broadcast rows; only the display name/URL changed.
     displayName: "SportyNet",
     officialUrl: "https://www.youtube.com/@SportyNetBrasil/streams",
+    instagramHandle: "sportynetbrasil",
   },
-  { id: "tntsports", displayName: "TNT Sports", officialUrl: "https://play.max.com/tnt-sports/" },
-  { id: "youtube", displayName: "YouTube", officialUrl: "https://youtube.com/" },
+  {
+    id: "tntsports",
+    displayName: "TNT Sports",
+    officialUrl: "https://play.max.com/tnt-sports/",
+    instagramHandle: "tntsportsbr",
+  },
+  { id: "youtube", displayName: "YouTube", officialUrl: "https://youtube.com/", instagramHandle: "youtubebrasil" },
 ];
 
 // Free-text (as seen scraped from ge.globo's liveWatchSources[].name, or typed

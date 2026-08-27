@@ -9,7 +9,7 @@ import { formatKickoffLabel } from "./kickoffLabel.js";
 import { buildMatchImageTree } from "./template.js";
 
 const WIDTH = 1080;
-const HEIGHT = 1350;
+const HEIGHT = 1080;
 
 // Loaded once per cold start, reused across every match rendered in a run.
 const fonts = loadFonts();

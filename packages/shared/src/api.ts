@@ -8,6 +8,8 @@ export interface BroadcastView {
   alternateUrl?: string;
   /** Prefer a local asset for this channel when we have one; this is the fallback (source-provided) logo, e.g. for channels like ge TV we don't have local art for. */
   logoUrl: string;
+  /** Instagram handle (no "@"), for tagging the broadcaster in the poster's caption — undefined until manually verified for that channel (see Channel.instagramHandle). */
+  instagramHandle?: string;
   /** True when the source can't confirm this actually airs in the viewer's region (see Channel.regionalCaveat). */
   regionalCaveat: boolean;
 }

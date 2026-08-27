@@ -15,27 +15,11 @@ const REGIONAL_CAVEAT_TEXT = " — pode variar por região, confira a programaç
 // hidden hover state.
 const REGIONAL_CAVEAT_CAPTION = "A transmissão pela Globo pode variar por região — confira a programação local";
 
-// Every logo SVG has the same square canvas, but what's actually drawn
-// inside varies for real: some are a wide band (a wordmark), others are a
-// near-square badge/icon that fills more of that canvas. Fitting both into
-// one identical box made the badge-style ones read as noticeably bigger —
-// confirmed by rendering all 17 at a fixed size and comparing, not guessed.
-// Wide logos keep the original box; square-ish ones get a touch smaller so
-// the two groups read as closer in visual weight.
-const SQUARE_LOGO_CHANNEL_IDS = new Set([
-  "cazetv",
-  "getv",
-  "globo",
-  "nossofutebol",
-  "paramountplus",
-  "primevideo",
-  "record",
-  "sbt",
-  "tntsports",
-]);
-
-const WIDE_LOGO_BOX = "w-28 h-28 max-lg:w-20 max-lg:h-20 max-sm:w-18 max-sm:h-18";
-const SQUARE_LOGO_BOX = "w-24 h-20 max-lg:w-18 max-lg:h-18 max-sm:w-16 max-sm:h-16";
+// Every channel now ships curated square icon art (see channelLogoUrl), so
+// one square box fits all — no more per-shape "wide vs square" sizing.
+// Channel logos are the most important info on the card, so it's sized
+// generously.
+const LOGO_BOX = "w-28 h-28 max-lg:w-22 max-lg:h-22 max-sm:w-20 max-sm:h-20";
 
 const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) => {
   if (broadcasts.length === 0) {
@@ -55,60 +39,65 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
   return (
     <div>
       <div className="flex flex-wrap justify-start items-center gap-x-6 gap-y-3 max-lg:gap-x-3 max-sm:justify-center">
-        {broadcasts.map((broadcast) => (
-          <div key={broadcast.channelId} className="flex flex-col items-center gap-1">
-            <a
-              href={broadcast.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`relative flex items-center justify-center hover:scale-105 transition ${
-                SQUARE_LOGO_CHANNEL_IDS.has(broadcast.channelId) ? SQUARE_LOGO_BOX : WIDE_LOGO_BOX
-              }`}
-            >
-              <img
-                src={channelLogoUrl(broadcast.channelId)}
-                alt={broadcast.displayName}
-                title={`${broadcast.displayName}${broadcast.regionalCaveat ? REGIONAL_CAVEAT_TEXT : ""}`}
-                className="max-w-full max-h-full object-contain"
-                loading="lazy"
-                onError={(event) => {
-                  if (event.currentTarget.src !== broadcast.logoUrl) {
-                    event.currentTarget.src = broadcast.logoUrl;
-                  } else {
-                    event.currentTarget.style.display = "none";
-                  }
-                }}
-              />
-              {broadcast.regionalCaveat && (
-                <span
-                  aria-hidden="true"
-                  className="absolute -top-1 -right-1 flex items-center justify-center size-5 rounded-full bg-yellow-400 text-gray-900 shadow"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="size-3"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  >
-                    <path d="M12 4v16M5.07 8l13.86 8M18.93 8l-13.86 8" />
-                  </svg>
-                </span>
-              )}
-            </a>
-            {broadcast.alternateUrl && (
+        {broadcasts.map((broadcast) => {
+          return (
+            <div key={broadcast.channelId} className="flex flex-col items-center gap-1">
               <a
-                href={broadcast.alternateUrl}
+                href={broadcast.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-gray-500 underline hover:text-gray-700"
+                className={`relative flex items-center justify-center hover:scale-105 transition ${LOGO_BOX}`}
               >
-                outro link
+                <img
+                  src={channelLogoUrl(broadcast.channelId)}
+                  alt={broadcast.displayName}
+                  title={`${broadcast.displayName}${broadcast.regionalCaveat ? REGIONAL_CAVEAT_TEXT : ""}`}
+                  // Applied unconditionally: curated art that already has its
+                  // own transparent rounded corners (e.g. ESPN, Premiere) has
+                  // nothing left to clip here, so this is a no-op for those —
+                  // but it's what rounds the flat-cornered ones (e.g. Globo,
+                  // CazéTV) instead of them reading as a stray square tile.
+                  className="max-w-full max-h-full object-contain rounded-2xl"
+                  loading="lazy"
+                  onError={(event) => {
+                    if (event.currentTarget.src !== broadcast.logoUrl) {
+                      event.currentTarget.src = broadcast.logoUrl;
+                    } else {
+                      event.currentTarget.style.display = "none";
+                    }
+                  }}
+                />
+                {broadcast.regionalCaveat && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -top-1 -right-1 flex items-center justify-center size-5 rounded-full bg-yellow-400 text-gray-900 shadow"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="size-3"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    >
+                      <path d="M12 4v16M5.07 8l13.86 8M18.93 8l-13.86 8" />
+                    </svg>
+                  </span>
+                )}
               </a>
-            )}
-          </div>
-        ))}
+              {broadcast.alternateUrl && (
+                <a
+                  href={broadcast.alternateUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-gray-500 underline hover:text-gray-700"
+                >
+                  outro link
+                </a>
+              )}
+            </div>
+          );
+        })}
       </div>
       {hasRegionalCaveat && (
         <p className="text-xs text-gray-500 mt-2 max-sm:text-center">
