@@ -65,11 +65,13 @@ export interface TemplateInput {
 // combines two long names, or an untracked opponent's occasionally-long
 // raw name). matchDetailsBlock tries the curated abbreviation dictionary
 // before accepting a smaller tier — see its own comment.
+const DETAIL_BLOCK_TOP_FONT_SIZE = 46;
+
 function detailBlockFontSize(lines: string[]): number {
   const longest = Math.max(...lines.map((line) => line.length));
-  if (longest <= 20) return 40;
-  if (longest <= 35) return 32;
-  return 25;
+  if (longest <= 20) return DETAIL_BLOCK_TOP_FONT_SIZE;
+  if (longest <= 35) return 37;
+  return 29;
 }
 
 function detailLine(text: string, fontSize: number): SatoriElement {
@@ -79,11 +81,10 @@ function detailLine(text: string, fontSize: number): SatoriElement {
       style: {
         display: "flex",
         fontSize,
-        // Explicit tight leading: satori otherwise applies the font's own
-        // (much taller) default line-height, which was most of the "too
-        // much air between lines" feedback — the `gap` below was never the
-        // main source of it.
-        lineHeight: 1,
+        // Tighter than the font's natural line box (1 == the font's own
+        // metric, still visibly airy in practice — confirmed by rendering
+        // and measuring the actual pixel gap between lines, not assumed).
+        lineHeight: 0.85,
         fontWeight: 700,
         color: GRAY_800,
         textTransform: "uppercase",
@@ -109,7 +110,7 @@ function matchDetailsBlock(input: TemplateInput): SatoriElement {
   // no-op (full name kept) whenever it wouldn't.
   let titleLine = fullTitle;
   let fontSize = fullSize;
-  if (fullSize < 40) {
+  if (fullSize < DETAIL_BLOCK_TOP_FONT_SIZE) {
     const abbreviatedTitle = `${abbreviateTeamName(input.homeTeamName)} x ${abbreviateTeamName(input.awayTeamName)}`;
     const abbreviatedSize = detailBlockFontSize([abbreviatedTitle, ...otherLines]);
     if (abbreviatedSize > fullSize) {

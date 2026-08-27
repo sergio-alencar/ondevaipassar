@@ -18,7 +18,6 @@ const WORD_ABBREVIATIONS: Record<string, string> = {
   universidad: "Univ.",
   deportivo: "Dep.",
   deportiva: "Dep.",
-  internacional: "Inter.",
   sociedad: "Soc.",
   sociedade: "Soc.",
   independiente: "Indep.",
