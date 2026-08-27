@@ -4,7 +4,7 @@ import type { MatchView } from "@ondevaipassar/shared";
 import { Resvg } from "@resvg/resvg-js";
 import satori from "satori";
 import type { ReactNode } from "react";
-import { channelLogoDataUri, crestDataUri, loadFonts, VERSUS_ICON, WORDMARK } from "./assets.js";
+import { channelLogoDataUri, crestArt, loadFonts, VERSUS_ICON, WORDMARK } from "./assets.js";
 import { formatKickoffLabel } from "./kickoffLabel.js";
 import { buildMatchImageTree } from "./template.js";
 
@@ -32,8 +32,8 @@ export async function renderMatchImage(match: MatchView): Promise<Buffer> {
   const tree = buildMatchImageTree({
     homeTeamName: match.homeTeamName,
     awayTeamName: match.awayTeamName,
-    homeCrestDataUri: crestDataUri(match.homeTeamId),
-    awayCrestDataUri: crestDataUri(match.awayTeamId),
+    homeCrest: crestArt(match.homeTeamId),
+    awayCrest: crestArt(match.awayTeamId),
     competitionName: match.competitionName,
     kickoffLabel: formatKickoffLabel(match.kickoffUtc, match.kickoffTimeConfirmed),
     channels: match.broadcasts.map((broadcast) => ({

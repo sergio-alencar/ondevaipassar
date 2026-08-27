@@ -34,11 +34,17 @@ export interface TemplateChannel {
   logoDataUri: string | null;
 }
 
+export interface TemplateCrest {
+  dataUri: string;
+  /** content width ÷ height, see assets.ts's CrestArt — drives the crest's box width so a shield-shaped crest's edge (not its invisible square canvas edge) sits the same distance from the "x" as a round crest's does. */
+  aspectRatio: number;
+}
+
 export interface TemplateInput {
   homeTeamName: string;
   awayTeamName: string;
-  homeCrestDataUri: string;
-  awayCrestDataUri: string;
+  homeCrest: TemplateCrest;
+  awayCrest: TemplateCrest;
   competitionName: string;
   kickoffLabel: string;
   channels: TemplateChannel[];
@@ -122,8 +128,16 @@ function matchDetailsBlock(input: TemplateInput): SatoriElement {
 
 const CREST_SIZE = 280;
 
-function teamCrest(crestDataUri: string): SatoriElement {
-  return h("img", { src: crestDataUri, style: { width: CREST_SIZE, height: CREST_SIZE, objectFit: "contain" } });
+// Height is always CREST_SIZE; width scales down from it for a crest
+// narrower than it is tall (aspectRatio < 1 — most shield-style crests),
+// so its own ink fills the box on every side instead of sitting centered
+// inside a square box with dead space on the two sides nearest the "x".
+// aspectRatio > 1 (wider than tall) doesn't happen for real football
+// crests, but is clamped to 1 defensively rather than ever rendering a
+// crest wider than CREST_SIZE.
+function teamCrest(crest: TemplateCrest): SatoriElement {
+  const width = Math.round(CREST_SIZE * Math.min(crest.aspectRatio, 1));
+  return h("img", { src: crest.dataUri, style: { width, height: CREST_SIZE, objectFit: "contain" } });
 }
 
 // Splits channels into as-equal-as-possible rows instead of greedily
@@ -328,9 +342,9 @@ export function buildMatchImageTree(input: TemplateInput): SatoriElement {
             "div",
             { style: { display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 24 } },
             [
-              teamCrest(input.homeCrestDataUri),
+              teamCrest(input.homeCrest),
               h("img", { src: input.versusIconDataUri, style: { width: 64, height: 64, objectFit: "contain" } }),
-              teamCrest(input.awayCrestDataUri),
+              teamCrest(input.awayCrest),
             ],
           ),
           h(
