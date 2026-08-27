@@ -65,13 +65,17 @@ export interface TemplateInput {
 // combines two long names, or an untracked opponent's occasionally-long
 // raw name). matchDetailsBlock tries the curated abbreviation dictionary
 // before accepting a smaller tier — see its own comment.
-const DETAIL_BLOCK_TOP_FONT_SIZE = 46;
+// Sized against the Figma mockup directly, not incrementally guessed: the
+// mock's title line is ~78% as wide as its crest row; measuring the same
+// ratio in our own render at the old size (46) gave only ~53%, so 46 was
+// scaled up by that gap (0.78/0.53) and the other tiers scaled with it.
+const DETAIL_BLOCK_TOP_FONT_SIZE = 68;
 
 function detailBlockFontSize(lines: string[]): number {
   const longest = Math.max(...lines.map((line) => line.length));
   if (longest <= 20) return DETAIL_BLOCK_TOP_FONT_SIZE;
-  if (longest <= 35) return 37;
-  return 29;
+  if (longest <= 35) return 55;
+  return 43;
 }
 
 function detailLine(text: string, fontSize: number): SatoriElement {
@@ -89,6 +93,12 @@ function detailLine(text: string, fontSize: number): SatoriElement {
         color: GRAY_800,
         textTransform: "uppercase",
         textAlign: "center",
+        // detailBlockFontSize's whole job is picking a size that keeps
+        // each line to one row — wrapping to two defeats that and breaks
+        // the vertical layout math below, which assumes each line's
+        // height, not two. Confirmed this actually happens without
+        // nowrap: a 33-char title at the middle tier silently wrapped.
+        whiteSpace: "nowrap",
       },
     },
     text,
@@ -182,18 +192,20 @@ const LABEL_TO_CHANNELS_GAP = 22;
 const CHANNEL_ROW_GAP = 12;
 
 // FIXED_OVERHEAD_ABOVE_CHANNELS is the real, *measured* pixel distance from
-// the top of the crests to the top of the first channel row (tier-40 names
-// — the tallest text case — with the gap props above in place), plus a
-// small safety cushion. It is NOT the sum of CREST_SIZE + the gap constants
-// + assumed text-line heights — an earlier version tried that and
-// undershot badly (measured ~620px, estimated ~581px), because satori adds
-// its own per-line leading on top of `lineHeight: 1` and each configured
-// `gap`, which isn't something its API exposes ahead of a render to
-// calculate from first principles. Confirmed by rendering the single-row
-// case and scanning the PNG for content bands top-to-bottom (crest row,
-// each detail line, the label) — re-measure the same way if CREST_SIZE,
-// any of the gaps above, or the detail/label font sizes change.
-const FIXED_OVERHEAD_ABOVE_CHANNELS = 640;
+// the top of the crests to the top of the first channel row (top-tier
+// names — the tallest text case — with the gap props above in place),
+// plus a small safety cushion. It is NOT the sum of CREST_SIZE + the gap
+// constants + assumed text-line heights — an earlier version tried that
+// and undershot badly, because satori adds its own per-line leading on
+// top of `lineHeight` and each configured `gap`, which isn't something
+// its API exposes ahead of a render to calculate from first principles.
+// Confirmed by rendering the single-row case and scanning the PNG for
+// content bands top-to-bottom (crest row, each detail line, the label) —
+// re-measure the same way if CREST_SIZE, any of the gaps above, or the
+// detail/label font sizes change (this value already had to move once,
+// from 640 to 665+cushion, when DETAIL_BLOCK_TOP_FONT_SIZE grew from 46
+// to 68).
+const FIXED_OVERHEAD_ABOVE_CHANNELS = 685;
 const CHANNELS_AREA_HEIGHT = CONTENT_REGION_HEIGHT - FIXED_OVERHEAD_ABOVE_CHANNELS;
 
 const MIN_TILE_SIZE = 90; // below this a logo stops being legible — real broadcast counts (checked against real match data: 6 is the highest seen) never actually hit this floor.
