@@ -22,6 +22,7 @@ describe("resolveTeamId", () => {
     expect(resolveTeamId("SC Corinthians Paulista")).toBe("corinthians");
     expect(resolveTeamId("Grêmio FBPA")).toBe("gremio");
     expect(resolveTeamId("Sport Club do Recife")).toBe("sport_recife");
+    expect(resolveTeamId("Athletic Club")).toBe("athletic");
   });
 
   it("returns null for an unrecognized name instead of guessing", () => {

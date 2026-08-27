@@ -7,6 +7,7 @@ const NORMALIZED_DISPLAY_NAME_TO_ID = new Map(TEAMS.map((team) => [normalizeText
 // name variance gets resolved — adapters never do their own team matching
 // (that's what produced the old codebase's 7 divergent normalization schemes).
 const FREE_TEXT_ALIASES: Record<string, string> = {
+  "athletic club": "athletic",
   "atletico-mg": "atletico_mineiro",
   "atletico mineiro": "atletico_mineiro",
   "ca mineiro": "atletico_mineiro",
