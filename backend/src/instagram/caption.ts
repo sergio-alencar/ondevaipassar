@@ -1,5 +1,4 @@
-import type { MatchView } from "@ondevaipassar/shared";
-import { formatKickoffLabel } from "./kickoffLabel.js";
+import { formatKickoffLabel, type MatchView } from "@ondevaipassar/shared";
 
 export function buildCaption(match: MatchView): string {
   const channels = match.broadcasts.map((broadcast) => broadcast.displayName).join(", ");

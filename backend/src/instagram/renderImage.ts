@@ -1,11 +1,10 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import type { MatchView } from "@ondevaipassar/shared";
+import { formatKickoffLabel, type MatchView } from "@ondevaipassar/shared";
 import { Resvg } from "@resvg/resvg-js";
 import satori from "satori";
 import type { ReactNode } from "react";
 import { channelLogoDataUri, crestArt, loadFonts, VERSUS_ICON, WORDMARK } from "./assets.js";
-import { formatKickoffLabel } from "./kickoffLabel.js";
 import { buildMatchImageTree } from "./template.js";
 
 const WIDTH = 1080;
