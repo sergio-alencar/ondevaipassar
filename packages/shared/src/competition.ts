@@ -13,6 +13,7 @@ export interface Competition {
 export const COMPETITIONS: Competition[] = [
   { id: "brasileirao-serie-a", displayName: "Campeonato Brasileiro Série A", type: "national-league" },
   { id: "brasileirao-serie-b", displayName: "Campeonato Brasileiro Série B", type: "national-league" },
+  { id: "brasileirao-serie-c", displayName: "Campeonato Brasileiro Série C", type: "national-league" },
   { id: "copa-do-brasil", displayName: "Copa do Brasil", type: "national-cup" },
   { id: "copa-do-nordeste", displayName: "Copa do Nordeste", type: "national-cup" },
   { id: "supercopa-do-brasil", displayName: "Supercopa do Brasil", type: "national-cup" },

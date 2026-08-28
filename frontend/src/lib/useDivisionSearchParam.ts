@@ -19,9 +19,16 @@ const PARAM = "divisao";
  * team page would have to step through every tab click made on Home
  * before actually leaving it.
  */
+// Every non-default Division value, lowercased, maps back to itself — kept
+// as an explicit lookup (not a chain of ternaries) so a 3rd/4th division
+// added later can't silently collapse into the default the way a binary
+// ternary did here before (any value other than "b" used to fall through
+// to "A" without anyone noticing).
+const DIVISION_BY_PARAM: Record<string, Division> = { b: "B", c: "C" };
+
 export function useDivisionSearchParam() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const division: Division = searchParams.get(PARAM) === "b" ? "B" : DEFAULT_DIVISION;
+  const division: Division = DIVISION_BY_PARAM[searchParams.get(PARAM) ?? ""] ?? DEFAULT_DIVISION;
 
   const setDivision = (next: Division) => {
     setSearchParams(next === DEFAULT_DIVISION ? {} : { [PARAM]: next.toLowerCase() }, { replace: true });

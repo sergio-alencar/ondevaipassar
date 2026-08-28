@@ -46,6 +46,19 @@ const NON_STANDARD_AGENDA_PATHS: Record<string, string> = {
   londrina: "pr/futebol/times/londrina/agenda/",
   "ponte-preta": "sp/campinas-e-regiao/futebol/times/ponte-preta/agenda-de-jogos-da-ponte-preta/",
   "athletico-pr": "pr/futebol/times/athletico-pr/agenda-de-jogos-do-athletico-pr/",
+  // Série C teams added while studying viability of tracking that division —
+  // these 7 are the ones that actually had a discoverable agenda page (out
+  // of 20 checked live); the other 13 keep aliases.geGlobo: null and are
+  // still covered by ge-globo-round's Série C hub entry for current-round
+  // fixtures, same tradeoff already accepted for Athletic/Chapecoense/São
+  // Bernardo.
+  "amazonas-fc": "am/futebol/times/amazonas-fc/agenda-de-jogos-do-amazonas-fc/",
+  "santa-cruz": "pe/futebol/times/santa-cruz/agenda-de-jogos-do-santa-cruz/",
+  guarani: "sp/campinas-e-regiao/futebol/times/guarani/agenda-de-jogos-do-guarani/",
+  ituano: "sp/tem-esporte/futebol/times/ituano/agenda-de-jogos-do-ituano/",
+  "volta-redonda": "rj/sul-do-rio-costa-verde/futebol/times/volta-redonda/agenda/",
+  brusque: "sc/futebol/times/brusque/agenda-de-jogos-do-brusque/",
+  paysandu: "pa/futebol/times/paysandu/agenda-de-jogos-do-paysandu/",
 };
 
 export function buildTeamAgendaUrl(geGloboSlug: string): string {

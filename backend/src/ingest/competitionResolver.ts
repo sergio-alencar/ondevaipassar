@@ -8,6 +8,7 @@ import { normalizeText, slugify } from "@ondevaipassar/shared";
 const COMPETITION_ALIASES: Record<string, string> = {
   "campeonato brasileiro": "brasileirao-serie-a",
   "campeonato brasileiro serie b": "brasileirao-serie-b",
+  "campeonato brasileiro serie c": "brasileirao-serie-c",
   "copa do brasil": "copa-do-brasil",
   "copa do nordeste": "copa-do-nordeste",
   "supercopa do brasil": "supercopa-do-brasil",

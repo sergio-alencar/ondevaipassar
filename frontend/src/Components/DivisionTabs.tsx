@@ -5,7 +5,7 @@ interface DivisionTabsProps {
   onChange: (division: Division) => void;
 }
 
-const DIVISIONS: Division[] = ["A", "B"];
+const DIVISIONS: Division[] = ["A", "B", "C"];
 
 const DivisionTabs = ({ active, onChange }: DivisionTabsProps) => (
   <div className="flex justify-center gap-2">

@@ -4,15 +4,18 @@ import type { CanonicalMatch, FetchResult, FixtureSourceAdapter } from "../types
 import { fetchListaJogos } from "./client.js";
 import type { RoundMatch } from "./schema.js";
 
-// Only the two competitions ge.globo runs this "current round" hub widget
-// for that this project ingests daily — same two as the onde-assistir news
-// feed's ESPN counterpart would have targeted, chosen for the same reason:
-// highest match volume, daily relevance. One more entry here is the whole
-// diff for tracking another competition's hub, same spirit as
-// youtubeEnrichment.ts's TRACKED_CHANNELS list.
+// The competitions ge.globo runs this "current round" hub widget for that
+// this project ingests daily. One more entry here is the whole diff for
+// tracking another competition's hub, same spirit as youtubeEnrichment.ts's
+// TRACKED_CHANNELS list. brasileirao-serie-c confirmed live the same way as
+// the other two: https://ge.globo.com/futebol/brasileirao-serie-c/ has the
+// same `const listaJogos = [...]` block, parsed by the exact same
+// extractListaJogos with zero changes (10 matches, 20 distinct teams, same
+// single round-robin shape as Séries A/B).
 const HUB_SOURCES: { url: string; competitionId: string }[] = [
   { url: "https://ge.globo.com/futebol/brasileirao-serie-a/", competitionId: "brasileirao-serie-a" },
   { url: "https://ge.globo.com/futebol/brasileirao-serie-b/", competitionId: "brasileirao-serie-b" },
+  { url: "https://ge.globo.com/futebol/brasileirao-serie-c/", competitionId: "brasileirao-serie-c" },
 ];
 
 // Brazil has used a fixed UTC-3 offset (no DST) since 2019 — same assumption
