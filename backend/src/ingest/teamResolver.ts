@@ -38,6 +38,7 @@ const FREE_TEXT_ALIASES: Record<string, string> = {
   "ceara sc": "ceara",
   "mirassol fc": "mirassol",
   "botafogo fr": "botafogo",
+  "floresta-ce": "floresta",
 };
 
 /** Resolves a raw team name (as scraped/returned by any source) to our canonical Team.id, or null if unrecognized. Never throws — an unresolved team just means the raw name gets displayed as-is. */
