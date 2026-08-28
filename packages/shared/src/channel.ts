@@ -36,6 +36,11 @@ const CHANNELS: Channel[] = [
     instagramHandle: "cazetv",
   },
   {
+    id: "dazn",
+    displayName: "DAZN",
+    officialUrl: "https://www.dazn.com/pt-BR/",
+  },
+  {
     id: "disneyplus",
     displayName: "Disney+",
     officialUrl: "https://www.disneyplus.com/pt-br/",
@@ -139,6 +144,7 @@ const CHANNEL_ALIASES: Record<string, string> = {
   cazetv: "cazetv",
   "caze tv": "cazetv",
   "cazé tv": "cazetv",
+  dazn: "dazn",
   disney: "disneyplus",
   "disney+": "disneyplus",
   "star+": "disneyplus",

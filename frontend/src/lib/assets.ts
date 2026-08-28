@@ -52,6 +52,7 @@ export function crestProxyUrl(sourceUrl: string): string {
 const RASTER_EXTENSION: Record<string, string> = {
   band: "png",
   cazetv: "png",
+  dazn: "png",
   disneyplus: "png",
   espn: "png",
   getv: "png",
