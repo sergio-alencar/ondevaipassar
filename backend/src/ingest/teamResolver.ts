@@ -44,6 +44,11 @@ const FREE_TEXT_ALIASES: Record<string, string> = {
   // data) — displayName is "Inter de Milão" instead since that's the name
   // Brazilian coverage actually uses day to day.
   internazionale: "inter_de_milao",
+  "tottenham hotspur": "tottenham",
+  // itatiaia.com.br shortens this to just "Leverkusen" in running prose
+  // (confirmed live, "Elversberg x Leverkusen: onde assistir") — our own
+  // displayName keeps the full "Bayer Leverkusen".
+  leverkusen: "bayer_leverkusen",
 };
 
 /** Resolves a raw team name (as scraped/returned by any source) to our canonical Team.id, or null if unrecognized. Never throws — an unresolved team just means the raw name gets displayed as-is. */
