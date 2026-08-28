@@ -27,6 +27,21 @@ export function findSourceCrestUrl(teamId: string, matches: MatchView[]): string
   return undefined;
 }
 
+/**
+ * Routes a hotlinked crest URL (an untracked opponent's, straight from
+ * ge.globo — the only case TeamCrest ever falls back to this for) through
+ * our own backend instead of using it directly. ge.globo's crest SVGs
+ * declare a square canvas regardless of the real silhouette drawn inside
+ * (a shield-shaped crest sits centered in it with real padding), the same
+ * problem already fixed for local crest art by cropping the file — this
+ * proxy applies that same crop server-side, since we don't control or want
+ * to permanently store every foreign club's art locally just to crop it
+ * once. See backend/src/api/routes/crestProxy.ts.
+ */
+export function crestProxyUrl(sourceUrl: string): string {
+  return `${import.meta.env.VITE_API_BASE_URL}/api/crest-proxy?url=${encodeURIComponent(sourceUrl)}`;
+}
+
 // Every channel now ships curated square icon art (each channel's real app
 // icon or Instagram profile picture) instead of a brand wordmark SVG — see
 // packages/shared's Channel history for why. Extension varies per file

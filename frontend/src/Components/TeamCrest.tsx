@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Team } from "@ondevaipassar/shared";
-import { fallbackCrestUrl, localCrestUrl } from "../lib/assets";
+import { crestProxyUrl, fallbackCrestUrl, localCrestUrl } from "../lib/assets";
 
 interface TeamCrestProps {
   team: Pick<Team, "crestFile" | "knownCrestUrl"> | undefined;
@@ -22,7 +22,12 @@ interface TeamCrestProps {
 // effect below restarts the cascade from the top whenever the inputs
 // actually change, so a late-arriving fallback gets a real second attempt.
 const TeamCrest = ({ team, name, className, sourceCrestUrl }: TeamCrestProps) => {
-  const fallback = sourceCrestUrl || team?.knownCrestUrl;
+  const rawFallback = sourceCrestUrl || team?.knownCrestUrl;
+  // Proxied (see crestProxyUrl), not the raw ge.globo URL directly — the
+  // proxy crops the crest to its real content the same way local crest
+  // art already is, so an untracked opponent's crest doesn't sit smaller
+  // (or further from a "x" next to it) than a tracked team's does.
+  const fallback = rawFallback ? crestProxyUrl(rawFallback) : undefined;
   const localSrc = team ? localCrestUrl(team) : undefined;
 
   const [src, setSrc] = useState(localSrc ?? fallback ?? fallbackCrestUrl);
