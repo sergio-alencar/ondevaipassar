@@ -24,6 +24,11 @@ const CHANNELS: Channel[] = [
     instagramHandle: "esportenaband",
   },
   {
+    id: "canaldobenja",
+    displayName: "Canal do Benja",
+    officialUrl: "https://www.youtube.com/@canaldobenjaoficial/streams",
+  },
+  {
     id: "goat",
     displayName: "Canal GOAT",
     officialUrl: "https://www.youtube.com/@canalgoatbr/streams",
@@ -141,6 +146,8 @@ const CHANNEL_ALIASES: Record<string, string> = {
   band: "band",
   bandeirantes: "band",
   "band sports": "band",
+  "canal do benja": "canaldobenja",
+  benja: "canaldobenja",
   cazetv: "cazetv",
   "caze tv": "cazetv",
   "cazé tv": "cazetv",

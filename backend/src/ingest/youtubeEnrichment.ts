@@ -15,6 +15,14 @@ const TRACKED_CHANNELS: { channelId: string; youtubeChannelId: string; sourceId:
   { channelId: "getv", youtubeChannelId: "UCgCKagVhzGnZcuP9bSMgMCg", sourceId: "youtube-getv" },
   { channelId: "nossofutebol", youtubeChannelId: "UCMcc9elPZGpg6eU4i3YaCpA", sourceId: "youtube-nossofutebol" },
   { channelId: "sbt", youtubeChannelId: "UCxc3marqP9BJSkQ0_K4mqDg", sourceId: "youtube-sbt" },
+  // Added covering Série C — Sérgio's own research: most Série C broadcasts
+  // are SportyNet (nossofutebol, already tracked above), Canal do Benja, and
+  // Band. Channel id verified live (fetched
+  // https://www.youtube.com/@canaldobenjaoficial, real externalId, not
+  // guessed) — note there's a different, similarly-named unofficial channel
+  // at @canaldobenja with its own distinct id; this is specifically the
+  // "oficial" one Sérgio pointed at.
+  { channelId: "canaldobenja", youtubeChannelId: "UCT7xKN6IOoITtqnfjB-6m1g", sourceId: "youtube-canaldobenja" },
 ];
 
 async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], apiKey: string, allMatches: MatchCandidate[]): Promise<void> {
