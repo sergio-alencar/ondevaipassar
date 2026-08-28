@@ -4,7 +4,7 @@ import { resolveTeamId } from "../../ingest/teamResolver.js";
 import { getErrorMessage } from "../../lib/errors.js";
 import type { CanonicalBroadcast, CanonicalMatch, FetchResult, FixtureSourceAdapter } from "../types.js";
 import { fetchTeamAgenda } from "./client.js";
-import { parseSoccerEvent, type SoccerEvent } from "./schema.js";
+import { parseSoccerEvent, type LiveWatchSource, type SoccerEvent } from "./schema.js";
 
 // Small concurrent batches, not fully sequential: this now runs as a
 // serverless function against a real duration limit (previously it was a
@@ -42,6 +42,25 @@ function toKickoff(startDate: string | null, startHour: string | null): Kickoff 
   return { kickoffUtc: confirmed.toISOString(), kickoffTimeConfirmed: Boolean(startHour) };
 }
 
+// A liveWatchSources entry with a non-empty `cta` (in every sample seen,
+// literally "Assine") is a generic subscription upsell — "here's where you
+// COULD catch sports if you subscribe" — not a confirmation that *this*
+// match actually airs there. Confirmed live on two real, wrongly-shown
+// matches: Náutico x Athletic showed sportv + Premiere + globoplay (all
+// three cta:"Assine", all three pointing at /assine/ subscription pages,
+// and the match's own broadcastStatus was "PRE_DIA"/"FIQUE POR DENTRO" —
+// ge.globo's *own* signal that nothing is confirmed yet) alongside zero
+// entries anywhere on ge.globo's "onde assistir" coverage confirming
+// Globoplay specifically; a genuinely confirmed match (e.g. Internacional
+// x Grêmio -> Prime Vídeo) instead has exactly one entry with cta, url,
+// AND description all empty. This is a broader fix for the same disease
+// an earlier, narrower patch only partly caught (dropping a bare
+// "globoplay" entry specifically, kept below as a defensive second pass —
+// see its own comment).
+function isConfirmedSource(source: LiveWatchSource): boolean {
+  return source.cta === "";
+}
+
 // ge.globo lists a bare "globoplay" entry alongside whichever real channel
 // (sportv, premiere, ...) is actually airing the match. Globoplay there is
 // the app SporTV subscribers can stream through, not an independent way to
@@ -56,9 +75,14 @@ function toKickoff(startDate: string | null, startHour: string | null): Kickoff 
 // for Internacional x Atlético-MG, which names only sportv and premiere
 // (the mismatch Sérgio caught). Dropped only when something else is already
 // in the list, so a genuinely standalone Globoplay offering (never observed
-// so far) would still show.
+// so far) would still show. Largely redundant with the cta filter above
+// now (a redundant globoplay entry has always had a non-empty cta in every
+// sample seen) — kept anyway as a second, independent check in case a
+// future source page ever puts a bare globoplay upsell out with an empty
+// cta.
 export function resolveBroadcasts(sources: SoccerEvent["match"]["liveWatchSources"]): CanonicalBroadcast[] {
   const resolved = (sources ?? [])
+    .filter(isConfirmedSource)
     .map((source): CanonicalBroadcast | null => {
       const channelId = resolveChannelId(source.name);
       return channelId ? { channelId, logoUrl: source.officialLogoUrl } : null;

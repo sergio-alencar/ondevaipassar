@@ -1,4 +1,5 @@
 import { COMPETITIONS, TEAMS } from "@ondevaipassar/shared";
+import { and, eq, notInArray } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { broadcasts, competitions, matches, scrapeRuns, teams } from "../db/schema.js";
 import { getErrorMessage } from "../lib/errors.js";
@@ -87,7 +88,24 @@ export async function runAdapter(adapter: FixtureSourceAdapter): Promise<void> {
       ),
     );
 
-    const [first, ...rest] = [...matchUpserts, ...broadcastUpserts];
+    // Upserting only ever adds/updates rows — a channel this adapter
+    // resolved last run but no longer resolves this run (its source page
+    // stopped confirming it, or — the actual bug this fixed — our own
+    // resolution logic got stricter) would otherwise sit in the table
+    // forever, since nothing ever removes a broadcast that's no longer in
+    // the newly-fetched set. Scoped to this adapter's own sourceId so a
+    // different source's broadcast for the same match (e.g. the Premiere
+    // or YouTube supplementary scrapers in attachBroadcasts.ts) is never
+    // touched by this cleanup. notInArray(col, []) isn't used when a match
+    // has zero resolved broadcasts — an empty IN-list is dialect-risky, and
+    // "delete everything for this match+source" is what "keep nothing" means anyway.
+    const broadcastDeletes = canonicalMatches.map((match) => {
+      const keepChannelIds = match.broadcasts.map((broadcast) => broadcast.channelId);
+      const scope = and(eq(broadcasts.matchId, match.id), eq(broadcasts.sourceId, adapter.id));
+      return db.delete(broadcasts).where(keepChannelIds.length > 0 ? and(scope, notInArray(broadcasts.channelId, keepChannelIds)) : scope);
+    });
+
+    const [first, ...rest] = [...matchUpserts, ...broadcastDeletes, ...broadcastUpserts];
     if (first) await db.batch([first, ...rest]);
 
     await db.insert(scrapeRuns).values({
