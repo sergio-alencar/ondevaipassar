@@ -52,7 +52,7 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
           (justify-center on the grid itself) is what actually tightens
           the visible gap between crests.
         */}
-        <ul className="flex flex-wrap gap-10 justify-items-center justify-center lg:grid lg:grid-cols-[repeat(5,max-content)] lg:justify-center lg:gap-x-4 lg:gap-y-4 max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
+        <ul className="flex flex-wrap gap-10 justify-items-center justify-center lg:grid lg:grid-cols-[repeat(5,max-content)] lg:justify-center lg:gap-x-8 lg:gap-y-6 max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
           {teamsInDivision.map((team) => (
             <li key={team.id} onClick={() => setSelectedTeam(team)}>
               <Link to={`/time/${team.id}`}>
