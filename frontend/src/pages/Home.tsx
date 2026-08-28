@@ -36,11 +36,22 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
           {teamsInDivision.map((team) => (
             <li key={team.id} onClick={() => setSelectedTeam(team)}>
               <Link to={`/time/${team.id}`}>
+                {/*
+                  h-* w-auto, not h-* w-* (both fixed): a browser's default
+                  img sizing computes height from width when only width is
+                  constrained, so a fixed WIDTH box left a narrower-than-
+                  square crest (e.g. Flamengo) taller than a squarer one's
+                  box instead of the same height every crest was meant to
+                  share. Fixing height instead and letting width follow the
+                  crest's own real aspect ratio is what actually makes
+                  every crest's height consistent (same fix already
+                  applied to MatchCard.tsx).
+                */}
                 <TeamCrest
                   team={team}
                   name={team.displayName}
                   sourceCrestUrl={findSourceCrestUrl(team.id, matches)}
-                  className="h-38 w-40 px-4 py-2 hover:scale-105 transition max-sm:h-18 max-sm:w-18 max-lg:w-24 max-lg:px-2 max-lg:py-0"
+                  className="h-38 w-auto px-4 py-2 hover:scale-105 transition max-sm:h-18 max-lg:h-24 max-lg:px-2 max-lg:py-0"
                 />
               </Link>
             </li>
