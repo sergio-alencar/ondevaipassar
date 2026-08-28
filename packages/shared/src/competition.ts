@@ -29,6 +29,11 @@ export const COMPETITIONS: Competition[] = [
   { id: "campeonato-baiano", displayName: "Campeonato Baiano", type: "state" },
   { id: "campeonato-pernambucano", displayName: "Campeonato Pernambucano", type: "state" },
   { id: "campeonato-cearense", displayName: "Campeonato Cearense", type: "state" },
+  // A distinct competition from Campeonato Paranaense (both appear
+  // separately in ge.globo's own Athletico-PR agenda) — a state cup mixing
+  // the state's senior pro clubs against smaller in-state teams, closer in
+  // spirit to Copa do Brasil's own early rounds than to a state league.
+  { id: "copa-parana", displayName: "Copa Paraná", type: "state" },
   { id: "premier-league", displayName: "Premier League", type: "national-league" },
   { id: "la-liga", displayName: "La Liga", type: "national-league" },
   { id: "bundesliga", displayName: "Bundesliga", type: "national-league" },
