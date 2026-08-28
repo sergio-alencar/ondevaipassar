@@ -23,15 +23,26 @@ import { Resvg } from "@resvg/resvg-js";
 // an untracked opponent (crestProxy.ts route, per-request, since we don't
 // control or want to permanently store every foreign club's art).
 //
-// Deliberately does NOT add `fill="none"` on the rewritten root tag (an
-// earlier version did, matching the unrelated channel-logo crop script) —
-// that broke files whose paths get their color from a class in a <style>
-// block rather than a `fill` attribute of their own (confirmed: one real
-// crest, Club Libertad's, rendered fully blank with it). Leaving fill
-// unset lets each file's own content define its own color, same as the
-// untouched original tag did.
+// Rewrites width/height/viewBox *within* the original root tag rather than
+// replacing the whole tag with a freshly-built one — every other attribute
+// (fill, id, any xmlns:* namespace declarations) passes through completely
+// untouched. An earlier version rebuilt the tag from scratch with a fixed
+// small set of attributes, which broke real crests in two different, even
+// contradictory ways: adding `fill="none"` (to match the unrelated
+// channel-logo crop script) rendered Club Libertad's fully blank, because
+// its paths get their color from a class in a <style> block that a root
+// fill="none" overrides — but then *omitting* fill entirely rendered a new
+// solid-black outline on Fluminense's, because it has a path with no fill
+// of its own that depends on inheriting the root's original fill="none" to
+// stay invisible (SVG's fill initial value is black, not none). Dropping
+// other namespaces the same way separately broke two more crests that
+// declare xmlns:rdf for embedded Illustrator/RDF metadata deeper in the
+// file — resvg refused to parse the rewritten tag's now-undeclared `rdf:`
+// prefix. Editing attributes in place, leaving unrelated ones alone, is
+// the one approach that doesn't keep re-breaking some other real file.
 export function cropSvgToContent(svg: Buffer): { svg: Buffer; aspectRatio: number } {
-  const openTagMatch = svg.toString("utf-8").match(/<svg[^>]*viewBox="([\d.]+) ([\d.]+) ([\d.]+) ([\d.]+)"[^>]*>/);
+  const text = svg.toString("utf-8");
+  const openTagMatch = text.match(/<svg[^>]*viewBox="([\d.]+) ([\d.]+) ([\d.]+) ([\d.]+)"[^>]*>/);
   if (!openTagMatch) return { svg, aspectRatio: 1 }; // no viewBox to work from — render as-is rather than guess.
   const [, vbX, vbY, vbW, vbH] = openTagMatch.map(Number) as unknown as [number, number, number, number, number];
 
@@ -69,7 +80,15 @@ export function cropSvgToContent(svg: Buffer): { svg: Buffer; aspectRatio: numbe
   const cropH = cropMaxY - cropY;
 
   const round2 = (n: number) => Math.round(n * 100) / 100;
-  const newOpenTag = `<svg width="${round2(cropW)}" height="${round2(cropH)}" viewBox="${round2(cropX)} ${round2(cropY)} ${round2(cropW)} ${round2(cropH)}" xmlns="http://www.w3.org/2000/svg">`;
-  const cropped = svg.toString("utf-8").replace(/<svg[^>]*>/, newOpenTag);
+  const originalTag = openTagMatch[0];
+  const newViewBox = `viewBox="${round2(cropX)} ${round2(cropY)} ${round2(cropW)} ${round2(cropH)}"`;
+  let newTag = originalTag.replace(/viewBox="[^"]*"/, newViewBox);
+  // width/height are presentational (CSS pixel size when embedded with no
+  // other sizing), not part of the coordinate system the way viewBox is —
+  // updating them keeps the file's own declared aspect ratio consistent
+  // with its new viewBox, but only if the original tag actually had them.
+  if (/ width="[^"]*"/.test(newTag)) newTag = newTag.replace(/ width="[^"]*"/, ` width="${round2(cropW)}"`);
+  if (/ height="[^"]*"/.test(newTag)) newTag = newTag.replace(/ height="[^"]*"/, ` height="${round2(cropH)}"`);
+  const cropped = text.replace(originalTag, newTag);
   return { svg: Buffer.from(cropped, "utf-8"), aspectRatio: cropW / cropH };
 }
