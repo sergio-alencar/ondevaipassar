@@ -24,15 +24,6 @@ const liveWatchSourceSchema = z.object({
   name: z.string(),
   url: z.string(),
   officialLogoUrl: z.string(),
-  // Empty for a genuinely confirmed broadcast; "Assine" for a generic
-  // subscription upsell ge.globo shows regardless of whether this specific
-  // match actually airs there — see resolveBroadcasts in adapter.ts for
-  // why this field matters. Defaults to a non-empty sentinel (treated as
-  // "not confirmed" by resolveBroadcasts) for the rare source that omits
-  // it — this project's own rule is "no confirmed broadcast, skip the
-  // channel," so an unrecognized/missing signal should fail toward hiding
-  // a channel, not toward showing one we can't actually vouch for.
-  cta: z.string().default("unknown"),
 });
 
 export const soccerEventSchema = z.object({
