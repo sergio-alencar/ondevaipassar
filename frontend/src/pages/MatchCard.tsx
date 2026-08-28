@@ -22,20 +22,27 @@ const MatchCard = ({ match, team }: MatchCardProps) => {
           w-auto only looks right because the crest SVGs are cropped tight
           to their real content — an uncropped file would still show its
           old square canvas here.
+
+          max-w-* caps a genuine width outlier (Criciúma, Club Libertad —
+          really are ~1.5-1.8x wider than tall) so it can't crowd the "x"
+          between the two crests or blow past the card's own crest column.
+          1.25x the crest height at each breakpoint, same ratio Home.tsx
+          uses for its grid — generous enough that a normal round/square
+          badge still renders at full width.
         */}
         <div className="flex items-center justify-self-end gap-4 max-lg:gap-2 max-lg:justify-self-center">
           <TeamCrest
             team={match.homeTeamId ? findTeamById(match.homeTeamId) : undefined}
             name={match.homeTeamName}
             sourceCrestUrl={match.homeTeamCrestUrl}
-            className="h-32 w-auto max-lg:h-20 max-sm:h-18"
+            className="h-32 w-auto max-w-40 max-lg:h-20 max-lg:max-w-25 max-sm:h-18 max-sm:max-w-22.5"
           />
           <img className="size-6 max-lg:size-4" src={versus} alt="versus" />
           <TeamCrest
             team={match.awayTeamId ? findTeamById(match.awayTeamId) : undefined}
             name={match.awayTeamName}
             sourceCrestUrl={match.awayTeamCrestUrl}
-            className="h-32 w-auto max-lg:h-20 max-sm:h-18"
+            className="h-32 w-auto max-w-40 max-lg:h-20 max-lg:max-w-25 max-sm:h-18 max-sm:max-w-22.5"
           />
         </div>
 

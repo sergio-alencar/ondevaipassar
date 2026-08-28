@@ -42,7 +42,15 @@ const TeamCrest = ({ team, name, className, sourceCrestUrl }: TeamCrestProps) =>
 
   return (
     <img
-      className={className}
+      // object-contain, always (not caller-controlled): most crests are
+      // narrower than tall and just fill their h-* w-auto box exactly, but
+      // a real outlier (Criciúma, ~1.5:1; Club Libertad, ~1.8:1 — both
+      // genuinely that wide, not a cropping bug) needs its width capped by
+      // the caller's own max-w-* class to stop it from blowing out a
+      // content-sized grid column or crowding a match card's "x". Without
+      // object-contain, hitting that cap would squish the crest to fill
+      // the now-fixed width×height box instead of shrinking proportionally.
+      className={`${className} object-contain`}
       src={src}
       alt={name}
       title={name}

@@ -66,12 +66,22 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
                   crest's own real aspect ratio is what actually makes
                   every crest's height consistent (same fix already
                   applied to MatchCard.tsx).
+
+                  max-w-* caps a genuine width outlier (Criciúma, Club
+                  Libertad — really are ~1.5-1.8x wider than tall, not a
+                  cropping bug) so it can't make its own grid column
+                  wider than the rest (grid-cols-[repeat(5,max-content)]
+                  above sizes each column to its widest crest). 1.25x the
+                  crest height at each breakpoint — generous enough that
+                  every roughly-square or round badge (up to ~1.2:1,
+                  the widest non-outlier crest measured) still renders at
+                  full, unconstrained width.
                 */}
                 <TeamCrest
                   team={team}
                   name={team.displayName}
                   sourceCrestUrl={findSourceCrestUrl(team.id, matches)}
-                  className="h-24 w-auto px-2 py-1 hover:scale-105 transition max-sm:h-18"
+                  className="h-24 w-auto max-w-30 px-2 py-1 hover:scale-105 transition max-sm:h-18 max-sm:max-w-22.5"
                 />
               </Link>
             </li>
