@@ -17,7 +17,12 @@ export interface Channel {
 // Kept alphabetical by displayName (pt-BR collation) — re-sort if you add
 // or rename a channel, don't just append.
 const CHANNELS: Channel[] = [
-  { id: "band", displayName: "Band", officialUrl: "https://www.band.uol.com.br/ao-vivo/", instagramHandle: "esportenaband" },
+  {
+    id: "band",
+    displayName: "Band",
+    officialUrl: "https://www.band.com.br/ao-vivo/",
+    instagramHandle: "esportenaband",
+  },
   {
     id: "goat",
     displayName: "Canal GOAT",
@@ -27,7 +32,7 @@ const CHANNELS: Channel[] = [
   {
     id: "cazetv",
     displayName: "CazéTV",
-    officialUrl: "https://www.youtube.com/cazetv/",
+    officialUrl: "https://www.youtube.com/cazetv/streams/",
     instagramHandle: "cazetv",
   },
   {
@@ -36,17 +41,22 @@ const CHANNELS: Channel[] = [
     officialUrl: "https://www.disneyplus.com/pt-br/",
     instagramHandle: "disneyplusbr",
   },
-  { id: "espn", displayName: "ESPN", officialUrl: "https://www.espn.com.br/", instagramHandle: "espnbrasil" },
+  {
+    id: "espn",
+    displayName: "ESPN",
+    officialUrl: "https://www.espn.com.br/",
+    instagramHandle: "espnbrasil",
+  },
   {
     id: "getv",
     displayName: "ge TV",
-    officialUrl: "https://www.youtube.com/@getv",
+    officialUrl: "https://www.youtube.com/@getv/streams/",
     instagramHandle: "getv",
   },
   {
     id: "globo",
     displayName: "Globo",
-    officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/",
+    officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/6120663/",
     regionalCaveat: true,
     instagramHandle: "tvglobo",
   },
@@ -77,7 +87,7 @@ const CHANNELS: Channel[] = [
   {
     id: "record",
     displayName: "Record",
-    officialUrl: "https://assine.playplus.com/",
+    officialUrl: "https://www.recordplus.com/Live/LiveEvent/",
     instagramHandle: "sigarecord",
   },
   {
@@ -90,7 +100,7 @@ const CHANNELS: Channel[] = [
   {
     id: "sportv",
     displayName: "SporTV",
-    officialUrl: "https://globoplay.globo.com/sportv/ao-vivo/",
+    officialUrl: "https://globoplay.globo.com/sportv/ao-vivo/7339108/",
     instagramHandle: "sportv",
   },
   {
@@ -105,10 +115,15 @@ const CHANNELS: Channel[] = [
   {
     id: "tntsports",
     displayName: "TNT Sports",
-    officialUrl: "https://play.max.com/tnt-sports/",
+    officialUrl: "https://play.hbomax.com/tnt-sports",
     instagramHandle: "tntsportsbr",
   },
-  { id: "youtube", displayName: "YouTube", officialUrl: "https://youtube.com/", instagramHandle: "youtubebrasil" },
+  {
+    id: "youtube",
+    displayName: "YouTube",
+    officialUrl: "https://youtube.com/",
+    instagramHandle: "youtubebrasil",
+  },
 ];
 
 // Free-text (as seen scraped from ge.globo's liveWatchSources[].name, or typed
@@ -118,26 +133,47 @@ const CHANNELS: Channel[] = [
 // non-broadcast entries (e.g. "Cartola", a fantasy-football upsell) that
 // intentionally have no entry here, so they get filtered out rather than mapped.
 const CHANNEL_ALIASES: Record<string, string> = {
-  band: "band", bandeirantes: "band", "band sports": "band",
-  cazetv: "cazetv", "caze tv": "cazetv", "cazé tv": "cazetv",
-  "disney": "disneyplus", "disney+": "disneyplus", "star+": "disneyplus",
-  espn: "espn", "espn brasil": "espn", "espn+": "espn",
-  globo: "globo", "rede globo": "globo",
+  band: "band",
+  bandeirantes: "band",
+  "band sports": "band",
+  cazetv: "cazetv",
+  "caze tv": "cazetv",
+  "cazé tv": "cazetv",
+  disney: "disneyplus",
+  "disney+": "disneyplus",
+  "star+": "disneyplus",
+  espn: "espn",
+  "espn brasil": "espn",
+  "espn+": "espn",
+  globo: "globo",
+  "rede globo": "globo",
   globoplay: "globoplay",
   // ge TV is ge.globo's own free live-text/highlights product — distinct
   // from Globoplay (paid, full match) even though both are Globo-owned.
   // Verified as separate liveWatchSources entries with different
   // description/url/transmissionId, not a naming variant of one another.
   "ge tv": "getv",
-  goat: "goat", "canal goat": "goat",
-  "nosso futebol": "nossofutebol", sportynet: "nossofutebol", "sporty net": "nossofutebol",
-  paramount: "paramountplus", "paramount+": "paramountplus", "paramount plus": "paramountplus",
+  goat: "goat",
+  "canal goat": "goat",
+  "nosso futebol": "nossofutebol",
+  sportynet: "nossofutebol",
+  "sporty net": "nossofutebol",
+  paramount: "paramountplus",
+  "paramount+": "paramountplus",
+  "paramount plus": "paramountplus",
   premiere: "premiere",
-  prime: "primevideo", "prime video": "primevideo", "prime vídeo": "primevideo", "amazon prime video": "primevideo",
-  record: "record", "record tv": "record",
+  prime: "primevideo",
+  "prime video": "primevideo",
+  "prime vídeo": "primevideo",
+  "amazon prime video": "primevideo",
+  record: "record",
+  "record tv": "record",
   sbt: "sbt",
-  sportv: "sportv", "sportv 2": "sportv", "sportv 3": "sportv",
-  tnt: "tntsports", "tnt sports": "tntsports",
+  sportv: "sportv",
+  "sportv 2": "sportv",
+  "sportv 3": "sportv",
+  tnt: "tntsports",
+  "tnt sports": "tntsports",
   youtube: "youtube",
 };
 
