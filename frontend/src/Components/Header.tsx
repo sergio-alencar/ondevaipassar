@@ -47,7 +47,18 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
       <header
         className={`${headerBgClass} sticky top-0 z-30 transition-colors duration-300`}
       >
-        <div className="flex justify-between items-center max-w-7xl mx-auto px-24 max-sm:px-6">
+        {/*
+          relative lives here, on the full-width row, not on the inner
+          "times" + icon wrapper below — DropdownMenu is positioned
+          absolute against THIS box now, not that narrower one. It used to
+          be anchored to the inner wrapper (only as wide as "times" + the
+          icon), which broke two ways: fixed pixel offsets (top-19 right-12)
+          calibrated against that box's small size didn't land the menu
+          under the trigger on desktop, and max-sm:w-full resolved to
+          "100% of that tiny box" instead of the viewport, so almost the
+          whole menu rendered off-screen on mobile.
+        */}
+        <div className="relative flex justify-between items-center max-w-7xl mx-auto px-24 max-sm:px-6">
           <button
             id="menu-botao"
             type="button"
@@ -65,7 +76,7 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
             <img className="w-42 py-4 max-sm:w-32" src={logoHeader} alt="Onde Vai Passar" />
           </Link>
 
-          <div className="relative flex gap-4 py-6 items-center">
+          <div className="flex gap-4 py-6 items-center">
             <p className="text-white text-xl uppercase font-bold select-none max-sm:!hidden">
               times
             </p>
@@ -79,13 +90,14 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
             >
               <img className="size-7" src={escudo} alt="" />
             </button>
-            <DropdownMenu
-              ref={dropdownRef}
-              setSelectedTeam={setSelectedTeam}
-              isVisible={isDropdownVisible}
-              setIsDropdownVisible={setIsDropdownVisible}
-            />
           </div>
+
+          <DropdownMenu
+            ref={dropdownRef}
+            setSelectedTeam={setSelectedTeam}
+            isVisible={isDropdownVisible}
+            setIsDropdownVisible={setIsDropdownVisible}
+          />
         </div>
       </header>
       <div
