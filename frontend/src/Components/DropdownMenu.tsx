@@ -5,7 +5,7 @@ import { findSourceCrestUrl } from "../lib/assets";
 import { useTeamsByDivision } from "../lib/useTeamsByDivision";
 import DivisionTabs from "./DivisionTabs";
 import DropdownMenuTeam from "./DropdownMenuTeam";
-import triangleIcon from "../assets/images/icones/triangulo.svg";
+import triangleIcon from "../assets/images/icones/triangulo-2.svg";
 
 interface DropdownMenuProps {
   setSelectedTeam: (team: Team) => void;
