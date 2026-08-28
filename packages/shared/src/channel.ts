@@ -20,7 +20,7 @@ const CHANNELS: Channel[] = [
   {
     id: "band",
     displayName: "Band",
-    officialUrl: "https://www.band.com.br/ao-vivo/",
+    officialUrl: "https://www.band.com.br/ao-vivo",
     instagramHandle: "esportenaband",
   },
   {
@@ -37,43 +37,48 @@ const CHANNELS: Channel[] = [
   {
     id: "cazetv",
     displayName: "CazéTV",
-    officialUrl: "https://www.youtube.com/cazetv/streams/",
+    officialUrl: "https://www.youtube.com/cazetv/streams",
     instagramHandle: "cazetv",
   },
   {
     id: "dazn",
     displayName: "DAZN",
-    officialUrl: "https://www.dazn.com/pt-BR/",
+    officialUrl: "https://www.dazn.com/pt-BR",
   },
   {
     id: "disneyplus",
     displayName: "Disney+",
-    officialUrl: "https://www.disneyplus.com/pt-br/",
+    officialUrl: "https://www.disneyplus.com/pt-br",
     instagramHandle: "disneyplusbr",
   },
   {
     id: "espn",
     displayName: "ESPN",
-    officialUrl: "https://www.espn.com.br/",
+    officialUrl: "https://www.espn.com.br",
     instagramHandle: "espnbrasil",
+  },
+  {
+    id: "fpftv",
+    displayName: "FPF TV",
+    officialUrl: "https://www.youtube.com/@federacaopr/streams",
   },
   {
     id: "getv",
     displayName: "ge TV",
-    officialUrl: "https://www.youtube.com/@getv/streams/",
+    officialUrl: "https://www.youtube.com/@getv/streams",
     instagramHandle: "getv",
   },
   {
     id: "globo",
     displayName: "Globo",
-    officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/6120663/",
+    officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/6120663",
     regionalCaveat: true,
     instagramHandle: "tvglobo",
   },
   {
     id: "globoplay",
     displayName: "Globoplay",
-    officialUrl: "https://globoplay.globo.com/",
+    officialUrl: "https://globoplay.globo.com",
     instagramHandle: "globoplay",
   },
   {
@@ -84,25 +89,25 @@ const CHANNELS: Channel[] = [
   {
     id: "paramountplus",
     displayName: "Paramount Plus",
-    officialUrl: "https://www.paramountplus.com/br/collections/sports-hub-br/",
+    officialUrl: "https://www.paramountplus.com/br/collections/sports-hub-br",
     instagramHandle: "paramountplusesportes",
   },
   {
     id: "premiere",
     displayName: "Premiere",
-    officialUrl: "https://globoplay.globo.com/canais/premiere/",
+    officialUrl: "https://globoplay.globo.com/canais/premiere",
     instagramHandle: "premiere",
   },
   {
     id: "primevideo",
     displayName: "Prime Video",
-    officialUrl: "https://www.primevideo.com/sports/",
+    officialUrl: "https://www.primevideo.com/sports",
     instagramHandle: "primevideosportbr",
   },
   {
     id: "record",
     displayName: "Record",
-    officialUrl: "https://www.recordplus.com/Live/LiveEvent/",
+    officialUrl: "https://www.recordplus.com/Live/LiveEvent",
     instagramHandle: "sigarecord",
   },
   {
@@ -115,7 +120,7 @@ const CHANNELS: Channel[] = [
   {
     id: "sportv",
     displayName: "SporTV",
-    officialUrl: "https://globoplay.globo.com/sportv/ao-vivo/7339108/",
+    officialUrl: "https://globoplay.globo.com/sportv/ao-vivo/7339108",
     instagramHandle: "sportv",
   },
   {
@@ -146,12 +151,12 @@ const CHANNELS: Channel[] = [
   {
     id: "xsports",
     displayName: "XSports",
-    officialUrl: "https://www.xsports.com.br/",
+    officialUrl: "https://www.xsports.com.br",
   },
   {
     id: "youtube",
     displayName: "YouTube",
-    officialUrl: "https://youtube.com/",
+    officialUrl: "https://youtube.com",
     instagramHandle: "youtubebrasil",
   },
 ];
@@ -187,6 +192,7 @@ const CHANNEL_ALIASES: Record<string, string> = {
   "espn 3": "espn",
   "espn 4": "espn",
   "espn 5": "espn",
+  "fpf tv": "fpftv",
   globo: "globo",
   "rede globo": "globo",
   globoplay: "globoplay",
