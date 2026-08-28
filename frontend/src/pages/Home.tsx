@@ -41,10 +41,20 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
           (was h-38/152px) specifically so those 4 rows fit a typical
           laptop viewport without scrolling — h-38 alone was already close
           to 800px tall before adding the heading/tabs above it.
+
+          grid-cols-[repeat(5,max-content)], not grid-cols-5: grid-cols-5
+          makes 5 *equal-width* columns spanning the full container, so a
+          narrow w-auto crest just sits centered in a much wider column —
+          shrinking gap-x (the space *between* columns) barely changed
+          anything because the actual sparse look was empty space *inside*
+          each column, not between them. Sizing columns to their own
+          content and centering the resulting (narrower) row as a whole
+          (justify-center on the grid itself) is what actually tightens
+          the visible gap between crests.
         */}
-        <ul className="flex flex-wrap gap-10 justify-items-center justify-center lg:grid lg:grid-cols-5 lg:gap-x-1 lg:gap-y-4 max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
+        <ul className="flex flex-wrap gap-10 justify-items-center justify-center lg:grid lg:grid-cols-[repeat(5,max-content)] lg:justify-center lg:gap-x-4 lg:gap-y-4 max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
           {teamsInDivision.map((team) => (
-            <li key={team.id} onClick={() => setSelectedTeam(team)} className="lg:justify-self-center">
+            <li key={team.id} onClick={() => setSelectedTeam(team)}>
               <Link to={`/time/${team.id}`}>
                 {/*
                   h-* w-auto, not h-* w-* (both fixed): a browser's default
