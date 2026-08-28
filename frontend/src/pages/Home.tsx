@@ -93,7 +93,7 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
         </ul>
       </div>
 
-      {loading && <p className="text-center text-lg mt-16">A carregar jogos...</p>}
+      {loading && <p className="text-center text-lg mt-16">Carregando jogos...</p>}
       {error && <p className="text-center text-lg text-red-500 mt-16">Erro: {error}</p>}
 
       {!loading && !error && matchesToday.length > 0 && (
