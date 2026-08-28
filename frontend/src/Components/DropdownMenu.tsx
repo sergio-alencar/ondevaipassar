@@ -44,7 +44,16 @@ const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
           <div className="mb-4">
             <DivisionTabs active={division} onChange={setDivision} />
           </div>
-          <ul className="grid grid-cols-4 gap-6 max-h-80 overflow-y-auto">
+          {/*
+            justify-items-center: grid-cols-4 makes 4 *equal-width* columns —
+            without this, each <li> defaults to justify-self:stretch (full
+            column width), but its content (a Link wrapping a w-auto crest)
+            doesn't stretch, so it just sits at the column's left edge. A
+            narrow crest visibly hugs the left; a crest wide enough to fill
+            the column looks "centered" only by coincidence. This centers
+            every item's own (shrink-to-fit) box within its column instead.
+          */}
+          <ul className="grid grid-cols-4 gap-6 max-h-80 overflow-y-auto justify-items-center">
             {teamsInDivision.map((team) => (
               <DropdownMenuTeam
                 key={team.id}

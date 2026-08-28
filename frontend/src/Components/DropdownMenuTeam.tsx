@@ -12,12 +12,20 @@ const DropdownMenuTeam = ({ team, setSelectedTeam, sourceCrestUrl }: DropdownMen
   return (
     <li>
       <Link to={`/time/${team.id}`} onClick={() => setSelectedTeam(team)}>
-        {/* h-* w-auto, not size-* (both fixed) — see Home.tsx's crest for why: a fixed width left a narrower-than-square crest taller than the others instead of a consistent height. */}
+        {/*
+          h-* w-auto, not size-* (both fixed) — see Home.tsx's crest for why: a
+          fixed width left a narrower-than-square crest taller than the others
+          instead of a consistent height.
+
+          max-w-* caps a genuine width outlier (Criciúma, Club Libertad —
+          really are ~1.5-1.8x wider than tall) — same 1.25x-height ratio as
+          Home.tsx/MatchCard.tsx.
+        */}
         <TeamCrest
           team={team}
           name={team.displayName}
           sourceCrestUrl={sourceCrestUrl}
-          className="h-10 w-auto opacity-70 hover:opacity-100 transition max-sm:opacity-100 max-sm:h-14 max-sm:my-2"
+          className="h-10 w-auto max-w-12.5 opacity-70 hover:opacity-100 transition max-sm:opacity-100 max-sm:h-14 max-sm:max-w-17.5 max-sm:my-2"
         />
       </Link>
     </li>
