@@ -32,9 +32,19 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
         <div className="mb-8">
           <DivisionTabs active={division} onChange={setDivision} />
         </div>
-        <ul className="flex flex-wrap gap-10 justify-items-center justify-center max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
+        {/*
+          lg:grid-cols-5, not flex-wrap, on desktop: every division has
+          exactly 20 teams (see packages/shared/src/team.ts), so a fixed 5
+          columns always gives exactly 4 rows — a flexible wrap can't
+          guarantee that (it reflows to whatever fits the viewport width).
+          Crest height is also deliberately smaller than it used to be
+          (was h-38/152px) specifically so those 4 rows fit a typical
+          laptop viewport without scrolling — h-38 alone was already close
+          to 800px tall before adding the heading/tabs above it.
+        */}
+        <ul className="flex flex-wrap gap-10 justify-items-center justify-center lg:grid lg:grid-cols-5 lg:gap-x-8 lg:gap-y-4 max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
           {teamsInDivision.map((team) => (
-            <li key={team.id} onClick={() => setSelectedTeam(team)}>
+            <li key={team.id} onClick={() => setSelectedTeam(team)} className="lg:justify-self-center">
               <Link to={`/time/${team.id}`}>
                 {/*
                   h-* w-auto, not h-* w-* (both fixed): a browser's default
@@ -51,7 +61,7 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
                   team={team}
                   name={team.displayName}
                   sourceCrestUrl={findSourceCrestUrl(team.id, matches)}
-                  className="h-38 w-auto px-4 py-2 hover:scale-105 transition max-sm:h-18 max-lg:h-24 max-lg:px-2 max-lg:py-0"
+                  className="h-24 w-auto px-2 py-1 hover:scale-105 transition max-sm:h-18"
                 />
               </Link>
             </li>
