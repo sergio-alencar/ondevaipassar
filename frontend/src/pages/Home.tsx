@@ -5,7 +5,7 @@ import DivisionTabs from "../Components/DivisionTabs";
 import TeamCrest from "../Components/TeamCrest";
 import { MatchesContext } from "../context/MatchesContext";
 import { findSourceCrestUrl } from "../lib/assets";
-import { useTeamsByDivision } from "../lib/useTeamsByDivision";
+import { useDivisionSearchParam } from "../lib/useDivisionSearchParam";
 import MatchCard from "./MatchCard";
 import type { SetSelectedTeam } from "../types";
 
@@ -15,7 +15,11 @@ interface HomeProps {
 
 const Home = ({ setSelectedTeam }: HomeProps) => {
   const { matches, loading, error } = useContext(MatchesContext);
-  const { division, setDivision, teamsInDivision } = useTeamsByDivision();
+  // URL-backed (?divisao=b), not plain state: opening a team page and going
+  // back used to always land on Série A regardless of what was selected —
+  // Home fully remounts on that route change, resetting a useState. See
+  // useDivisionSearchParam's own comment.
+  const { division, setDivision, teamsInDivision } = useDivisionSearchParam();
 
   useEffect(() => {
     setSelectedTeam(null);
