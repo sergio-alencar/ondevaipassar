@@ -6,6 +6,17 @@ export function isTodayInBrasilia(kickoffUtc: string, now: Date = new Date()): b
   return format.format(now) === format.format(new Date(kickoffUtc));
 }
 
+// Adding a flat 24h and re-formatting in the target timezone is safe here
+// specifically because Brazil has used a fixed UTC-3 offset (no DST) since
+// 2019 — same assumption this codebase's own ingest code already relies on
+// elsewhere; a country that still observes DST could land on the wrong
+// calendar day this way once or twice a year.
+export function isTomorrowInBrasilia(kickoffUtc: string, now: Date = new Date()): boolean {
+  const format = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
+  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  return format.format(tomorrow) === format.format(new Date(kickoffUtc));
+}
+
 // Compact, social-media-casual format ("segunda, 6/ago, 19h" / "...21h30")
 // — shared by the site (MatchCard.tsx) and the Instagram poster
 // (caption.ts, renderImage.ts) so a match's date/time reads identically

@@ -1,4 +1,4 @@
-import { isTodayInBrasilia } from "@ondevaipassar/shared";
+import { isTodayInBrasilia, isTomorrowInBrasilia } from "@ondevaipassar/shared";
 import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DivisionTabs from "../Components/DivisionTabs";
@@ -26,6 +26,7 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
   }, [setSelectedTeam]);
 
   const matchesToday = matches.filter((match) => isTodayInBrasilia(match.kickoffUtc));
+  const matchesTomorrow = matches.filter((match) => isTomorrowInBrasilia(match.kickoffUtc));
 
   return (
     <main className="py-4 max-lg:grow max-w-7xl mx-auto px-4">
@@ -104,6 +105,20 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
 
           <ul className="divide-y divide-gray-300 my-8">
             {matchesToday.map((match) => (
+              <MatchCard key={match.id} match={match} />
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {!loading && !error && matchesTomorrow.length > 0 && (
+        <div className="mt-16">
+          <h2 className="text-4xl font-bold mb-8 pt-8 uppercase text-center max-sm:text-2xl text-gray-800">
+            Jogos de Amanhã
+          </h2>
+
+          <ul className="divide-y divide-gray-300 my-8">
+            {matchesTomorrow.map((match) => (
               <MatchCard key={match.id} match={match} />
             ))}
           </ul>
