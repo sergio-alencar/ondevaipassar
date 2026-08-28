@@ -7,17 +7,33 @@ import { resolveTeamId } from "./teamResolver.js";
 
 // Every meuguia.tv channel we track this way — one more entry here is the
 // whole diff for tracking a new one, same spirit as youtubeEnrichment.ts's
-// TRACKED_CHANNELS. Channel code verified live (page title matches);
-// ESPN/TNT Sports are foreign-league channels ge.globo's own per-team
-// agenda data covers weakly or not at all (confirmed live: Aston Villa x
-// Arsenal's ge.globo agenda only listed Disney+, not the ESPN simulcast
-// meuguia.tv's own ESPN grid shows) — ge.globo has no dedicated Brazilian
-// broadcaster to double-check foreign leagues against the way it does for
-// Brasileirão, so this fills a gap YouTube-only sources can't (a real TV
-// channel, not a livestream).
+// TRACKED_CHANNELS. Full code list confirmed live via
+// meuguia.tv/programacao/categoria/Esportes (Sérgio pointed at this — it's
+// a "what's live right now, by channel" overview, distinct from a single
+// channel's own ~2-week grid page, but its <h2> next to each channel link
+// names the real channel). ESPN/SporTV each have several numbered feeds
+// (ESPN 2-5, SporTV 2-3) that air genuinely different matches at the same
+// time (confirmed live: ES4 had Benfica x Estoril and Boca Juniors x
+// Lanús while ESP itself had other games) — all funneled into the same
+// channelId since a viewer just needs to know "it's on ESPN", not which
+// numbered feed, same simplification this codebase's own
+// CHANNEL_ALIASES already makes for ge.globo's "SporTV 2"/"SporTV 3" text
+// (packages/shared/src/channel.ts). Each code still gets its own sourceId
+// so scrape_runs reflects each fetch's own health separately. Left out:
+// "135" (Combate, MMA — not football), "OFF" (unclear/generic, not
+// obviously football), "121" (Premiere Clubes — redundant with the
+// existing dedicated Premiere adapter's own source).
 const TRACKED_CHANNELS: { code: string; channelId: string; sourceId: string }[] = [
-  { code: "ESP", channelId: "espn", sourceId: "meuguia-espn" },
+  { code: "ESP", channelId: "espn", sourceId: "meuguia-esp" },
+  { code: "ES2", channelId: "espn", sourceId: "meuguia-es2" },
+  { code: "ES3", channelId: "espn", sourceId: "meuguia-es3" },
+  { code: "ES4", channelId: "espn", sourceId: "meuguia-es4" },
+  { code: "ES5", channelId: "espn", sourceId: "meuguia-es5" },
   { code: "TNT", channelId: "tntsports", sourceId: "meuguia-tnt" },
+  { code: "SPO", channelId: "sportv", sourceId: "meuguia-spo" },
+  { code: "SP2", channelId: "sportv", sourceId: "meuguia-sp2" },
+  { code: "SP3", channelId: "sportv", sourceId: "meuguia-sp3" },
+  { code: "BSP", channelId: "band", sourceId: "meuguia-bsp" },
 ];
 
 async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], allMatches: MatchCandidate[]): Promise<void> {
