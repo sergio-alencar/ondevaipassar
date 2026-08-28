@@ -4,6 +4,7 @@ import { env } from "../config/env.js";
 import { ensureSchema } from "../db/client.js";
 import { seedRegistry } from "../ingest/pipeline.js";
 import { competitionsRoutes } from "./routes/competitions.js";
+import { crestProxyRoutes } from "./routes/crestProxy.js";
 import { cronRoutes } from "./routes/cron.js";
 import { healthRoutes } from "./routes/health.js";
 import { instagramCronRoutes } from "./routes/instagramCron.js";
@@ -27,6 +28,7 @@ export async function buildApp() {
   await app.register(cronRoutes);
   await app.register(instagramCronRoutes);
   await app.register(instagramPreviewRoutes);
+  await app.register(crestProxyRoutes);
 
   return app;
 }
