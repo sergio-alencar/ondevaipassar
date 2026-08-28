@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { env } from "../../config/env.js";
 import { runFutebolInteriorEnrichment } from "../../ingest/futebolInteriorEnrichment.js";
+import { runFutnatvEnrichment } from "../../ingest/futnatvEnrichment.js";
 import { runItatiaiaEnrichment } from "../../ingest/itatiaiaEnrichment.js";
 import { runMeuguiaEnrichment } from "../../ingest/meuguiaEnrichment.js";
 import { runOndeAssistirEnrichment } from "../../ingest/ondeAssistirEnrichment.js";
@@ -47,6 +48,7 @@ export async function cronRoutes(app: FastifyInstance): Promise<void> {
     await runTudoSobrePaulistaEnrichment();
     await runMeuguiaEnrichment();
     await runItatiaiaEnrichment();
+    await runFutnatvEnrichment();
 
     return { status: "ok", ranAt: new Date().toISOString() };
   });

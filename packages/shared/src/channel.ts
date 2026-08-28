@@ -77,6 +77,11 @@ const CHANNELS: Channel[] = [
     instagramHandle: "globoplay",
   },
   {
+    id: "nsports",
+    displayName: "N Sports",
+    officialUrl: "https://www.youtube.com/@NSports/streams",
+  },
+  {
     id: "paramountplus",
     displayName: "Paramount Plus",
     officialUrl: "https://www.paramountplus.com/br/collections/sports-hub-br/",
@@ -129,6 +134,21 @@ const CHANNELS: Channel[] = [
     instagramHandle: "tntsportsbr",
   },
   {
+    id: "tvbrasil",
+    displayName: "TV Brasil",
+    officialUrl: "https://play.ebc.com.br/tvs",
+  },
+  {
+    id: "uolesporte",
+    displayName: "UOL Esporte",
+    officialUrl: "https://www.youtube.com/@UOLEsporte/streams",
+  },
+  {
+    id: "xsports",
+    displayName: "XSports",
+    officialUrl: "https://www.xsports.com.br/",
+  },
+  {
     id: "youtube",
     displayName: "YouTube",
     officialUrl: "https://youtube.com/",
@@ -146,6 +166,7 @@ const CHANNEL_ALIASES: Record<string, string> = {
   band: "band",
   bandeirantes: "band",
   "band sports": "band",
+  bandsports: "band",
   "canal do benja": "canaldobenja",
   benja: "canaldobenja",
   cazetv: "cazetv",
@@ -158,6 +179,14 @@ const CHANNEL_ALIASES: Record<string, string> = {
   espn: "espn",
   "espn brasil": "espn",
   "espn+": "espn",
+  // Confirmed live (futnatv.net): ESPN's numbered feeds air genuinely
+  // different matches in parallel, same simplification already made for
+  // meuguia.tv's own ES2-ES5 channel codes — a viewer just needs "it's on
+  // ESPN," not which feed.
+  "espn 2": "espn",
+  "espn 3": "espn",
+  "espn 4": "espn",
+  "espn 5": "espn",
   globo: "globo",
   "rede globo": "globo",
   globoplay: "globoplay",
@@ -171,6 +200,8 @@ const CHANNEL_ALIASES: Record<string, string> = {
   "nosso futebol": "nossofutebol",
   sportynet: "nossofutebol",
   "sporty net": "nossofutebol",
+  "n sports": "nsports",
+  nsports: "nsports",
   paramount: "paramountplus",
   "paramount+": "paramountplus",
   "paramount plus": "paramountplus",
@@ -187,6 +218,9 @@ const CHANNEL_ALIASES: Record<string, string> = {
   "sportv 3": "sportv",
   tnt: "tntsports",
   "tnt sports": "tntsports",
+  "tv brasil": "tvbrasil",
+  "uol esporte": "uolesporte",
+  xsports: "xsports",
   youtube: "youtube",
 };
 

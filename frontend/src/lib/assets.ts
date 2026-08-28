@@ -61,6 +61,7 @@ const RASTER_EXTENSION: Record<string, string> = {
   globoplay: "png",
   goat: "png",
   nossofutebol: "jpeg",
+  nsports: "jpg",
   paramountplus: "png",
   premiere: "png",
   primevideo: "png",
@@ -68,6 +69,8 @@ const RASTER_EXTENSION: Record<string, string> = {
   sbt: "png",
   sportv: "png",
   tntsports: "png",
+  tvbrasil: "png",
+  uolesporte: "png",
   youtube: "png",
 };
 
