@@ -5,7 +5,16 @@ interface DivisionTabsProps {
   onChange: (division: Division) => void;
 }
 
-const DIVISIONS: Division[] = ["A", "B", "C"];
+const DIVISIONS: Division[] = ["A", "B", "C", "EUROPA"];
+
+// "Europa" isn't a "Série X" — needs its own label rather than the template
+// every other division shares.
+const DIVISION_LABELS: Record<Division, string> = {
+  A: "Série A",
+  B: "Série B",
+  C: "Série C",
+  EUROPA: "Europa",
+};
 
 const DivisionTabs = ({ active, onChange }: DivisionTabsProps) => (
   <div className="flex justify-center gap-2">
@@ -17,7 +26,7 @@ const DivisionTabs = ({ active, onChange }: DivisionTabsProps) => (
           active === division ? "bg-gray-800 text-white" : "bg-gray-200 text-gray-600 hover:bg-gray-300"
         }`}
       >
-        Série {division}
+        {DIVISION_LABELS[division]}
       </button>
     ))}
   </div>

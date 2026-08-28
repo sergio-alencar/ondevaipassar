@@ -26,6 +26,11 @@ const COMPETITION_ALIASES: Record<string, string> = {
   "campeonato baiano": "campeonato-baiano",
   "campeonato pernambucano": "campeonato-pernambucano",
   "campeonato cearense": "campeonato-cearense",
+  // Confirmed live from the 4 European clubs with a working per-team agenda
+  // (Arsenal, Manchester City, Barcelona, Real Madrid) — "LALIGA" is
+  // ge.globo's own raw spelling (all caps, no space), not a typo here.
+  "premier league": "premier-league",
+  laliga: "la-liga",
 };
 
 /** Resolves a raw championship name to our canonical Competition.id. Unrecognized names get a stable slugified stopgap id rather than being dropped — so a new competition shows up immediately, and promoting it to a registry entry (packages/shared/src/competition.ts) is a pure addition, not a rename. */

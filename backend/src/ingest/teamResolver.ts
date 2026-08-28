@@ -39,6 +39,11 @@ const FREE_TEXT_ALIASES: Record<string, string> = {
   "mirassol fc": "mirassol",
   "botafogo fr": "botafogo",
   "floresta-ce": "floresta",
+  // ge.globo's own raw name for this club is "Internazionale" (confirmed
+  // live, both the league-hub and Real Madrid/Arsenal's own scheduleTeam
+  // data) — displayName is "Inter de Milão" instead since that's the name
+  // Brazilian coverage actually uses day to day.
+  internazionale: "inter_de_milao",
 };
 
 /** Resolves a raw team name (as scraped/returned by any source) to our canonical Team.id, or null if unrecognized. Never throws — an unresolved team just means the raw name gets displayed as-is. */

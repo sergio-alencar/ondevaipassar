@@ -12,10 +12,25 @@ import type { RoundMatch } from "./schema.js";
 // same `const listaJogos = [...]` block, parsed by the exact same
 // extractListaJogos with zero changes (10 matches, 20 distinct teams, same
 // single round-robin shape as Séries A/B).
+// The 5 European league hubs (added for the "Europa" division) use this
+// exact same `const listaJogos = [...]` shape, confirmed live — the only
+// difference from the domestic hubs is the url. This is what makes the hub
+// source valuable there too, and more so than domestically: most of these
+// 20 clubs have no discoverable per-team agenda page on ge.globo at all
+// (confirmed live: e.g. Juventus's own team page doesn't link one, unlike
+// Real Madrid's), and their team home pages don't embed a real crest either
+// (just a generic escudo_default placeholder) — so for those teams, this
+// hub is the ONLY source of both fixtures and a real crest, not just a
+// gap-filler like it is domestically.
 const HUB_SOURCES: { url: string; competitionId: string }[] = [
   { url: "https://ge.globo.com/futebol/brasileirao-serie-a/", competitionId: "brasileirao-serie-a" },
   { url: "https://ge.globo.com/futebol/brasileirao-serie-b/", competitionId: "brasileirao-serie-b" },
   { url: "https://ge.globo.com/futebol/brasileirao-serie-c/", competitionId: "brasileirao-serie-c" },
+  { url: "https://ge.globo.com/futebol/futebol-internacional/futebol-ingles/", competitionId: "premier-league" },
+  { url: "https://ge.globo.com/futebol/futebol-internacional/futebol-espanhol/", competitionId: "la-liga" },
+  { url: "https://ge.globo.com/futebol/futebol-internacional/futebol-alemao/", competitionId: "bundesliga" },
+  { url: "https://ge.globo.com/futebol/futebol-internacional/futebol-frances/", competitionId: "ligue-1" },
+  { url: "https://ge.globo.com/futebol/futebol-internacional/futebol-italiano/", competitionId: "serie-a-italiana" },
 ];
 
 // Brazil has used a fixed UTC-3 offset (no DST) since 2019 — same assumption

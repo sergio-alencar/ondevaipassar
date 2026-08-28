@@ -59,6 +59,16 @@ const NON_STANDARD_AGENDA_PATHS: Record<string, string> = {
   "volta-redonda": "rj/sul-do-rio-costa-verde/futebol/times/volta-redonda/agenda/",
   brusque: "sc/futebol/times/brusque/agenda-de-jogos-do-brusque/",
   paysandu: "pa/futebol/times/paysandu/agenda-de-jogos-do-paysandu/",
+  // European clubs (the "Europa" division) live under an extra
+  // futebol-internacional/{liga}/ segment, always non-standard for that
+  // reason alone — of the 20 checked live, only these 4 actually had a
+  // discoverable agenda page; the other 16 keep aliases.geGlobo: null and
+  // rely entirely on ge-globo-round's league-hub entries (see that
+  // adapter's own comment) for both fixtures and crest.
+  arsenal: "futebol/futebol-internacional/futebol-ingles/times/arsenal/agenda-de-jogos-do-arsenal/",
+  "manchester-city": "futebol/futebol-internacional/futebol-ingles/times/manchester-city/agenda-de-jogos-do-manchester-city/",
+  barcelona: "futebol/futebol-internacional/futebol-espanhol/times/barcelona/agenda-de-jogos-do-barcelona/",
+  "real-madrid": "futebol/futebol-internacional/futebol-espanhol/times/real-madrid/agenda-de-jogos-do-real-madrid/",
 };
 
 export function buildTeamAgendaUrl(geGloboSlug: string): string {

@@ -29,6 +29,18 @@ export const COMPETITIONS: Competition[] = [
   { id: "campeonato-baiano", displayName: "Campeonato Baiano", type: "state" },
   { id: "campeonato-pernambucano", displayName: "Campeonato Pernambucano", type: "state" },
   { id: "campeonato-cearense", displayName: "Campeonato Cearense", type: "state" },
+  { id: "premier-league", displayName: "Premier League", type: "national-league" },
+  { id: "la-liga", displayName: "La Liga", type: "national-league" },
+  { id: "bundesliga", displayName: "Bundesliga", type: "national-league" },
+  { id: "ligue-1", displayName: "Ligue 1", type: "national-league" },
+  // "serie-a-italiana", not "serie-a": ge.globo's own competition name for
+  // this is genuinely just "Serie A" (Italian spelling, no accent) — nearly
+  // identical to Brasileirão's "Série A" and a real collision risk in
+  // competitionResolver.ts's free-text alias map if an Italian per-team
+  // agenda source is ever added (none is yet — this round-hub source
+  // hardcodes competitionId directly, never resolves it from raw text, so
+  // the risk doesn't apply here). A distinct id sidesteps it either way.
+  { id: "serie-a-italiana", displayName: "Campeonato Italiano (Serie A)", type: "national-league" },
 ];
 
 export function findCompetitionById(id: string): Competition | undefined {
