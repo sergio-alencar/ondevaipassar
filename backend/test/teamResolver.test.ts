@@ -26,6 +26,14 @@ describe("resolveTeamId", () => {
     expect(resolveTeamId("Athletic-MG")).toBe("athletic");
   });
 
+  it("resolves OneFootball's own verbose domestic team names (real examples, confirmed live)", () => {
+    expect(resolveTeamId("Grêmio Novorizontino")).toBe("novorizontino");
+    expect(resolveTeamId("São Bernardo FC")).toBe("sao_bernardo");
+    expect(resolveTeamId("Athletic Club SJDR MG")).toBe("athletic");
+    expect(resolveTeamId("Internacional de Limeira")).toBe("inter_de_limeira");
+    expect(resolveTeamId("Barra")).toBe("barra_sc");
+  });
+
   it("returns null for an unrecognized name instead of guessing", () => {
     expect(resolveTeamId("Racing Club de Montevideo")).toBeNull();
     expect(resolveTeamId("")).toBeNull();

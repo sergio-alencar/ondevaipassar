@@ -59,6 +59,26 @@ const FREE_TEXT_ALIASES: Record<string, string> = {
   // form). Revisit if a source ever produces bare "Inter" for the
   // Brazilian club specifically.
   inter: "inter_de_milao",
+  // OneFootball's own domestic (Séries A/B/C) team names, confirmed live —
+  // several add a verbose state/city suffix ge.globo's own displayName
+  // never uses.
+  "athletico paranaense": "athletico_paranaense",
+  "athletic club sjdr mg": "athletic",
+  "gremio novorizontino": "novorizontino",
+  operario: "operario_pr",
+  "sao bernardo fc": "sao_bernardo",
+  "amazonas fc am": "amazonas",
+  "anapolis fc go": "anapolis",
+  barra: "barra_sc",
+  "caxias do sul": "caxias",
+  "ferroviaria sp": "ferroviaria",
+  "floresta ec ce": "floresta",
+  "guarani sp": "guarani",
+  "internacional de limeira": "inter_de_limeira",
+  "maranhao-ma": "maranhao",
+  "paysandu sc pa": "paysandu",
+  "volta redonda fc": "volta_redonda",
+  "ypiranga fc": "ypiranga_rs",
 };
 
 /** Resolves a raw team name (as scraped/returned by any source) to our canonical Team.id, or null if unrecognized. Never throws — an unresolved team just means the raw name gets displayed as-is. */

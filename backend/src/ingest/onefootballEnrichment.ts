@@ -24,6 +24,16 @@ const COMPETITIONS: { slug: string; competitionId: string }[] = [
   { slug: "bundesliga-1", competitionId: "bundesliga" },
   { slug: "ligue-1-23", competitionId: "ligue-1" },
   { slug: "serie-a-13", competitionId: "serie-a-italiana" },
+  // Domestic Séries A/B/C — every team in these is already richly covered
+  // by ge.globo's own per-team agenda (unlike Europa, where 16/20 clubs
+  // have none), so this mostly won't create new rows here; its real value
+  // domestically is the same kickoff-time backfill described above, plus a
+  // safety net for the rare gap ge.globo's own sources miss (confirmed
+  // real earlier this session: Athletic x Chapecoense, Novorizontino x
+  // Sport — both teams lacking a working agenda page at the time).
+  { slug: "brasileirao-betano-16", competitionId: "brasileirao-serie-a" },
+  { slug: "brasileirao-serie-b-superbet-119", competitionId: "brasileirao-serie-b" },
+  { slug: "brasileirao-serie-c-195", competitionId: "brasileirao-serie-c" },
 ];
 
 export interface Candidate {
