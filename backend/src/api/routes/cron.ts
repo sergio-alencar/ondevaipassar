@@ -4,6 +4,7 @@ import { runFutebolInteriorEnrichment } from "../../ingest/futebolInteriorEnrich
 import { runItatiaiaEnrichment } from "../../ingest/itatiaiaEnrichment.js";
 import { runMeuguiaEnrichment } from "../../ingest/meuguiaEnrichment.js";
 import { runOndeAssistirEnrichment } from "../../ingest/ondeAssistirEnrichment.js";
+import { runOnefootballEnrichment } from "../../ingest/onefootballEnrichment.js";
 import { runPremiereEnrichment } from "../../ingest/premiereEnrichment.js";
 import { runAdapter } from "../../ingest/pipeline.js";
 import { runTudoSobrePaulistaEnrichment } from "../../ingest/tudoSobrePaulistaEnrichment.js";
@@ -30,9 +31,15 @@ export async function cronRoutes(app: FastifyInstance): Promise<void> {
     for (const adapter of ACTIVE_ADAPTERS) {
       await runAdapter(adapter);
     }
-    // All three run after the loop above on purpose: they only attach a
-    // broadcast to a match ge.globo already ingested this run, never
-    // create one themselves.
+    // Runs right after ge.globo's own adapters (needs to see what they
+    // just found, to dedupe against it) and before every broadcast
+    // enrichment below (so a match it creates this run is still eligible
+    // to get a broadcast attached in the same pass, e.g. itatiaia/meuguia
+    // confirming a channel for a fixture only OneFootball knew about).
+    await runOnefootballEnrichment();
+    // Every enrichment below runs last on purpose: they only attach a
+    // broadcast to a match some earlier step already ingested this run,
+    // never create one themselves.
     await runYoutubeEnrichment();
     await runPremiereEnrichment();
     await runOndeAssistirEnrichment();

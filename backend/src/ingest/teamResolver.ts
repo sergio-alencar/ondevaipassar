@@ -49,6 +49,16 @@ const FREE_TEXT_ALIASES: Record<string, string> = {
   // (confirmed live, "Elversberg x Leverkusen: onde assistir") — our own
   // displayName keeps the full "Bayer Leverkusen".
   leverkusen: "bayer_leverkusen",
+  psg: "paris_saint_germain",
+  // Genuinely ambiguous with "Internacional" (the Brazilian club, also
+  // tracked) — resolved this way deliberately: every Brazilian source in
+  // this codebase spells that one out in full ("Internacional", never bare
+  // "Inter", precisely because it IS ambiguous), while "Inter" bare is the
+  // standard colloquial name for Milan's club internationally (confirmed
+  // live: OneFootball's own Serie A page uses exactly "Inter", no fuller
+  // form). Revisit if a source ever produces bare "Inter" for the
+  // Brazilian club specifically.
+  inter: "inter_de_milao",
 };
 
 /** Resolves a raw team name (as scraped/returned by any source) to our canonical Team.id, or null if unrecognized. Never throws — an unresolved team just means the raw name gets displayed as-is. */
