@@ -37,6 +37,8 @@ export interface MatchRow {
   homeTeamId: string | null;
   awayTeamId: string | null;
   kickoffUtc: string;
+  kickoffTimeConfirmed: boolean;
+  round: number | null;
 }
 
 // null on the candidate side means "untracked opponent" — a wildcard, not
@@ -78,6 +80,22 @@ export function findCoveringMatches(candidate: Candidate, allMatches: MatchRow[]
 }
 
 /**
+ * Which of `coveringMatches` (from some OTHER source) should get
+ * `candidate`'s own kickoff time backfilled onto them — see
+ * runOnefootballEnrichment's own doc comment for the full reasoning.
+ * Exported for direct unit testing, same as findCoveringMatches: the
+ * same-BRT-day requirement (stricter than findCoveringMatches's own
+ * ±1-day tolerance) is the one thing standing between this safely filling
+ * a gap and silently moving a match to the wrong day.
+ */
+export function findBackfillTargets(candidate: Candidate, coveringMatches: MatchRow[]): MatchRow[] {
+  const candidateDate = toBrtCalendarDate(candidate.kickoffUtc);
+  return coveringMatches.filter(
+    (match) => !match.kickoffTimeConfirmed && daysBetween(toBrtCalendarDate(match.kickoffUtc), candidateDate) === 0,
+  );
+}
+
+/**
  * Supplementary FIXTURE source for the "Europa" division — genuinely
  * different in kind from every other source added this session, which
  * only ever attach a broadcast to a match ge.globo already created. 16 of
@@ -100,6 +118,20 @@ export function findCoveringMatches(candidate: Candidate, allMatches: MatchRow[]
  * - A candidate covered only by this source's own earlier row (or none at
  *   all): upserted normally, same as any other fixture adapter.
  *
+ * Also backfills a specific kickoff time onto a covering match from
+ * ANOTHER source when that match only has a "date confirmed, exact time
+ * not yet" placeholder (kickoffTimeConfirmed: false — a real, common state
+ * for a match still weeks out even on a team's own rich ge.globo agenda;
+ * Sérgio asked for this specifically, having noticed a lot of "horário a
+ * confirmar" in the Europa division). Deliberately conservative: only when
+ * OneFootball's own date agrees with the existing placeholder's date (same
+ * BRT calendar day, not just within the usual ±1-day matching tolerance) —
+ * a real discrepancy was found live between OneFootball and an existing
+ * ge.globo-sourced date for the same fixture (a full day apart, not just
+ * an hours-level rounding difference), so this never lets OneFootball's
+ * own date silently override which DAY a match is already believed to be
+ * on, only fills in a time-of-day gap on a day both sources already agree on.
+ *
  * Deliberately NOT registered as a FixtureSourceAdapter / in
  * sources/registry.ts — that generic pipeline (see ingest/pipeline.ts) has
  * no concept of "matches ge.globo already knows about," which this needs
@@ -114,6 +146,7 @@ export async function runOnefootballEnrichment(): Promise<void> {
     let unresolvedCount = 0;
     let insertedCount = 0;
     let deletedCount = 0;
+    let backfilledCount = 0;
 
     for (const competition of COMPETITIONS) {
       let cards: RoundMatchCard[];
@@ -152,6 +185,21 @@ export async function runOnefootballEnrichment(): Promise<void> {
             await db.batch([first, ...rest]);
             deletedCount += ownCovering.length;
           }
+
+          const backfillTargets = findBackfillTargets(candidate, otherCovering);
+          if (backfillTargets.length > 0) {
+            const now = new Date().toISOString();
+            const updates = backfillTargets.map((match) =>
+              db
+                .update(matches)
+                .set({ kickoffUtc: candidate.kickoffUtc, kickoffTimeConfirmed: true, round: match.round ?? round, updatedAt: now })
+                .where(eq(matches.id, match.id)),
+            );
+            const [first, ...rest] = updates;
+            await db.batch([first, ...rest]);
+            backfilledCount += backfillTargets.length;
+          }
+
           continue;
         }
 
@@ -199,6 +247,8 @@ export async function runOnefootballEnrichment(): Promise<void> {
       matchesUnresolved: unresolvedCount,
     });
 
-    console.log(`[${SOURCE_ID}] upserted ${insertedCount} matches, deleted ${deletedCount} now-redundant (${unresolvedCount} competition fetches failed)`);
+    console.log(
+      `[${SOURCE_ID}] upserted ${insertedCount} matches, backfilled a kickoff time onto ${backfilledCount} existing ones, deleted ${deletedCount} now-redundant (${unresolvedCount} competition fetches failed)`,
+    );
   });
 }
