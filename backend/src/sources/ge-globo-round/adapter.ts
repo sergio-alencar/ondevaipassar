@@ -106,8 +106,22 @@ export const geGloboRoundAdapter: FixtureSourceAdapter = {
         const rawMatches = await fetchListaJogos(hub.url);
         for (const rawMatch of rawMatches) {
           const canonical = toCanonicalMatch(rawMatch, hub.competitionId);
-          if (canonical) byId.set(canonical.id, canonical);
-          else unresolvedCount++;
+          if (!canonical) {
+            unresolvedCount++;
+            continue;
+          }
+          // Neither side a team we track at all — not our concern, and
+          // NOT counted as unresolved (it's the expected, common case for
+          // a European hub: we track a handful of clubs out of a whole
+          // league, so most of a round's matches involve two clubs we
+          // don't track on either side). Confirmed live as a real bug: 29
+          // such matches (e.g. "Crystal Palace x Everton", neither
+          // tracked) were showing up on the home page's "hoje"/"amanhã"
+          // sections before this filter existed — this hub has no
+          // per-team dependency the way the per-team geGloboAdapter does,
+          // so it never had an implicit "only our own teams" guard.
+          if (canonical.homeTeamId === null && canonical.awayTeamId === null) continue;
+          byId.set(canonical.id, canonical);
         }
       } catch (error) {
         console.error(`[ge-globo-round] failed to fetch hub ${hub.url}:`, getErrorMessage(error));

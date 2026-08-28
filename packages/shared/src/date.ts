@@ -17,6 +17,20 @@ export function isTomorrowInBrasilia(kickoffUtc: string, now: Date = new Date())
   return format.format(tomorrow) === format.format(new Date(kickoffUtc));
 }
 
+// Midnight BRT = 03:00 UTC on the same calendar day (fixed UTC-3, no DST,
+// same assumption as isTomorrowInBrasilia above) — used as the `from` the
+// frontend sends /api/matches, instead of leaving that param off entirely
+// (which defaults to "right now" server-side, see getMatchViews.ts). That
+// default is why a "Jogos de Hoje" section reads correctly all morning but
+// silently empties out every afternoon as each match's own kickoff instant
+// passes "now" — anchoring on the start of today instead keeps a match
+// that already kicked off (or even finished) counted as still "today"
+// long after that.
+export function startOfTodayInBrasiliaUtc(now: Date = new Date()): string {
+  const format = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
+  return `${format.format(now)}T03:00:00.000Z`;
+}
+
 // Compact, social-media-casual format ("segunda, 6/ago, 19h" / "...21h30")
 // — shared by the site (MatchCard.tsx) and the Instagram poster
 // (caption.ts, renderImage.ts) so a match's date/time reads identically

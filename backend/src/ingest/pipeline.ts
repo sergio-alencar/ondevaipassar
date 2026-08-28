@@ -1,5 +1,5 @@
 import { COMPETITIONS, TEAMS } from "@ondevaipassar/shared";
-import { and, eq, notInArray } from "drizzle-orm";
+import { and, eq, isNull, notInArray } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { broadcasts, competitions, matches, scrapeRuns, teams } from "../db/schema.js";
 import { getErrorMessage } from "../lib/errors.js";
@@ -105,7 +105,20 @@ export async function runAdapter(adapter: FixtureSourceAdapter): Promise<void> {
       return db.delete(broadcasts).where(keepChannelIds.length > 0 ? and(scope, notInArray(broadcasts.channelId, keepChannelIds)) : scope);
     });
 
-    const [first, ...rest] = [...matchUpserts, ...broadcastDeletes, ...broadcastUpserts];
+    // Neither team tracked is never something an adapter should still be
+    // producing (ge-globo-round's own toCanonicalMatch call site already
+    // filters this out before it reaches canonicalMatches above), but a row
+    // like that from a run BEFORE that filter existed would otherwise sit
+    // in the table forever — upserting only ever adds/updates, nothing else
+    // here ever deletes a whole match row. Confirmed real: 31 such rows
+    // (e.g. "Crystal Palace x Everton", neither tracked) were still showing
+    // up on the home page from before this filter existed. Scoped to this
+    // adapter's own sourceId, same reasoning as broadcastDeletes above.
+    const untrackedMatchCleanup = db
+      .delete(matches)
+      .where(and(eq(matches.sourceId, adapter.id), isNull(matches.homeTeamId), isNull(matches.awayTeamId)));
+
+    const [first, ...rest] = [...matchUpserts, untrackedMatchCleanup, ...broadcastDeletes, ...broadcastUpserts];
     if (first) await db.batch([first, ...rest]);
 
     await db.insert(scrapeRuns).values({

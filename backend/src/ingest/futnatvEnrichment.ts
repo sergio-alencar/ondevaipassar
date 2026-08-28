@@ -92,16 +92,23 @@ export async function runFutnatvEnrichment(): Promise<void> {
         .insert(broadcasts)
         .values({ id: `${matchId}__${channelId}`, matchId, channelId, logoUrl: "", watchUrl, regionalDetail, sourceId: SOURCE_ID, createdAt: now });
 
-      // Globo's own broadcast row usually already exists by the time this
-      // runs — created by ge.globo's own primary detection, which has no
-      // way to know the per-state detail futnatv gives us. A plain
-      // onConflictDoNothing would silently never attach regionalDetail at
-      // all in that (very common) case, so this specifically updates just
-      // that one field on an existing row instead of leaving it alone —
-      // still never touches the row's own logoUrl/watchUrl/sourceId,
-      // which stay owned by whichever source got there first.
-      return regionalDetail
-        ? insert.onConflictDoUpdate({ target: broadcasts.id, set: { regionalDetail } })
+      // A broadcast row for this channel usually already exists by the time
+      // this runs — created by ge.globo's own primary detection, or by
+      // itatiaia/meuguia earlier in the same cron pass, none of which know
+      // this match's own specific stream url or Globo's per-state detail.
+      // A plain onConflictDoNothing would silently never attach either
+      // field in that (very common — confirmed live, Vasco x Cruzeiro's
+      // own "cazetv" row already existed before futnatv ran) case, so this
+      // specifically updates just the field(s) this run actually has
+      // something new for, on the existing row — still never touches that
+      // row's own logoUrl/sourceId, which stay owned by whichever source
+      // got there first.
+      const updateFields: { watchUrl?: string; regionalDetail?: string } = {};
+      if (watchUrl) updateFields.watchUrl = watchUrl;
+      if (regionalDetail) updateFields.regionalDetail = regionalDetail;
+
+      return Object.keys(updateFields).length > 0
+        ? insert.onConflictDoUpdate({ target: broadcasts.id, set: updateFields })
         : insert.onConflictDoNothing({ target: broadcasts.id });
     });
 
