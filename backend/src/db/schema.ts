@@ -41,6 +41,11 @@ export const broadcasts = sqliteTable("broadcasts", {
   matchId: text("match_id").notNull(),
   channelId: text("channel_id").notNull(),
   logoUrl: text("logo_url").notNull(),
+  // A per-match direct link (e.g. a specific YouTube stream's own video url)
+  // — null for the common case of a source with no such thing (a live TV
+  // channel, or a broadcaster's own generic schedule page), which falls
+  // back to the channel's officialUrl at render time (see getMatchViews.ts).
+  watchUrl: text("watch_url"),
   sourceId: text("source_id").notNull(),
   createdAt: text("created_at").notNull(),
 });

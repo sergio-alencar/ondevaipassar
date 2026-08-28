@@ -10,6 +10,8 @@ export interface AttachBroadcastsParams<T extends TeamPairStream> {
   /** Source-provided logo, or null to leave an existing broadcast row's logoUrl untouched (e.g. no channel avatar found this run). */
   channelLogoUrl: string | null;
   allMatches: MatchCandidate[];
+  /** Extracts a per-broadcast direct link from the matched stream (e.g. a YouTube video URL for that exact match) — omitted for a source with no such per-stream link (e.g. Premiere's channel-grid schedule), in which case the broadcast falls back to the channel's own officialUrl at render time (see getMatchViews.ts). */
+  getWatchUrl?: (stream: T) => string | undefined;
 }
 
 /**
@@ -26,32 +28,40 @@ export interface AttachBroadcastsParams<T extends TeamPairStream> {
 export async function attachBroadcastsFromStreams<T extends TeamPairStream>(
   params: AttachBroadcastsParams<T>,
 ): Promise<void> {
-  const { sourceId, channelId, streams, channelLogoUrl, allMatches } = params;
+  const { sourceId, channelId, streams, channelLogoUrl, allMatches, getWatchUrl } = params;
   const startedAt = new Date().toISOString();
 
-  const { matchIds, unresolvedCount } = matchStreamsToBroadcasts(streams, allMatches);
+  const { matchIds, matchedStreams, unresolvedCount } = matchStreamsToBroadcasts(streams, allMatches);
   const now = new Date().toISOString();
 
   if (matchIds.length > 0) {
-    // No logo of our own to offer (e.g. Premiere, which has no per-run
-    // avatar source) means nothing to change on an existing row — an empty
+    // No logo/watch link of our own to offer (e.g. Premiere, which has
+    // neither a per-run avatar source nor a per-match video url) means
+    // nothing to change on an existing row — an empty
     // onConflictDoUpdate({ set: {} }) throws ("No values to set"), so this
     // is a real onConflictDoNothing, not just an update with an empty diff.
     // A match that already has a "premiere" broadcast from ge.globo's own
     // primary detection (same id: `${matchId}__premiere`) correctly keeps
     // that row untouched rather than being overwritten by this
     // supplementary source.
-    const upserts = matchIds.map((matchId) => {
+    const upserts = matchIds.map((matchId, index) => {
+      const watchUrl = getWatchUrl?.(matchedStreams[index]) ?? null;
       const insert = db.insert(broadcasts).values({
         id: `${matchId}__${channelId}`,
         matchId,
         channelId,
         logoUrl: channelLogoUrl ?? "",
+        watchUrl,
         sourceId,
         createdAt: now,
       });
-      return channelLogoUrl
-        ? insert.onConflictDoUpdate({ target: broadcasts.id, set: { logoUrl: channelLogoUrl } })
+
+      const updateFields: { logoUrl?: string; watchUrl?: string } = {};
+      if (channelLogoUrl) updateFields.logoUrl = channelLogoUrl;
+      if (watchUrl) updateFields.watchUrl = watchUrl;
+
+      return Object.keys(updateFields).length > 0
+        ? insert.onConflictDoUpdate({ target: broadcasts.id, set: updateFields })
         : insert.onConflictDoNothing({ target: broadcasts.id });
     });
     const [first, ...rest] = upserts;

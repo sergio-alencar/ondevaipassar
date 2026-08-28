@@ -76,6 +76,7 @@ export function ensureSchema(): Promise<unknown> {
         match_id TEXT NOT NULL,
         channel_id TEXT NOT NULL,
         logo_url TEXT NOT NULL,
+        watch_url TEXT,
         source_id TEXT NOT NULL,
         created_at TEXT NOT NULL
       );
@@ -102,7 +103,8 @@ export function ensureSchema(): Promise<unknown> {
         created_at TEXT NOT NULL
       );
     `)
-      .then(() => addColumnIfMissing("matches", "kickoff_time_confirmed INTEGER NOT NULL DEFAULT 1"));
+      .then(() => addColumnIfMissing("matches", "kickoff_time_confirmed INTEGER NOT NULL DEFAULT 1"))
+      .then(() => addColumnIfMissing("broadcasts", "watch_url TEXT"));
   }
   return ready;
 }

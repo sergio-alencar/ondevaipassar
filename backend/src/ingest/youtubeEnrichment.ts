@@ -33,6 +33,11 @@ async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], apiKey: st
     streams,
     channelLogoUrl,
     allMatches,
+    // Links straight to this match's own stream instead of the channel's
+    // generic /streams page — Sérgio asked for this specifically (a viewer
+    // shouldn't have to hunt through a channel's whole upcoming list to
+    // find the one match they came for).
+    getWatchUrl: (stream) => `https://www.youtube.com/watch?v=${stream.videoId}`,
   });
 }
 

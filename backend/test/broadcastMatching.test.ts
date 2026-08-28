@@ -27,6 +27,12 @@ describe("matchStreamsToBroadcasts", () => {
     expect(result.unresolvedCount).toBe(0);
   });
 
+  it("returns the original stream alongside each matched id, same order, for a caller that needs a per-stream field", () => {
+    const stream = buildStream();
+    const result = matchStreamsToBroadcasts([stream], [buildMatch()]);
+    expect(result.matchedStreams).toEqual([stream]);
+  });
+
   it("matches regardless of home/away order (a stream can list either team first)", () => {
     const result = matchStreamsToBroadcasts(
       [buildStream({ homeTeamId: "palmeiras", awayTeamId: "botafogo" })],

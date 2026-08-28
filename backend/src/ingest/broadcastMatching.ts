@@ -47,9 +47,11 @@ export interface MatchCandidate {
   kickoffUtc: string;
 }
 
-export interface MatchedBroadcasts {
+export interface MatchedBroadcasts<T> {
   /** ids of already-ingested matches that should get a broadcast attached. */
   matchIds: string[];
+  /** Same order/index as matchIds — the original stream that produced each match, for a caller that needs a per-stream field beyond just the matchId (e.g. YouTube's videoId, for a direct link to that specific stream instead of the channel's generic URL). */
+  matchedStreams: T[];
   /** streams that didn't resolve to exactly one candidate match — zero (no fixture found yet) or 2+ (genuine ambiguity, e.g. a same-pair rematch within the date tolerance). */
   unresolvedCount: number;
 }
@@ -57,9 +59,10 @@ export interface MatchedBroadcasts {
 export function matchStreamsToBroadcasts<T extends TeamPairStream>(
   streams: T[],
   candidateMatches: MatchCandidate[],
-): MatchedBroadcasts {
+): MatchedBroadcasts<T> {
   let unresolvedCount = 0;
   const matchIds: string[] = [];
+  const matchedStreams: T[] = [];
 
   for (const stream of streams) {
     const streamDate = toBrtCalendarDate(stream.streamDateUtc);
@@ -75,7 +78,8 @@ export function matchStreamsToBroadcasts<T extends TeamPairStream>(
       continue;
     }
     matchIds.push(candidates[0].id);
+    matchedStreams.push(stream);
   }
 
-  return { matchIds, unresolvedCount };
+  return { matchIds, matchedStreams, unresolvedCount };
 }
