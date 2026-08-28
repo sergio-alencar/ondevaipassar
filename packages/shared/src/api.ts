@@ -12,6 +12,8 @@ export interface BroadcastView {
   instagramHandle?: string;
   /** True when the source can't confirm this actually airs in the viewer's region (see Channel.regionalCaveat). */
   regionalCaveat: boolean;
+  /** The broadcaster's own real state-by-state availability text (e.g. "RJ, AC, AL, ..." or "menos SP, CE, MS e PR"), when a source actually gave us one — undefined for the common case, which falls back to a generic "confira a programação local" disclaimer instead. */
+  regionalDetail?: string;
 }
 
 /** Shape returned by GET /api/matches — shared so the backend route and the frontend fetch client can't drift apart. */

@@ -46,6 +46,16 @@ export const broadcasts = sqliteTable("broadcasts", {
   // channel, or a broadcaster's own generic schedule page), which falls
   // back to the channel's officialUrl at render time (see getMatchViews.ts).
   watchUrl: text("watch_url"),
+  // Raw regional-availability text for a broadcast that varies by state
+  // (confirmed live so far only for "globo": futnatv.net gives this as the
+  // parenthetical in e.g. "Globo (RJ, AC, AL, ...)" or "Globo (menos SP,
+  // CE, MS e PR)") — null for the common case of no source having this
+  // detail, which falls back to the generic regionalCaveat disclaimer at
+  // render time (see getMatchViews.ts / MatchBroadcasts.tsx). Kept as the
+  // source's own raw wording rather than parsed into a state list — the
+  // "menos X, Y e Z" (exclusion) phrasing doesn't invert cleanly into an
+  // inclusion list without a full 27-UF reference list to diff against.
+  regionalDetail: text("regional_detail"),
   sourceId: text("source_id").notNull(),
   createdAt: text("created_at").notNull(),
 });

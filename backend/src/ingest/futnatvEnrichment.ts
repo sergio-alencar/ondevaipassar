@@ -41,7 +41,7 @@ export async function runFutnatvEnrichment(): Promise<void> {
     const allMatches: MatchCandidate[] = await db.select().from(matches);
     const datedGames = await fetchAllUpcomingGames();
 
-    const resolved: { matchId: string; channelId: string; watchUrl: string | null }[] = [];
+    const resolved: { matchId: string; channelId: string; watchUrl: string | null; regionalDetail: string | null }[] = [];
     let unresolvedCount = 0;
 
     for (const { game, dateKey } of datedGames) {
@@ -61,33 +61,49 @@ export async function runFutnatvEnrichment(): Promise<void> {
         continue;
       }
 
-      const byChannelId = new Map<string, string | null>();
-      for (const { channelNameRaw, watchUrl } of parseBroadcastChannels(game.broadcast, game.youtubeUrl ?? null)) {
+      const byChannelId = new Map<string, { watchUrl: string | null; regionalDetail: string | null }>();
+      for (const { channelNameRaw, watchUrl, regionalDetail } of parseBroadcastChannels(game.broadcast, game.youtubeUrl ?? null)) {
         const channelId = resolveChannelId(channelNameRaw);
         if (!channelId) continue;
         const existing = byChannelId.get(channelId);
         // The same channel is sometimes mentioned twice in one string (e.g.
         // "NSports, YouTube (NSports) e Disney+") — keep whichever mention
-        // actually carries a watch link.
-        if (existing === undefined || (!existing && watchUrl)) byChannelId.set(channelId, watchUrl);
+        // actually carries a watch link/regional detail.
+        if (existing === undefined || (!existing.watchUrl && watchUrl) || (!existing.regionalDetail && regionalDetail)) {
+          byChannelId.set(channelId, {
+            watchUrl: watchUrl ?? existing?.watchUrl ?? null,
+            regionalDetail: regionalDetail ?? existing?.regionalDetail ?? null,
+          });
+        }
       }
       if (byChannelId.size === 0) {
         unresolvedCount++;
         continue;
       }
 
-      for (const [channelId, watchUrl] of byChannelId) {
-        resolved.push({ matchId: matchIds[0], channelId, watchUrl });
+      for (const [channelId, { watchUrl, regionalDetail }] of byChannelId) {
+        resolved.push({ matchId: matchIds[0], channelId, watchUrl, regionalDetail });
       }
     }
 
     const now = new Date().toISOString();
-    const upserts = resolved.map(({ matchId, channelId, watchUrl }) =>
-      db
+    const upserts = resolved.map(({ matchId, channelId, watchUrl, regionalDetail }) => {
+      const insert = db
         .insert(broadcasts)
-        .values({ id: `${matchId}__${channelId}`, matchId, channelId, logoUrl: "", watchUrl, sourceId: SOURCE_ID, createdAt: now })
-        .onConflictDoNothing({ target: broadcasts.id }),
-    );
+        .values({ id: `${matchId}__${channelId}`, matchId, channelId, logoUrl: "", watchUrl, regionalDetail, sourceId: SOURCE_ID, createdAt: now });
+
+      // Globo's own broadcast row usually already exists by the time this
+      // runs — created by ge.globo's own primary detection, which has no
+      // way to know the per-state detail futnatv gives us. A plain
+      // onConflictDoNothing would silently never attach regionalDetail at
+      // all in that (very common) case, so this specifically updates just
+      // that one field on an existing row instead of leaving it alone —
+      // still never touches the row's own logoUrl/watchUrl/sourceId,
+      // which stay owned by whichever source got there first.
+      return regionalDetail
+        ? insert.onConflictDoUpdate({ target: broadcasts.id, set: { regionalDetail } })
+        : insert.onConflictDoNothing({ target: broadcasts.id });
+    });
 
     if (upserts.length > 0) {
       const [first, ...rest] = upserts;

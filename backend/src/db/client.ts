@@ -77,6 +77,7 @@ export function ensureSchema(): Promise<unknown> {
         channel_id TEXT NOT NULL,
         logo_url TEXT NOT NULL,
         watch_url TEXT,
+        regional_detail TEXT,
         source_id TEXT NOT NULL,
         created_at TEXT NOT NULL
       );
@@ -104,7 +105,8 @@ export function ensureSchema(): Promise<unknown> {
       );
     `)
       .then(() => addColumnIfMissing("matches", "kickoff_time_confirmed INTEGER NOT NULL DEFAULT 1"))
-      .then(() => addColumnIfMissing("broadcasts", "watch_url TEXT"));
+      .then(() => addColumnIfMissing("broadcasts", "watch_url TEXT"))
+      .then(() => addColumnIfMissing("broadcasts", "regional_detail TEXT"));
   }
   return ready;
 }

@@ -73,6 +73,7 @@ async function buildMatchViews(conditions: (SQL | undefined)[]): Promise<MatchVi
               instagramHandle: channel.instagramHandle,
               logoUrl: broadcast.logoUrl,
               regionalCaveat: channel.regionalCaveat ?? false,
+              regionalDetail: broadcast.regionalDetail ?? undefined,
             },
           ];
         })

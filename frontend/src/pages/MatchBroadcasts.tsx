@@ -35,11 +35,26 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
   }
 
   const hasRegionalCaveat = broadcasts.some((broadcast) => broadcast.regionalCaveat);
+  // futnatv.net gives the real state-by-state text for some matches (see
+  // futnatvEnrichment.ts) — when we have it, show that instead of the
+  // generic "confira a programação local" brush-off. Most matches still
+  // won't have this (only that one source covers it, and not every game),
+  // so the generic caption stays as the fallback.
+  const regionalDetailBroadcast = broadcasts.find((broadcast) => broadcast.regionalDetail);
+  const regionalCaveatCaption = regionalDetailBroadcast
+    ? `${regionalDetailBroadcast.displayName} disponível em: ${regionalDetailBroadcast.regionalDetail}`
+    : REGIONAL_CAVEAT_CAPTION;
 
   return (
     <div>
       <div className="flex flex-wrap justify-start items-center gap-x-6 gap-y-3 max-lg:gap-x-3 max-sm:justify-center">
         {broadcasts.map((broadcast) => {
+          const tooltipSuffix = broadcast.regionalDetail
+            ? `: ${broadcast.regionalDetail}`
+            : broadcast.regionalCaveat
+              ? REGIONAL_CAVEAT_TEXT
+              : "";
+
           return (
             <div key={broadcast.channelId} className="flex flex-col items-center gap-1">
               <a
@@ -51,7 +66,7 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
                 <img
                   src={channelLogoUrl(broadcast.channelId)}
                   alt={broadcast.displayName}
-                  title={`${broadcast.displayName}${broadcast.regionalCaveat ? REGIONAL_CAVEAT_TEXT : ""}`}
+                  title={`${broadcast.displayName}${tooltipSuffix}`}
                   // Applied unconditionally: curated art that already has its
                   // own transparent rounded corners (e.g. ESPN, Premiere) has
                   // nothing left to clip here, so this is a no-op for those —
@@ -101,7 +116,7 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
       </div>
       {hasRegionalCaveat && (
         <p className="text-xs text-gray-500 mt-2 max-sm:text-center">
-          <span className="font-bold">*</span> {REGIONAL_CAVEAT_CAPTION}
+          <span className="font-bold">*</span> {regionalCaveatCaption}
         </p>
       )}
     </div>
