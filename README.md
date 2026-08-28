@@ -1,12 +1,43 @@
-# React + Vite
+# ondevaipassar
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Agrega, para qualquer time brasileiro e qualquer campeonato (Série A/B, copas nacionais, continentais, estaduais), em que canal de TV ou serviço de streaming o próximo jogo vai passar.
 
-Currently, two official plugins are available:
+**Em produção**: front em https://ondevaipassar-nine.vercel.app, backend em https://ondevaipassar-api.vercel.app.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Stack
 
-## Expanding the ESLint configuration
+- **Backend** (`backend/`): Node.js + TypeScript, Fastify rodando como função serverless da Vercel. Drizzle ORM sobre libSQL (local em arquivo, Turso em produção). Agendamento via Vercel Cron. Scraping lê o JSON já embutido no HTML server-rendered das fontes (ge.globo), sem headless browser.
+- **Frontend** (`frontend/`): React 19 + Vite + TypeScript + Tailwind 4.
+- **Compartilhado** (`packages/shared/`): registro canônico de times/competições/canais, usado por backend e frontend.
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Como rodar local
+
+```
+npm install                # na raiz — instala tudo e compila packages/shared
+
+cd backend
+npm run dev                 # API local, porta 3000
+npm run typecheck
+npm test
+
+cd frontend
+npm run dev                  # Vite dev server, porta 5173
+npm run build                 # typecheck + build de produção
+```
+
+`backend/.env.example` e `frontend/.env.example` têm as variáveis esperadas — copie para `.env` antes de rodar local.
+
+## Documentação
+
+- [`CLAUDE.md`](./CLAUDE.md) — convenções de código e orientação rápida (voltado a quem/o que mexe no código, incluindo Claude Code).
+- [`review.md`](./review.md) — diagnóstico do código antigo, decisões de arquitetura tomadas (com o porquê) e estado atual por fase.
+
+## Próximos passos
+
+Ideias e pontos já identificados para desenvolvimento futuro, ainda não priorizados:
+
+- Incluir times da Série C.
+- Incluir times selecionados da Europa (não a totalidade — curadoria, não cobertura completa).
+- Integração com canal de updates no WhatsApp.
+- Integração com X/Twitter.
+- No Instagram, postar também em Stories (hoje só feed).
