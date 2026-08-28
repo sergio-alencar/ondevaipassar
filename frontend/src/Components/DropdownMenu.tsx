@@ -79,8 +79,18 @@ const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
           (23.5 * 4px) in. 390px viewport, wrapper inset 24px from the
           row (max-sm:right-6) — icon center at x=352, lands within a
           couple px of center at mr-0, so no further pull-in needed.
+
+          -mb-1: Sérgio spotted a hairline gap between the triangle and
+          the box below it. Confirmed via raw pixel sampling (not just a
+          zoomed screenshot, which can mislead) that the two were
+          touching at a fractional-pixel boundary (triangle height
+          computes to 16.0625px) — close but not overlapping, letting a
+          single row of the header's own purple bleed through at that
+          seam. -mb-1 (4px) pulls the triangle down into the box by more
+          than any sub-pixel rounding could reopen; re-verified with the
+          same pixel sampling that the purple line is gone.
         */}
-        <img src={triangleIcon} alt="" className="w-8 h-auto mt-2 mr-23.5 max-sm:mr-0" />
+        <img src={triangleIcon} alt="" className="w-8 h-auto mt-2 mr-23.5 max-sm:mr-0 -mb-1" />
         <div className="bg-white shadow p-4 rounded-lg w-96 max-sm:w-[calc(100vw-3rem)]">
           <div className="mb-4">
             <DivisionTabs active={division} onChange={setDivision} />
