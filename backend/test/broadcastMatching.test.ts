@@ -80,4 +80,40 @@ describe("matchStreamsToBroadcasts", () => {
     );
     expect(result.unresolvedCount).toBe(1);
   });
+
+  // Real bug found live: a "Europa" club (we track 20 individual clubs, not
+  // entire leagues) plays almost every match against an opponent we don't
+  // track at all — e.g. CazéTV's "Elversberg x Bayer Leverkusen" stream was
+  // silently dropped entirely before ever reaching this function, because
+  // the old code required BOTH sides to resolve to a tracked team. null on
+  // one side (the untracked opponent) must still match.
+  it("matches when only one side is a tracked team (an untracked opponent, e.g. a 'Europa' club's foreign rival)", () => {
+    const result = matchStreamsToBroadcasts(
+      [buildStream({ homeTeamId: null, awayTeamId: "palmeiras" })],
+      [buildMatch({ homeTeamId: null, awayTeamId: "palmeiras" })],
+    );
+    expect(result.matchIds).toEqual(["ge-globo:1"]);
+  });
+
+  it("matches a tracked team regardless of which side it's listed on when the other side is untracked", () => {
+    const result = matchStreamsToBroadcasts(
+      [buildStream({ homeTeamId: null, awayTeamId: "palmeiras" })],
+      [buildMatch({ homeTeamId: "palmeiras", awayTeamId: null })],
+    );
+    expect(result.matchIds).toEqual(["ge-globo:1"]);
+  });
+
+  it("does not match when the one tracked side doesn't correspond to any candidate", () => {
+    const result = matchStreamsToBroadcasts(
+      [buildStream({ homeTeamId: null, awayTeamId: "vasco" })],
+      [buildMatch({ homeTeamId: null, awayTeamId: "palmeiras" })],
+    );
+    expect(result.unresolvedCount).toBe(1);
+  });
+
+  it("counts as unresolved (never wildcard-matches everything) when neither side of the stream is tracked", () => {
+    const result = matchStreamsToBroadcasts([buildStream({ homeTeamId: null, awayTeamId: null })], [buildMatch()]);
+    expect(result.matchIds).toEqual([]);
+    expect(result.unresolvedCount).toBe(1);
+  });
 });

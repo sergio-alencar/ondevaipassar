@@ -4,8 +4,12 @@ import { parseMatchTitle } from "./schema.js";
 
 export interface YoutubeStream {
   videoId: string;
-  homeTeamId: string;
-  awayTeamId: string;
+  // Nullable: a "Europa" club plays almost every match against an opponent
+  // we don't individually track (we track 20 clubs, not entire leagues) —
+  // see broadcastMatching.ts's TeamPairStream for how a null side is
+  // matched as a wildcard rather than dropped.
+  homeTeamId: string | null;
+  awayTeamId: string | null;
   streamDateUtc: string;
 }
 
@@ -48,7 +52,10 @@ export async function fetchUpcomingStreams(youtubeChannelId: string, apiKey: str
 
     const homeTeamId = resolveTeamId(candidate.homeTeamNameRaw);
     const awayTeamId = resolveTeamId(candidate.awayTeamNameRaw);
-    if (!homeTeamId || !awayTeamId) continue; // a real match, just not one involving a team we track
+    // Only drop it when NEITHER side is a team we track at all — a
+    // "Europa" club vs. an untracked opponent (the normal case there) still
+    // has one resolvable side to match on, see broadcastMatching.ts.
+    if (!homeTeamId && !awayTeamId) continue;
 
     streams.push({ videoId: candidate.videoId, homeTeamId, awayTeamId, streamDateUtc });
   }

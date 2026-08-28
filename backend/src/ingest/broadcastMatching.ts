@@ -34,10 +34,24 @@ function daysBetween(a: CalendarDate, b: CalendarDate): number {
 }
 
 export interface TeamPairStream {
-  homeTeamId: string;
-  awayTeamId: string;
+  // Nullable, not always string: a source only ever resolves an id for a
+  // team WE track (see e.g. youtube/adapter.ts's resolveTeamId calls) — for
+  // the "Europa" division we track 20 individual clubs out of entire
+  // leagues, so "our tracked club vs. some other club we don't track at
+  // all" is the NORMAL case there, not a rare edge case the way it was
+  // when every source only ever covered fully-tracked Brasileirão
+  // divisions. null means "unresolved/untracked side," matched as a
+  // wildcard below — see teamMatches.
+  homeTeamId: string | null;
+  awayTeamId: string | null;
   /** Whatever rough date/time the broadcaster's own source gives for this stream — never trusted as *the* kickoff time, only used to pick which candidate match this is. */
   streamDateUtc: string;
+}
+
+// null on the stream side means "untracked opponent, could be anyone" — a
+// wildcard, not a mismatch. Both non-null sides must still agree exactly.
+function teamMatches(streamTeamId: string | null, candidateTeamId: string | null): boolean {
+  return streamTeamId === null || streamTeamId === candidateTeamId;
 }
 
 export interface MatchCandidate {
@@ -65,10 +79,17 @@ export function matchStreamsToBroadcasts<T extends TeamPairStream>(
   const matchedStreams: T[] = [];
 
   for (const stream of streams) {
+    // Nothing to anchor on at all (both sides untracked) — would otherwise
+    // wildcard-match literally any fixture on the right date.
+    if (stream.homeTeamId === null && stream.awayTeamId === null) {
+      unresolvedCount++;
+      continue;
+    }
+
     const streamDate = toBrtCalendarDate(stream.streamDateUtc);
     const candidates = candidateMatches.filter((match) => {
-      const sameOrder = match.homeTeamId === stream.homeTeamId && match.awayTeamId === stream.awayTeamId;
-      const swappedOrder = match.homeTeamId === stream.awayTeamId && match.awayTeamId === stream.homeTeamId;
+      const sameOrder = teamMatches(stream.homeTeamId, match.homeTeamId) && teamMatches(stream.awayTeamId, match.awayTeamId);
+      const swappedOrder = teamMatches(stream.homeTeamId, match.awayTeamId) && teamMatches(stream.awayTeamId, match.homeTeamId);
       if (!sameOrder && !swappedOrder) return false;
       return daysBetween(toBrtCalendarDate(match.kickoffUtc), streamDate) <= DATE_TOLERANCE_DAYS;
     });

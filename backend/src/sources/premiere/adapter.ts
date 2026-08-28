@@ -3,8 +3,12 @@ import { fetchPremiereApolloState } from "./client.js";
 import { extractPremiereMatches } from "./schema.js";
 
 export interface PremiereStream {
-  homeTeamId: string;
-  awayTeamId: string;
+  // Nullable, same reasoning as YoutubeStream: Premiere also carries
+  // continental matches (Libertadores/Sul-Americana) against South
+  // American clubs we don't individually track — see
+  // broadcastMatching.ts's TeamPairStream.
+  homeTeamId: string | null;
+  awayTeamId: string | null;
   startTimeUtc: string;
 }
 
@@ -23,7 +27,7 @@ export async function fetchPremiereStreams(): Promise<PremiereStream[]> {
   for (const match of matches) {
     const homeTeamId = resolveTeamId(match.homeTeamNameRaw);
     const awayTeamId = resolveTeamId(match.awayTeamNameRaw);
-    if (!homeTeamId || !awayTeamId) continue; // a real match, just not one involving a team we track
+    if (!homeTeamId && !awayTeamId) continue; // neither side is a team we track at all
 
     streams.push({ homeTeamId, awayTeamId, startTimeUtc: match.startTimeUtc });
   }
