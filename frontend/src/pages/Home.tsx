@@ -42,7 +42,7 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
           laptop viewport without scrolling — h-38 alone was already close
           to 800px tall before adding the heading/tabs above it.
         */}
-        <ul className="flex flex-wrap gap-10 justify-items-center justify-center lg:grid lg:grid-cols-5 lg:gap-x-2 lg:gap-y-4 max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
+        <ul className="flex flex-wrap gap-10 justify-items-center justify-center lg:grid lg:grid-cols-5 lg:gap-x-1 lg:gap-y-4 max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
           {teamsInDivision.map((team) => (
             <li key={team.id} onClick={() => setSelectedTeam(team)} className="lg:justify-self-center">
               <Link to={`/time/${team.id}`}>
