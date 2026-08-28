@@ -1,5 +1,6 @@
 import { fetchText } from "../../http/client.js";
 import { extractBalancedJsonObject } from "../../http/json.js";
+import { buildTeamHomeUrl } from "./client.js";
 import { parseNewsFeedItem, type NewsFeedItem } from "./newsFeedSchema.js";
 
 const ITEMS_MARKER = '"items":[{"age":';
@@ -26,11 +27,7 @@ export function extractNewsFeedItems(html: string): NewsFeedItem[] {
   return parsed.map(parseNewsFeedItem).filter((item): item is NewsFeedItem => item !== null);
 }
 
-export function buildTeamNewsFeedUrl(geGloboSlug: string): string {
-  return `https://ge.globo.com/futebol/times/${geGloboSlug}/`;
-}
-
 export async function fetchTeamNewsFeed(geGloboSlug: string): Promise<NewsFeedItem[]> {
-  const html = await fetchText(buildTeamNewsFeedUrl(geGloboSlug));
+  const html = await fetchText(buildTeamHomeUrl(geGloboSlug));
   return extractNewsFeedItems(html);
 }

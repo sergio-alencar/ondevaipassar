@@ -33,12 +33,44 @@ export function extractScheduleTeam(html: string): ScheduleTeamStructure {
 // individually as discovered rather than guessed.
 const NON_STANDARD_AGENDA_PATHS: Record<string, string> = {
   mirassol: "sp/tem-esporte/futebol/times/mirassol/agenda-de-jogos-do-mirassol/",
+  // These 8 teams previously had aliases.geGlobo: null (no source at all) —
+  // found live while investigating why Novorizontino x Sport, a real match
+  // today, was completely missing from the site: neither team had a working
+  // agenda URL, so the match never got ingested by either side. Confirmed
+  // each of the 8 below actually embeds the scheduleTeam JSON before adding.
+  novorizontino: "sp/tem-esporte/futebol/times/novorizontino/agenda-de-jogos-do-novorizontino/",
+  sport: "pe/futebol/times/sport/agenda/",
+  cuiaba: "mt/futebol/times/cuiaba/agenda/",
+  avai: "sc/futebol/times/avai/agenda/",
+  remo: "pa/futebol/times/remo/agenda/",
+  londrina: "pr/futebol/times/londrina/agenda/",
+  "ponte-preta": "sp/campinas-e-regiao/futebol/times/ponte-preta/agenda-de-jogos-da-ponte-preta/",
+  "athletico-pr": "pr/futebol/times/athletico-pr/agenda-de-jogos-do-athletico-pr/",
 };
 
 export function buildTeamAgendaUrl(geGloboSlug: string): string {
   const nonStandardPath = NON_STANDARD_AGENDA_PATHS[geGloboSlug];
   if (nonStandardPath) return `https://ge.globo.com/${nonStandardPath}`;
   return `https://ge.globo.com/futebol/times/${geGloboSlug}/agenda-de-jogos-do-${geGloboSlug}/`;
+}
+
+/**
+ * A team's base "times/{slug}/" homepage — one directory level up from its
+ * agenda page, used by newsFeedClient.ts (a different page than the agenda,
+ * but under the same state-prefixed sub-portal for the same non-standard
+ * teams). Derived from NON_STANDARD_AGENDA_PATHS rather than a second
+ * hardcoded map: every one of its values is that same base path plus an
+ * agenda-specific suffix, so truncating right after "times/{slug}/" recovers
+ * it exactly, with no separate list to keep in sync.
+ */
+export function buildTeamHomeUrl(geGloboSlug: string): string {
+  const nonStandardPath = NON_STANDARD_AGENDA_PATHS[geGloboSlug];
+  if (!nonStandardPath) return `https://ge.globo.com/futebol/times/${geGloboSlug}/`;
+
+  const marker = `times/${geGloboSlug}/`;
+  const markerIndex = nonStandardPath.indexOf(marker);
+  const basePath = markerIndex === -1 ? nonStandardPath : nonStandardPath.slice(0, markerIndex + marker.length);
+  return `https://ge.globo.com/${basePath}`;
 }
 
 export async function fetchTeamAgenda(geGloboSlug: string): Promise<ScheduleTeamStructure> {
