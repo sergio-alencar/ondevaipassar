@@ -47,7 +47,24 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
       <header
         className={`${headerBgClass} sticky top-0 z-30 transition-colors duration-300`}
       >
-        <div className="flex justify-between items-center max-w-7xl mx-auto px-24 max-sm:px-6">
+        {/*
+          relative here, on the full row — not on the icon's own tiny
+          wrapper. Tried anchoring to just the icon so the vertical
+          "top-full" would land right at the trigger's own bottom edge,
+          but that box's real height (measured live via devtools
+          protocol) is only ~28-41px, nowhere near the row's real ~90px
+          (set by the taller logo elsewhere in this same row) — every
+          attempt to stretch that tiny box to the row's real height
+          (align-self:stretch, h-full, negative margins to counteract
+          padding) either had no effect or only partly closed the gap,
+          because the wrapper is nested two levels inside the row and
+          each level's own padding kept eating back into it. Anchoring
+          to the row directly sidesteps all of that — it's already
+          exactly the header's real height, no fighting the box model
+          needed. Horizontal centering under the icon is handled by a
+          measured (not guessed) offset inside DropdownMenu instead.
+        */}
+        <div className="relative flex justify-between items-center max-w-7xl mx-auto px-24 max-sm:px-6">
           <button
             id="menu-botao"
             type="button"
@@ -69,34 +86,24 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
             <p className="text-white text-xl uppercase font-bold select-none max-sm:!hidden">
               times
             </p>
-            {/*
-              relative here, tightly around just the icon button — not the
-              whole "times" + icon group, and not the full header row. The
-              triangle and menu are both positioned against THIS box, so
-              the triangle lands under the icon by construction (centered
-              via items-end + matching size, not a guessed pixel offset)
-              instead of being estimated against a bigger box it wasn't
-              really anchored to.
-            */}
-            <div className="relative">
-              <button
-                ref={escudoRef}
-                type="button"
-                onClick={toggleDropdown}
-                className="cursor-pointer"
-                aria-label="Escolha o time"
-                title="Escolha o time"
-              >
-                <img className="size-7" src={escudo} alt="" />
-              </button>
-              <DropdownMenu
-                ref={dropdownRef}
-                setSelectedTeam={setSelectedTeam}
-                isVisible={isDropdownVisible}
-                setIsDropdownVisible={setIsDropdownVisible}
-              />
-            </div>
+            <button
+              ref={escudoRef}
+              type="button"
+              onClick={toggleDropdown}
+              className="cursor-pointer"
+              aria-label="Escolha o time"
+              title="Escolha o time"
+            >
+              <img className="size-7" src={escudo} alt="" />
+            </button>
           </div>
+
+          <DropdownMenu
+            ref={dropdownRef}
+            setSelectedTeam={setSelectedTeam}
+            isVisible={isDropdownVisible}
+            setIsDropdownVisible={setIsDropdownVisible}
+          />
         </div>
       </header>
       <div
