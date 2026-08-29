@@ -60,17 +60,35 @@ async function fetchHotlinkedCrestArt(sourceUrl: string): Promise<CrestArt | nul
       return { dataUri: `data:${contentType || "application/octet-stream"};base64,${body.toString("base64")}`, aspectRatio: 1 };
     }
     // Real bug found live: a ge.globo crest without a viewBox (some do
-    // ship this way — only width/height in px) crashed Satori entirely
-    // ("Failed to parse SVG ... missing viewBox"), taking the WHOLE
-    // Instagram post down with it, not just that one crest. cropSvgToContent
-    // itself silently no-ops without a viewBox (fine for the frontend's own
-    // browser-based crestProxy use, which doesn't need one) — this checks
-    // for one first, since only Satori actually requires it.
-    if (!body.toString("utf-8").includes("viewBox")) return null;
-    return loadCrestArt(body);
+    // ship this way — only "width="800px" height="800px"" — confirmed on
+    // Elversberg's own crest) crashed Satori entirely ("Failed to parse
+    // SVG ... missing viewBox"), taking the WHOLE Instagram post down with
+    // it, not just that one crest. cropSvgToContent itself silently
+    // no-ops without a viewBox (fine for the frontend's own browser-based
+    // crestProxy use, which doesn't need one) — Satori does, so this
+    // synthesizes one from the width/height ge.globo already gives before
+    // handing off to it, rather than settling for the generic shield when
+    // the real dimensions are sitting right there. If even that can't
+    // produce one (no width/height either — none seen live yet, but cheap
+    // to guard), still refuse to hand Satori something it'll choke on.
+    const withViewBox = ensureSvgViewBox(body);
+    if (!withViewBox.toString("utf-8").includes("viewBox")) return null;
+    return loadCrestArt(withViewBox);
   } catch {
     return null;
   }
+}
+
+const WIDTH_HEIGHT_PATTERN = /<svg\b[^>]*\bwidth="([\d.]+)(?:px)?"[^>]*\bheight="([\d.]+)(?:px)?"/;
+
+/** Injects a `viewBox="0 0 W H"` synthesized from the SVG's own width/height attributes when it's missing one entirely — a no-op (same buffer back) when a viewBox is already present, or when even width/height can't be found. */
+function ensureSvgViewBox(svg: Buffer): Buffer {
+  const text = svg.toString("utf-8");
+  if (text.includes("viewBox")) return svg;
+  const match = text.match(WIDTH_HEIGHT_PATTERN);
+  if (!match) return svg;
+  const [, width, height] = match;
+  return Buffer.from(text.replace("<svg", `<svg viewBox="0 0 ${width} ${height}"`));
 }
 
 /** Local crest art (data URI + real content aspect ratio, see CrestArt) for a tracked team; for an untracked opponent, fetches the source's own hotlinked crest (see fetchHotlinkedCrestArt) when one was given; falls back to the generic gray shield when neither is available. */

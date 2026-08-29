@@ -56,10 +56,14 @@ describe("renderMatchImage", () => {
     expect(isPng(png)).toBe(true);
   });
 
-  // Real bug found live: a ge.globo crest with no viewBox (only px
-  // width/height) crashed Satori entirely — "Failed to parse SVG ...
-  // missing viewBox" — taking the whole post down, not just that crest.
-  it("falls back to the generic shield for a hotlinked SVG with no viewBox, without throwing", async () => {
+  // Real bug found live (Elversberg's own real crest, confirmed by
+  // fetching it directly): no viewBox, only "width="800px" height="800px"
+  // — crashed Satori entirely ("Failed to parse SVG ... missing
+  // viewBox"), taking the whole post down, not just that crest. Fixed by
+  // synthesizing a viewBox from the width/height already given, rather
+  // than settling for the generic shield when the real dimensions are
+  // right there.
+  it("synthesizes a viewBox from width/height for a hotlinked SVG that has none, instead of crashing or falling back", async () => {
     const noViewBoxSvg = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px"><circle cx="400" cy="400" r="300"/></svg>');
     vi.stubGlobal(
       "fetch",
@@ -67,6 +71,24 @@ describe("renderMatchImage", () => {
         ok: true,
         headers: new Headers({ "content-type": "image/svg+xml" }),
         arrayBuffer: async () => noViewBoxSvg.buffer.slice(noViewBoxSvg.byteOffset, noViewBoxSvg.byteOffset + noViewBoxSvg.byteLength),
+      }),
+    );
+
+    const png = await renderMatchImage(
+      buildMatch({ awayTeamId: null, awayTeamName: "Visitante", awayTeamCrestUrl: "https://s.sde.globo.com/media/organizations/x.svg" }),
+    );
+
+    expect(isPng(png)).toBe(true);
+  });
+
+  it("falls back to the generic shield for a hotlinked SVG with neither a viewBox nor width/height to synthesize one from", async () => {
+    const bareSvg = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><circle cx="400" cy="400" r="300"/></svg>');
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        headers: new Headers({ "content-type": "image/svg+xml" }),
+        arrayBuffer: async () => bareSvg.buffer.slice(bareSvg.byteOffset, bareSvg.byteOffset + bareSvg.byteLength),
       }),
     );
 
