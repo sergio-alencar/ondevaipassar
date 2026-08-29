@@ -81,10 +81,31 @@ const CHANNELS: Channel[] = [
     officialUrl: "https://globoplay.globo.com",
     instagramHandle: "globoplay",
   },
+  // Sérgio asked for this to always be shown alongside TNT Sports, never on
+  // its own — TNT Sports' own Champions League games stream through the
+  // HBO Max app, so a viewer following either brand should see both. See
+  // ingest/channelMirroring.ts for how a "tntsports" broadcast automatically
+  // gets a companion "hbomax" row, regardless of which source confirmed it.
+  {
+    id: "hbomax",
+    displayName: "HBO Max",
+    officialUrl: "https://www.hbomax.com/br/pt/sports",
+  },
   {
     id: "nsports",
     displayName: "N Sports",
     officialUrl: "https://www.youtube.com/@NSports/streams",
+  },
+  // Sérgio flagged both of these for Bundesliga coverage.
+  {
+    id: "jovempanesportes",
+    displayName: "Jovem Pan Esportes",
+    officialUrl: "https://www.youtube.com/@jovempanesportes/streams",
+  },
+  {
+    id: "romariotv",
+    displayName: "Romário TV",
+    officialUrl: "https://www.youtube.com/@RomarioTVoficial/streams",
   },
   {
     id: "paramountplus",
@@ -218,6 +239,8 @@ const CHANNEL_ALIASES: Record<string, string> = {
   "amazon prime video": "primevideo",
   record: "record",
   "record tv": "record",
+  "hbo max": "hbomax",
+  hbomax: "hbomax",
   sbt: "sbt",
   sportv: "sportv",
   "sportv 2": "sportv",

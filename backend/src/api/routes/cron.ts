@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { env } from "../../config/env.js";
+import { runChannelMirroring } from "../../ingest/channelMirroring.js";
 import { runFemininoEnrichment } from "../../ingest/femininoEnrichment.js";
 import { runFutebolInteriorEnrichment } from "../../ingest/futebolInteriorEnrichment.js";
 import { runFutnatvEnrichment } from "../../ingest/futnatvEnrichment.js";
@@ -54,6 +55,9 @@ export async function cronRoutes(app: FastifyInstance): Promise<void> {
     await runMeuguiaEnrichment();
     await runItatiaiaEnrichment();
     await runFutnatvEnrichment();
+    // Runs dead last — mirrors whatever the final "tntsports" state of
+    // this whole run turned out to be, from any of the sources above.
+    await runChannelMirroring();
 
     return { status: "ok", ranAt: new Date().toISOString() };
   });
