@@ -56,6 +56,21 @@ const TRACKED_CHANNELS: { channelId: string; youtubeChannelId: string; sourceId:
   // shared men's resolver here would either silently fail to match or,
   // worse, attach this stream to a men's fixture of the same team name.
   { channelId: "nsports", youtubeChannelId: "UCf9WJPpsh5BHDY-OeISgIqA", sourceId: "youtube-nsports", division: "feminino" },
+  // Sérgio flagged both for Bundesliga coverage. Real titles confirmed live
+  // already match an EXISTING TITLE_PATTERNS entry each — no new regex
+  // needed: Jovem Pan uses the Canal GOAT/ge tv shape ("DARMSTADT X
+  // HANNOVER 96 | AO VIVO E COM IMAGENS | BUNDESLIGA 2 | 3ª RODADA"),
+  // Romário TV uses the ge tv/CazéTV shape ("AO VIVO: UNION BERLIN X
+  // FRANKFURT | BUNDESLIGA 2026/27 - 1ª RODADA"). Both channels also post
+  // non-live content this same title shape could in principle collide
+  // with — Jovem Pan's own post-match recaps for Brazilian games (e.g.
+  // "Cruzeiro 1 x 1 Atlético-MG - 26/08/2026 - Copa do Brasil") — but none
+  // of those actually contain the literal "AO VIVO" every TITLE_PATTERNS
+  // entry requires, so they're already excluded by construction, not by
+  // any special-casing here. Men's resolver (the default) is correct for
+  // both — neither channel's real content is Feminino.
+  { channelId: "jovempanesportes", youtubeChannelId: "UCv-Nx8pSfG_LxbViMz14RWQ", sourceId: "youtube-jovempanesportes" },
+  { channelId: "romariotv", youtubeChannelId: "UCDUmY6hhe6qOzf_syVE-8Gg", sourceId: "youtube-romariotv" },
 ];
 
 async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], apiKey: string, allMatches: MatchCandidate[]): Promise<void> {
