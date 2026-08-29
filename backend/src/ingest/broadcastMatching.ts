@@ -94,11 +94,26 @@ export function matchStreamsToBroadcasts<T extends TeamPairStream>(
       return daysBetween(toBrtCalendarDate(match.kickoffUtc), streamDate) <= DATE_TOLERANCE_DAYS;
     });
 
-    if (candidates.length !== 1) {
+    // A wildcard (untracked opponent) side widens `candidates` to catch
+    // any real 1-day rollover — but real bug found live: Athletico-PR's
+    // own FPF TV stream ("Athletico x Paraná Clube", Paraná untracked so
+    // the away side wildcards) landed on the SAME BRT day as the real Copa
+    // Paraná fixture, yet also fell within the 1-day tolerance of an
+    // unrelated Série A match the following day (Athletico-PR x
+    // Fluminense) — 2 candidates, silently unresolved, no broadcast ever
+    // attached. When the tolerant set has more than one candidate, narrow
+    // to same-BRT-day matches first; only fall back to "ambiguous" if that
+    // narrower set still isn't exactly one (e.g. a genuine same-day
+    // doubleheader for the same team pair).
+    const sameDayCandidates =
+      candidates.length > 1 ? candidates.filter((match) => daysBetween(toBrtCalendarDate(match.kickoffUtc), streamDate) === 0) : candidates;
+    const resolved = sameDayCandidates.length === 1 ? sameDayCandidates : candidates;
+
+    if (resolved.length !== 1) {
       unresolvedCount++;
       continue;
     }
-    matchIds.push(candidates[0].id);
+    matchIds.push(resolved[0].id);
     matchedStreams.push(stream);
   }
 

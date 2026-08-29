@@ -73,6 +73,37 @@ describe("matchStreamsToBroadcasts", () => {
     expect(result.unresolvedCount).toBe(1);
   });
 
+  // Real bug found live: FPF TV's "Athletico x Paraná Clube" stream (away
+  // side wildcards — Paraná Clube isn't a tracked team) fell within the
+  // 1-day tolerance of BOTH the real same-day Copa Paraná fixture AND an
+  // unrelated Série A match the next day (Athletico-PR x Fluminense) —
+  // the old code saw 2 candidates and gave up, so the broadcast never
+  // attached even though only one candidate was actually on the stream's
+  // own BRT day.
+  it("prefers the exact same-BRT-day candidate when a wildcard side also picks up an unrelated 1-day-tolerant match", () => {
+    const result = matchStreamsToBroadcasts(
+      [buildStream({ homeTeamId: "athletico_paranaense", awayTeamId: null, streamDateUtc: "2026-08-29T18:30:00.000Z" })],
+      [
+        buildMatch({ id: "copa-parana", homeTeamId: "athletico_paranaense", awayTeamId: null, kickoffUtc: "2026-08-29T18:30:00.000Z" }),
+        buildMatch({ id: "serie-a", homeTeamId: "athletico_paranaense", awayTeamId: "fluminense", kickoffUtc: "2026-08-30T14:00:00.000Z" }),
+      ],
+    );
+    expect(result.matchIds).toEqual(["copa-parana"]);
+    expect(result.unresolvedCount).toBe(0);
+  });
+
+  it("still stays unresolved (never guesses) when 2+ candidates are on the exact same BRT day", () => {
+    const result = matchStreamsToBroadcasts(
+      [buildStream({ streamDateUtc: "2026-09-06T18:30:00.000Z" })],
+      [
+        buildMatch({ id: "a", kickoffUtc: "2026-09-06T21:30:00.000Z" }),
+        buildMatch({ id: "b", kickoffUtc: "2026-09-06T15:00:00.000Z" }),
+      ],
+    );
+    expect(result.matchIds).toEqual([]);
+    expect(result.unresolvedCount).toBe(1);
+  });
+
   it("does not match a different team pair even on the same date", () => {
     const result = matchStreamsToBroadcasts(
       [buildStream({ homeTeamId: "flamengo", awayTeamId: "vasco" })],
