@@ -4,7 +4,7 @@ Agrega, para qualquer time brasileiro e qualquer campeonato (Série A/B, copas n
 
 Leia `review.md` antes de mexer em qualquer coisa — ele tem o diagnóstico do código antigo, as decisões tomadas (com o porquê) e o estado atual por fase. Este arquivo (`CLAUDE.md`) é só convenção e orientação rápida.
 
-**Em produção**: front em https://ondevaipassar-nine.vercel.app, backend em https://ondevaipassar-api.vercel.app — ambos na conta Vercel pessoal do Sérgio (`sergio-alencar`, não a "speivox", que é conta de trabalho). Custo: $0/mês (Vercel Hobby + Turso free tier), decisão explícita do Sérgio.
+**Em produção**: front em https://ondevaipassar.com, backend em https://api.ondevaipassar.com — domínio próprio (comprado na Hostinger, DNS apontando pra Vercel via registro `A`), migrado a partir das URLs técnicas `ondevaipassar-nine.vercel.app`/`ondevaipassar-api.vercel.app` (que continuam existindo como alias, mas não são mais o link canônico). Ambos os projetos na conta Vercel pessoal do Sérgio (`sergio-alencar`, não a "speivox", que é conta de trabalho). Custo: $0/mês (Vercel Hobby + Turso free tier), decisão explícita do Sérgio.
 
 ## Stack
 

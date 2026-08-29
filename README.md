@@ -2,7 +2,7 @@
 
 Agrega, para qualquer time brasileiro e qualquer campeonato (Série A/B, copas nacionais, continentais, estaduais), em que canal de TV ou serviço de streaming o próximo jogo vai passar.
 
-**Em produção**: front em https://ondevaipassar-nine.vercel.app, backend em https://ondevaipassar-api.vercel.app.
+**Em produção**: front em https://ondevaipassar.com, backend em https://api.ondevaipassar.com (as URLs técnicas `ondevaipassar-nine.vercel.app`/`ondevaipassar-api.vercel.app` continuam existindo como alias, mas não são mais o link canônico).
 
 ## Stack
 
