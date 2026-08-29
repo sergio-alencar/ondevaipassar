@@ -62,7 +62,7 @@ const RASTER_EXTENSION: Record<string, string> = {
   globoplay: "png",
   goat: "png",
   hbomax: "png",
-  jovempanesportes: "jpeg",
+  jovempanesportes: "png",
   nossofutebol: "jpeg",
   nsports: "jpg",
   paramountplus: "png",
