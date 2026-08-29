@@ -22,63 +22,6 @@ export interface CrestArt {
   aspectRatio: number;
 }
 
-function loadCrestArt(svg: Buffer): CrestArt {
-  const { svg: cropped, aspectRatio } = cropSvgToContent(svg);
-  return { dataUri: `data:image/svg+xml;base64,${cropped.toString("base64")}`, aspectRatio };
-}
-
-const FALLBACK_CREST = loadCrestArt(readFileSync(`${ASSETS_DIR}icons/escudo-cinza.svg`));
-// logo-3.svg itself is white-fill-only (built for the site header's colored
-// background, see frontend's Header.tsx) — invisible on this template's
-// plain white canvas. logo-3-purple.svg is a derived copy (fill="white" ->
-// fill="#581c87", nothing else changed) made just for this corner mark.
-export const WORDMARK = readSvgDataUri(`${ASSETS_DIR}icons/logo-3-purple.svg`);
-export const VERSUS_ICON = readSvgDataUri(`${ASSETS_DIR}icons/versus.svg`);
-
-/**
- * Fetches a hotlinked crest (same allowlisted hosts as crestProxy.ts — an
- * untracked opponent's crest only ever exists as ge.globo's/OneFootball's
- * own URL, never ours to store) and turns it into CrestArt. SVG gets the
- * same viewBox crop local art already gets; a raster crest (OneFootball's
- * are PNG, see crestProxy.ts) is embedded as-is — Satori renders a raster
- * `<img>` fine (see channelLogoDataUri's own comment on that), and this
- * project has no image-dimension library to compute its real aspect ratio,
- * so it defaults to 1 (square), close enough for the badge-style crests
- * actually seen from these two sources. Returns null on any failure
- * (disallowed host, network error, timeout, or an SVG Satori can't render —
- * see the viewBox check below) — caller falls back to the generic shield,
- * same as a tracked team missing its local file.
- */
-async function fetchHotlinkedCrestArt(sourceUrl: string): Promise<CrestArt | null> {
-  if (!isAllowedCrestUrl(sourceUrl)) return null;
-  try {
-    const response = await fetch(sourceUrl, { signal: AbortSignal.timeout(5000) });
-    if (!response.ok) return null;
-    const contentType = response.headers.get("content-type") ?? "";
-    const body = Buffer.from(await response.arrayBuffer());
-    if (!contentType.includes("svg")) {
-      return { dataUri: `data:${contentType || "application/octet-stream"};base64,${body.toString("base64")}`, aspectRatio: 1 };
-    }
-    // Real bug found live: a ge.globo crest without a viewBox (some do
-    // ship this way — only "width="800px" height="800px"" — confirmed on
-    // Elversberg's own crest) crashed Satori entirely ("Failed to parse
-    // SVG ... missing viewBox"), taking the WHOLE Instagram post down with
-    // it, not just that one crest. cropSvgToContent itself silently
-    // no-ops without a viewBox (fine for the frontend's own browser-based
-    // crestProxy use, which doesn't need one) — Satori does, so this
-    // synthesizes one from the width/height ge.globo already gives before
-    // handing off to it, rather than settling for the generic shield when
-    // the real dimensions are sitting right there. If even that can't
-    // produce one (no width/height either — none seen live yet, but cheap
-    // to guard), still refuse to hand Satori something it'll choke on.
-    const withViewBox = ensureSvgViewBox(body);
-    if (!withViewBox.toString("utf-8").includes("viewBox")) return null;
-    return loadCrestArt(withViewBox);
-  } catch {
-    return null;
-  }
-}
-
 const WIDTH_HEIGHT_PATTERN = /<svg\b[^>]*\bwidth="([\d.]+)(?:px)?"[^>]*\bheight="([\d.]+)(?:px)?"/;
 
 /** Injects a `viewBox="0 0 W H"` synthesized from the SVG's own width/height attributes when it's missing one entirely — a no-op (same buffer back) when a viewBox is already present, or when even width/height can't be found. */
@@ -91,12 +34,75 @@ function ensureSvgViewBox(svg: Buffer): Buffer {
   return Buffer.from(text.replace("<svg", `<svg viewBox="0 0 ${width} ${height}"`));
 }
 
-/** Local crest art (data URI + real content aspect ratio, see CrestArt) for a tracked team; for an untracked opponent, fetches the source's own hotlinked crest (see fetchHotlinkedCrestArt) when one was given; falls back to the generic gray shield when neither is available. */
+/**
+ * Real bug found live, TWICE: both a hotlinked crest (Elversberg's own,
+ * from ge.globo) AND a *local* crest file (Maranhão's — one of 6 shipped
+ * without a viewBox, confirmed live: anapolis/itabaiana/maranhao/barra_sc/
+ * floresta.svg) crashed Satori entirely ("Failed to parse SVG ... missing
+ * viewBox"), taking the WHOLE Instagram post down with it, not just that
+ * one crest — cropSvgToContent itself silently no-ops without a viewBox
+ * (fine for the frontend's own browser-based crestProxy use, which
+ * doesn't need one), so both callers below need this same guard, not just
+ * the hotlink path where it was first found. Synthesizes a viewBox from
+ * the SVG's own width/height first (so the real crest still renders, not
+ * just a safe non-crash) and returns null only when that's not possible
+ * either — caller falls back to the generic shield.
+ */
+function loadCrestArt(svg: Buffer): CrestArt | null {
+  const withViewBox = ensureSvgViewBox(svg);
+  if (!withViewBox.toString("utf-8").includes("viewBox")) return null;
+  const { svg: cropped, aspectRatio } = cropSvgToContent(withViewBox);
+  return { dataUri: `data:image/svg+xml;base64,${cropped.toString("base64")}`, aspectRatio };
+}
+
+// escudo-cinza.svg itself is verified (by this file's own test suite) to
+// have a real viewBox, so this cast is safe — the fallback of the
+// fallback would have nowhere left to go.
+const FALLBACK_CREST = loadCrestArt(readFileSync(`${ASSETS_DIR}icons/escudo-cinza.svg`)) as CrestArt;
+// logo-3.svg itself is white-fill-only (built for the site header's colored
+// background, see frontend's Header.tsx) — invisible on this template's
+// plain white canvas. logo-3-purple.svg is a derived copy (fill="white" ->
+// fill="#581c87", nothing else changed) made just for this corner mark.
+export const WORDMARK = readSvgDataUri(`${ASSETS_DIR}icons/logo-3-purple.svg`);
+export const VERSUS_ICON = readSvgDataUri(`${ASSETS_DIR}icons/versus.svg`);
+
+/**
+ * Fetches a hotlinked crest (same allowlisted hosts as crestProxy.ts — an
+ * untracked opponent's crest only ever exists as ge.globo's/OneFootball's
+ * own URL, never ours to store) and turns it into CrestArt. SVG gets the
+ * same viewBox handling loadCrestArt gives local art; a raster crest
+ * (OneFootball's are PNG, see crestProxy.ts) is embedded as-is — Satori
+ * renders a raster `<img>` fine (see channelLogoDataUri's own comment on
+ * that), and this project has no image-dimension library to compute its
+ * real aspect ratio, so it defaults to 1 (square), close enough for the
+ * badge-style crests actually seen from these two sources. Returns null
+ * on any failure (disallowed host, network error, timeout, or an SVG
+ * loadCrestArt can't make Satori-safe) — caller falls back to the generic
+ * shield, same as a tracked team missing its local file.
+ */
+async function fetchHotlinkedCrestArt(sourceUrl: string): Promise<CrestArt | null> {
+  if (!isAllowedCrestUrl(sourceUrl)) return null;
+  try {
+    const response = await fetch(sourceUrl, { signal: AbortSignal.timeout(5000) });
+    if (!response.ok) return null;
+    const contentType = response.headers.get("content-type") ?? "";
+    const body = Buffer.from(await response.arrayBuffer());
+    if (!contentType.includes("svg")) {
+      return { dataUri: `data:${contentType || "application/octet-stream"};base64,${body.toString("base64")}`, aspectRatio: 1 };
+    }
+    return loadCrestArt(body);
+  } catch {
+    return null;
+  }
+}
+
+/** Local crest art (data URI + real content aspect ratio, see CrestArt) for a tracked team; for an untracked opponent, fetches the source's own hotlinked crest (see fetchHotlinkedCrestArt) when one was given; falls back to the generic gray shield when neither is available (including when loadCrestArt itself returns null — a local file present but Satori-unsafe, see its own doc comment). */
 export async function crestArt(teamId: string | null, sourceCrestUrl?: string | null): Promise<CrestArt> {
   const crestFile = teamId ? findTeamById(teamId)?.crestFile : undefined;
   if (crestFile) {
     try {
-      return loadCrestArt(readFileSync(`${ASSETS_DIR}crests/${crestFile}`));
+      const local = loadCrestArt(readFileSync(`${ASSETS_DIR}crests/${crestFile}`));
+      if (local) return local;
     } catch {
       // fall through to the source-hotlink / generic-shield cascade below
     }

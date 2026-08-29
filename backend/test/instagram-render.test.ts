@@ -112,6 +112,17 @@ describe("renderMatchImage", () => {
     expect(isPng(png)).toBe(true);
   });
 
+  // Real bug found live, same day as the hotlink one above but a
+  // different code path: Maranhão's own LOCAL crest file (one of 6
+  // shipped without a viewBox — see assets.ts's own loadCrestArt comment)
+  // crashed Satori the exact same way, since crestArt's local-file branch
+  // never went through the hotlink-only fix at first. No mocking needed —
+  // exercises the real fixture file already in the repo.
+  it("renders a valid PNG for a tracked team whose local crest file has no viewBox (Maranhão)", async () => {
+    const png = await renderMatchImage(buildMatch({ homeTeamId: "maranhao", homeTeamName: "Maranhão" }));
+    expect(isPng(png)).toBe(true);
+  });
+
   it("renders a valid, non-empty PNG for a match with local crest art on both sides", async () => {
     const png = await renderMatchImage(buildMatch());
     expect(isPng(png)).toBe(true);
