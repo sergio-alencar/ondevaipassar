@@ -23,6 +23,16 @@ const TRACKED_CHANNELS: { channelId: string; youtubeChannelId: string; sourceId:
   // at @canaldobenja with its own distinct id; this is specifically the
   // "oficial" one Sérgio pointed at.
   { channelId: "canaldobenja", youtubeChannelId: "UCT7xKN6IOoITtqnfjB-6m1g", sourceId: "youtube-canaldobenja" },
+  // Sérgio confirmed FPF TV broadcasts Copa Paraná (a state cup ge.globo's
+  // own liveWatchSources never confirms a channel for — no other tracked
+  // source covers this competition either). Channel id verified live
+  // (fetched https://www.youtube.com/@federacaopr, real externalId, not
+  // guessed) — as of that same check, the channel had no match scheduled
+  // on its own /streams tab yet (smaller broadcasters like this one
+  // typically only publish/schedule close to kickoff), so this can't be
+  // confirmed end-to-end against a real stream yet; added on the strength
+  // of the channel id itself being real, same as every other entry here.
+  { channelId: "fpftv", youtubeChannelId: "UCb74ViTMFgndOaTehM5PVdg", sourceId: "youtube-fpftv" },
 ];
 
 async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], apiKey: string, allMatches: MatchCandidate[]): Promise<void> {
