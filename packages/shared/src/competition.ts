@@ -47,6 +47,10 @@ export const COMPETITIONS: Competition[] = [
   // hardcodes competitionId directly, never resolves it from raw text, so
   // the risk doesn't apply here). A distinct id sidesteps it either way.
   { id: "serie-a-italiana", displayName: "Campeonato Italiano (Serie A)", type: "national-league" },
+  // Raw name on ge.globo's own team-agenda pages (confirmed live, Real
+  // Madrid's own agenda) is literally "Champions League" — no accent/collision
+  // risk with anything else tracked here, unlike the Italian Serie A case above.
+  { id: "champions-league", displayName: "Champions League", type: "continental" },
 ];
 
 export function findCompetitionById(id: string): Competition | undefined {
