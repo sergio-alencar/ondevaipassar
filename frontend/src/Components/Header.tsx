@@ -128,11 +128,6 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
           </svg>
         </button>
         <ul className="px-8 py-12 *:uppercase *:font-bold *:text-2xl space-y-4">
-          <li>
-            <Link to="/sobre" onClick={() => setIsMenuVisible(false)}>
-              Sobre
-            </Link>
-          </li>
           {SOCIAL_LINKS.map(({ label, url }) => (
             <li key={url}>
               <a href={url} target="_blank" rel="noopener noreferrer">
@@ -140,6 +135,11 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
               </a>
             </li>
           ))}
+          <li>
+            <Link to="/sobre" onClick={() => setIsMenuVisible(false)}>
+              Sobre
+            </Link>
+          </li>
         </ul>
       </div>
     </>
