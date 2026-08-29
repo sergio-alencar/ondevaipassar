@@ -56,6 +56,7 @@ const RASTER_EXTENSION: Record<string, string> = {
   dazn: "png",
   disneyplus: "png",
   espn: "png",
+  fpftv: "jpg",
   getv: "png",
   globo: "png",
   globoplay: "png",

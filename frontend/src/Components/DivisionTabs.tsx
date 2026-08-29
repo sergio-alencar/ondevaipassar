@@ -5,15 +5,16 @@ interface DivisionTabsProps {
   onChange: (division: Division) => void;
 }
 
-const DIVISIONS: Division[] = ["A", "B", "C", "EUROPA"];
+const DIVISIONS: Division[] = ["A", "B", "C", "EUROPA", "FEMININO"];
 
-// "Europa" isn't a "Série X" — needs its own label rather than the template
-// every other division shares.
+// "Europa"/"Feminino" aren't a "Série X" — need their own label rather than
+// the template every other division shares.
 const DIVISION_LABELS: Record<Division, string> = {
   A: "Série A",
   B: "Série B",
   C: "Série C",
   EUROPA: "Europa",
+  FEMININO: "Feminino",
 };
 
 const DivisionTabs = ({ active, onChange }: DivisionTabsProps) => (

@@ -12,6 +12,8 @@ const gameSchema = z.object({
   sport: z.string(),
   /** "HH'h'MM", always BRT — e.g. "14h00". */
   time: z.string(),
+  /** e.g. "Campeonato Brasileiro Série A", "Brasileirão Feminino", "Copa Paraná" — the ONLY reliable signal that a game is women's football, since the team names themselves are often identical text to a men's club (see ingest/femininoTeamResolver.ts's own doc comment for why that matters). */
+  competition: z.string(),
   home: z.string(),
   away: z.string(),
   broadcast: z.string(),

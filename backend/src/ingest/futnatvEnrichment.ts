@@ -10,7 +10,8 @@ import { resolveTeamId } from "./teamResolver.js";
 const SOURCE_ID = "futnatv";
 const KICKOFF_TIME_PATTERN = /^(\d{1,2})h(\d{2})$/;
 
-function toKickoffUtc(dateKey: string, time: string): string | null {
+/** Exported for femininoEnrichment.ts's own reuse — same futnatv "HH'h'MM" time shape, no reason to duplicate the BRT-offset math. */
+export function toKickoffUtc(dateKey: string, time: string): string | null {
   const timeMatch = time.match(KICKOFF_TIME_PATTERN);
   if (!timeMatch) return null;
 
@@ -45,6 +46,14 @@ export async function runFutnatvEnrichment(): Promise<void> {
     let unresolvedCount = 0;
 
     for (const { game, dateKey } of datedGames) {
+      // futnatv mixes every competition it covers into one per-day list —
+      // Brasileirão Feminino included, whose team names are often identical
+      // text to a men's club (e.g. "Flamengo"). This source only ever
+      // resolves against the men's-only teamResolver, so a Feminino game
+      // must never reach it (see femininoTeamResolver.ts for the dedicated,
+      // separate resolution path those games actually use).
+      if (game.competition.toLowerCase().includes("feminin")) continue;
+
       const streamDateUtc = toKickoffUtc(dateKey, game.time);
       if (!streamDateUtc) {
         unresolvedCount++;

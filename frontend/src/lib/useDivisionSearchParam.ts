@@ -24,7 +24,7 @@ const PARAM = "divisao";
 // added later can't silently collapse into the default the way a binary
 // ternary did here before (any value other than "b" used to fall through
 // to "A" without anyone noticing).
-const DIVISION_BY_PARAM: Record<string, Division> = { b: "B", c: "C", europa: "EUROPA" };
+const DIVISION_BY_PARAM: Record<string, Division> = { b: "B", c: "C", europa: "EUROPA", feminino: "FEMININO" };
 
 export function useDivisionSearchParam() {
   const [searchParams, setSearchParams] = useSearchParams();
