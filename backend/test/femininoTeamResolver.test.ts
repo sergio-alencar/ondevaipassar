@@ -18,7 +18,7 @@ describe("resolveFemininoTeamId", () => {
   });
 
   it("resolves the one club with no men's counterpart", () => {
-    expect(resolveFemininoTeamId("Mixto")).toBe("mixto");
+    expect(resolveFemininoTeamId("Mixto")).toBe("mixto_feminino");
   });
 
   it("resolves known free-text aliases mirrored from the men's side", () => {

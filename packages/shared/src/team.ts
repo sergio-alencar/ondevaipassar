@@ -114,7 +114,8 @@ export const TEAMS: Team[] = [
   { id: "milan", displayName: "Milan", color: "red-800", crestFile: "milan.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/teams/2018/03/11/milan.svg", aliases: { geGlobo: null } },
   { id: "mirassol", displayName: "Mirassol", color: "green-900", crestFile: "mirassol.svg", division: "A", aliases: { geGlobo: "mirassol" } },
   // No ge.globo team page found ("mixto", "mixto-ec", "mixto-mt" all 404, confirmed live). Crest sourced from Wikimedia Commons (File:Mixto_EC.svg, provided by Sérgio) — colors (black/white, nickname "Tigre da Vargas") confirmed via web search, not guessed.
-  { id: "mixto", displayName: "Mixto", color: "black", crestFile: "mixto.svg", division: "FEMININO", aliases: { geGlobo: null } },
+  // id has the "_feminino" suffix even though the men's club isn't tracked yet (unlike every other Feminino entry, which mirrors an already-tracked men's team) — Sérgio's own call: the men's Mixto currently plays Série D, but could be promoted to Série C in a future season, at which point it WOULD get tracked under the bare "mixto" id. Suffixing now avoids a collision later instead of a rename under real data.
+  { id: "mixto_feminino", displayName: "Mixto", color: "black", crestFile: "mixto.svg", division: "FEMININO", aliases: { geGlobo: null } },
   { id: "napoli", displayName: "Napoli", color: "blue-800", crestFile: "napoli.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2024/07/05/napoli-svg-70751_zoSpRjw.svg", aliases: { geGlobo: null } },
   { id: "nautico", displayName: "Náutico", color: "red-800", crestFile: "nautico.svg", division: "B", aliases: { geGlobo: "nautico" } },
   { id: "newcastle", displayName: "Newcastle", color: "black", crestFile: "newcastle.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2023/09/04/Newcastle_United.svg", aliases: { geGlobo: null } },
