@@ -7,7 +7,15 @@ const envSchema = z.object({
   // needs a Turso account; only a deployed environment does.
   DATABASE_URL: z.string().min(1).default("file:./data/ondevaipassar.db"),
   DATABASE_AUTH_TOKEN: z.string().optional(),
-  CORS_ORIGIN: z.string().min(1).default("http://localhost:5173"),
+  // Comma-separated so both the new custom domain and the old *.vercel.app
+  // one can stay allowed at once during the ondevaipassar.com migration —
+  // a link to the old URL floating around somewhere (Instagram bio, an old
+  // bookmark) shouldn't suddenly start failing on CORS.
+  CORS_ORIGIN: z
+    .string()
+    .min(1)
+    .default("http://localhost:5173")
+    .transform((value) => value.split(",").map((origin) => origin.trim())),
   // Vercel sets this automatically for cron-triggered requests
   // (Authorization: Bearer <CRON_SECRET>) — required in production so the
   // ingest and instagram-post endpoints can't be triggered by anyone who
