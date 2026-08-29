@@ -34,6 +34,12 @@ const TITLE_PATTERNS = [
   /^(.+?)\s+X\s+(.+?)\s*:\s*AO VIVO/i,
   // Canal GOAT, ge tv (some titles): "CRB X CRICIÚMA | AO VIVO E COM IMAGENS..."
   /^(.+?)\s+X\s+(.+?)\s*\|\s*AO VIVO/i,
+  // FPF TV: "COPA PARANÁ 2026 | ATHLETICO X PARANÁ CLUBE | RODADA 1, AO
+  // VIVO E DE GRAÇA!" — team pair sits between the 2nd and 3rd "|"-
+  // delimited segment, with "AO VIVO" only appearing later in the 4th one,
+  // not immediately after the team names the way every other channel's
+  // title has it. Confirmed live against 2 real titles.
+  /\|\s*(.+?)\s+X\s+(.+?)\s*\|\s*[^|]*AO VIVO/i,
 ];
 
 export interface ParsedStreamTitle {

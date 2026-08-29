@@ -79,6 +79,11 @@ const FREE_TEXT_ALIASES: Record<string, string> = {
   "paysandu sc pa": "paysandu",
   "volta redonda fc": "volta_redonda",
   "ypiranga fc": "ypiranga_rs",
+  // FPF TV's own YouTube titles shorten this to bare "Athletico" (confirmed
+  // live: "COPA PARANÁ 2026 | ATHLETICO X PARANÁ CLUBE | ..."). Distinct
+  // string from "Athletic" (the Minas Gerais club, id "athletic") — no
+  // normalizeText collision between the two.
+  athletico: "athletico_paranaense",
 };
 
 /** Resolves a raw team name (as scraped/returned by any source) to our canonical Team.id, or null if unrecognized. Never throws — an unresolved team just means the raw name gets displayed as-is. */

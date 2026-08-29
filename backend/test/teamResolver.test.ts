@@ -34,6 +34,11 @@ describe("resolveTeamId", () => {
     expect(resolveTeamId("Barra")).toBe("barra_sc");
   });
 
+  it("resolves FPF TV's shortened 'Athletico' to Athletico-PR, distinct from 'Athletic' (the Minas Gerais club)", () => {
+    expect(resolveTeamId("ATHLETICO")).toBe("athletico_paranaense");
+    expect(resolveTeamId("Athletic")).toBe("athletic");
+  });
+
   it("returns null for an unrecognized name instead of guessing", () => {
     expect(resolveTeamId("Racing Club de Montevideo")).toBeNull();
     expect(resolveTeamId("")).toBeNull();

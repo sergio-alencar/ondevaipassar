@@ -35,6 +35,17 @@ describe("parseMatchTitle", () => {
     });
   });
 
+  it("parses FPF TV's '{competition} | A X B | {round}, AO VIVO...' format, where AO VIVO sits in a later segment, not right after the team names", () => {
+    expect(parseMatchTitle("COPA PARANÁ 2026 | ATHLETICO X PARANÁ CLUBE | RODADA 1, AO VIVO E DE GRAÇA!")).toEqual({
+      homeTeamNameRaw: "ATHLETICO",
+      awayTeamNameRaw: "PARANÁ CLUBE",
+    });
+    expect(parseMatchTitle("COPA PARANÁ 2026 | LONDRINA X PARANAVAÍ | RODADA 1, AO VIVO E DE GRAÇA!")).toEqual({
+      homeTeamNameRaw: "LONDRINA",
+      awayTeamNameRaw: "PARANAVAÍ",
+    });
+  });
+
   it("returns null for non-match content (interviews, other sports formats)", () => {
     expect(parseMatchTitle("AO VIVO: SPATEN FIGHT NIGHT 3 | LUTA | ge tv")).toBeNull();
     expect(parseMatchTitle("AO VIVO! UBUNTU RECEBE A EX-JUDOCA EDINANCI FERNANDES DA SILVA | ge.globo")).toBeNull();
