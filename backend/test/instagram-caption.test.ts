@@ -33,7 +33,7 @@ function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
 }
 
 describe("buildCaption", () => {
-  it("repeats team names, competition, BRT date/time, channels, and their handles as text", () => {
+  it("repeats team names, competition, BRT date/time, channels, the regional caveat, and their handles as text", () => {
     const caption = buildCaption(buildMatch());
     expect(caption).toBe(
       [
@@ -41,9 +41,39 @@ describe("buildCaption", () => {
         "Campeonato Brasileiro Série A",
         "terça, 25/ago, 16h",
         "Transmissão: Globo, Premiere",
+        "* A transmissão pela Globo pode variar por região — confira a programação local",
         "@tvglobo @premiere",
       ].join("\n"),
     );
+  });
+
+  it("shows the real per-state detail instead of the generic caveat when futnatv gave us one", () => {
+    const caption = buildCaption(
+      buildMatch({
+        broadcasts: [
+          {
+            channelId: "globo",
+            displayName: "Globo",
+            url: "https://globo.com",
+            logoUrl: "",
+            regionalCaveat: true,
+            regionalDetail: "AC, AL, AM e SP",
+            instagramHandle: "tvglobo",
+          },
+        ],
+      }),
+    );
+    expect(caption).toContain("* Globo disponível em: AC, AL, AM e SP");
+    expect(caption).not.toContain("confira a programação local");
+  });
+
+  it("omits the regional caveat line entirely when no broadcast has one", () => {
+    const caption = buildCaption(
+      buildMatch({
+        broadcasts: [{ channelId: "cazetv", displayName: "CazéTV", url: "https://youtube.com", logoUrl: "", regionalCaveat: false }],
+      }),
+    );
+    expect(caption).not.toContain("*");
   });
 
   it("joins a single broadcast with no separator noise", () => {
