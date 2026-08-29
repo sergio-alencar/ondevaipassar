@@ -56,6 +56,27 @@ describe("renderMatchImage", () => {
     expect(isPng(png)).toBe(true);
   });
 
+  // Real bug found live: a ge.globo crest with no viewBox (only px
+  // width/height) crashed Satori entirely — "Failed to parse SVG ...
+  // missing viewBox" — taking the whole post down, not just that crest.
+  it("falls back to the generic shield for a hotlinked SVG with no viewBox, without throwing", async () => {
+    const noViewBoxSvg = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px"><circle cx="400" cy="400" r="300"/></svg>');
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        headers: new Headers({ "content-type": "image/svg+xml" }),
+        arrayBuffer: async () => noViewBoxSvg.buffer.slice(noViewBoxSvg.byteOffset, noViewBoxSvg.byteOffset + noViewBoxSvg.byteLength),
+      }),
+    );
+
+    const png = await renderMatchImage(
+      buildMatch({ awayTeamId: null, awayTeamName: "Visitante", awayTeamCrestUrl: "https://s.sde.globo.com/media/organizations/x.svg" }),
+    );
+
+    expect(isPng(png)).toBe(true);
+  });
+
   it("falls back to the generic shield when the hotlinked crest fetch fails, without throwing", async () => {
     vi.stubGlobal(
       "fetch",

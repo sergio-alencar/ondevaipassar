@@ -45,8 +45,9 @@ export const VERSUS_ICON = readSvgDataUri(`${ASSETS_DIR}icons/versus.svg`);
  * project has no image-dimension library to compute its real aspect ratio,
  * so it defaults to 1 (square), close enough for the badge-style crests
  * actually seen from these two sources. Returns null on any failure
- * (disallowed host, network error, timeout) — caller falls back to the
- * generic shield, same as a tracked team missing its local file.
+ * (disallowed host, network error, timeout, or an SVG Satori can't render —
+ * see the viewBox check below) — caller falls back to the generic shield,
+ * same as a tracked team missing its local file.
  */
 async function fetchHotlinkedCrestArt(sourceUrl: string): Promise<CrestArt | null> {
   if (!isAllowedCrestUrl(sourceUrl)) return null;
@@ -58,6 +59,14 @@ async function fetchHotlinkedCrestArt(sourceUrl: string): Promise<CrestArt | nul
     if (!contentType.includes("svg")) {
       return { dataUri: `data:${contentType || "application/octet-stream"};base64,${body.toString("base64")}`, aspectRatio: 1 };
     }
+    // Real bug found live: a ge.globo crest without a viewBox (some do
+    // ship this way — only width/height in px) crashed Satori entirely
+    // ("Failed to parse SVG ... missing viewBox"), taking the WHOLE
+    // Instagram post down with it, not just that one crest. cropSvgToContent
+    // itself silently no-ops without a viewBox (fine for the frontend's own
+    // browser-based crestProxy use, which doesn't need one) — this checks
+    // for one first, since only Satori actually requires it.
+    if (!body.toString("utf-8").includes("viewBox")) return null;
     return loadCrestArt(body);
   } catch {
     return null;
