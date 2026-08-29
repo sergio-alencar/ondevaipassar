@@ -4,6 +4,7 @@ import DropdownMenu from "./DropdownMenu";
 import logoHeader from "../assets/images/icones/logo-3.svg";
 import escudo from "../assets/images/icones/escudo.svg";
 import { backgroundColorClass } from "../lib/colors";
+import { SOCIAL_LINKS } from "../lib/socialLinks";
 import type { SelectedTeam, SetSelectedTeam } from "../types";
 
 interface HeaderProps {
@@ -108,16 +109,37 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
       </header>
       <div
         id="menu-left"
-        className={`bg-white w-64 h-full z-50 fixed top-0 left-0 shadow-lg transition-transform duration-300 ease-in-out ${
+        // w-80 (320px) still wrapped "Canal do WhatsApp" onto 2 lines by a
+        // few px — measured (devtools protocol) the label's own natural
+        // single-line width at 261px, +64px of the ul's own left/right
+        // padding = 326px needed at minimum. w-88 (352px) clears that
+        // with room to spare.
+        className={`bg-white w-88 h-full z-50 fixed top-0 left-0 shadow-lg transition-transform duration-300 ease-in-out ${
           isMenuVisible ? "translate-x-0" : "-translate-x-full"
         }`}
       >
+        {/* Closing this way already worked via the overlay's own onClick
+            (clicking outside the menu) — this button is an explicit,
+            visible way to do the same thing, since a tap-outside gesture
+            isn't always obvious on mobile. */}
+        <button type="button" onClick={() => setIsMenuVisible(false)} aria-label="Fechar menu" className="absolute top-6 right-6 cursor-pointer">
+          <svg viewBox="0 0 24 24" className="size-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none">
+            <path d="M5 5L19 19M19 5L5 19" />
+          </svg>
+        </button>
         <ul className="px-8 py-12 *:uppercase *:font-bold *:text-2xl space-y-4">
           <li>
             <Link to="/sobre" onClick={() => setIsMenuVisible(false)}>
               Sobre
             </Link>
           </li>
+          {SOCIAL_LINKS.map(({ label, url }) => (
+            <li key={url}>
+              <a href={url} target="_blank" rel="noopener noreferrer">
+                {label}
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
     </>
