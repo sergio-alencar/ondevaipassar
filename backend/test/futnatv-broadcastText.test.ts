@@ -19,17 +19,22 @@ describe("parseBroadcastChannels", () => {
     ]);
   });
 
-  it("captures a Globo state-list qualifier as regionalDetail, keeping the channel name plain (real example)", () => {
+  it("normalizes a Globo state-list qualifier into an alphabetical inclusion list, keeping the channel name plain (real example)", () => {
     const result = parseBroadcastChannels("Globo (RS, SP, PE e PR) e SporTV 2", null);
     expect(result).toEqual([
-      { channelNameRaw: "Globo", watchUrl: null, regionalDetail: "RS, SP, PE e PR" },
+      { channelNameRaw: "Globo", watchUrl: null, regionalDetail: "PE, PR, RS e SP" },
       { channelNameRaw: "SporTV 2", watchUrl: null, regionalDetail: null },
     ]);
   });
 
-  it("keeps Globo's own exclusion-list wording as-is, unparsed (real example: 'menos X, Y e Z')", () => {
+  it("inverts Globo's own exclusion-list wording into an alphabetical inclusion list against the full 27-UF reference (real example: 'menos X, Y e Z')", () => {
     const result = parseBroadcastChannels("Globo (menos SP, CE, MS e PR), Premiere e YouTube (GE TV)", "https://youtube.com/watch?v=x");
-    expect(result[0]).toEqual({ channelNameRaw: "Globo", watchUrl: null, regionalDetail: "menos SP, CE, MS e PR" });
+    expect(result[0]).toEqual({
+      channelNameRaw: "Globo",
+      watchUrl: null,
+      regionalDetail:
+        "AC, AL, AM, AP, BA, DF, ES, GO, MA, MG, MT, PA, PB, PE, PI, RJ, RN, RO, RR, RS, SC, SE e TO",
+    });
   });
 
   it("parses a long real example mixing all three shapes (Globo state list, bare channels, and a YouTube wrapper)", () => {
@@ -38,7 +43,12 @@ describe("parseBroadcastChannels", () => {
       "https://youtube.com/watch?v=x",
     );
     expect(result).toEqual([
-      { channelNameRaw: "Globo", watchUrl: null, regionalDetail: "RJ, AC, AL, AP, AM, BA, CE, ES, GO, MA, MG, MS, MT, PA, PB, PI, RN, RO, RR, SC, SE, TO, DF" },
+      {
+        channelNameRaw: "Globo",
+        watchUrl: null,
+        regionalDetail:
+          "AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PI, RJ, RN, RO, RR, SC, SE e TO",
+      },
       { channelNameRaw: "SporTV", watchUrl: null, regionalDetail: null },
       { channelNameRaw: "TV Brasil", watchUrl: null, regionalDetail: null },
       { channelNameRaw: "GE TV", watchUrl: "https://youtube.com/watch?v=x", regionalDetail: null },
