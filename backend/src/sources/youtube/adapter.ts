@@ -26,8 +26,21 @@ export interface YoutubeChannelFetchResult {
  * scheduledStartTime as the real kickoff signal) but never enough to create
  * a match record — see ingest/youtubeEnrichment.ts for how the result gets
  * attached to matches ge.globo already ingested.
+ *
+ * `resolveTeamIdFn` defaults to the shared men's-only resolver, but a
+ * channel that broadcasts Brasileirão Feminino (N Sports, confirmed live —
+ * its titles literally include "BRASILEIRÃO FEMININO") must pass
+ * `resolveFemininoTeamId` instead. Never both: a team name like "Bahia"
+ * means a different real club depending on which resolver reads it, so
+ * mixing them for one channel risks either a silent non-match or, worse,
+ * attaching this channel's stream to the wrong (men's) fixture — see
+ * femininoTeamResolver.ts's own doc comment.
  */
-export async function fetchUpcomingStreams(youtubeChannelId: string, apiKey: string): Promise<YoutubeChannelFetchResult> {
+export async function fetchUpcomingStreams(
+  youtubeChannelId: string,
+  apiKey: string,
+  resolveTeamIdFn: (rawName: string) => string | null = resolveTeamId,
+): Promise<YoutubeChannelFetchResult> {
   const [videos, channelLogoUrl] = await Promise.all([
     searchUpcomingVideos(youtubeChannelId, apiKey),
     fetchChannelAvatarUrl(youtubeChannelId, apiKey),
@@ -50,8 +63,8 @@ export async function fetchUpcomingStreams(youtubeChannelId: string, apiKey: str
     const streamDateUtc = scheduledStartTimes.get(candidate.videoId);
     if (!streamDateUtc) continue; // "upcoming" in search but no scheduledStartTime — inconsistent response, skip rather than guess
 
-    const homeTeamId = resolveTeamId(candidate.homeTeamNameRaw);
-    const awayTeamId = resolveTeamId(candidate.awayTeamNameRaw);
+    const homeTeamId = resolveTeamIdFn(candidate.homeTeamNameRaw);
+    const awayTeamId = resolveTeamIdFn(candidate.awayTeamNameRaw);
     // Only drop it when NEITHER side is a team we track at all — a
     // "Europa" club vs. an untracked opponent (the normal case there) still
     // has one resolvable side to match on, see broadcastMatching.ts.

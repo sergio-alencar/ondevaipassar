@@ -40,6 +40,15 @@ const TITLE_PATTERNS = [
   // not immediately after the team names the way every other channel's
   // title has it. Confirmed live against 2 real titles.
   /\|\s*(.+?)\s+X\s+(.+?)\s*\|\s*[^|]*AO VIVO/i,
+  // N Sports: "🔴 AO VIVO E COM IMAGENS I BAHIA X PALMEIRAS I QUARTAS DE
+  // FINAL I BRASILEIRÃO FEMININO 2026" — same "AO VIVO first, team pair
+  // after" shape as FPF TV's, but segments are separated by the literal
+  // letter "I" (confirmed live, not a pipe or any special bar character)
+  // instead of "|". Confirmed live against real titles, including a
+  // Brasileirão Feminino one — see femininoTeamResolver.ts's own doc
+  // comment for why resolving THIS channel's team names needs the
+  // dedicated Feminino resolver, never the shared one.
+  /AO VIVO E COM IMAGENS\s+I\s+(.+?)\s+X\s+(.+?)\s+I\s+/i,
 ];
 
 export interface ParsedStreamTitle {

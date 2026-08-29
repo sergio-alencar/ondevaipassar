@@ -46,6 +46,17 @@ describe("parseMatchTitle", () => {
     });
   });
 
+  it("parses N Sports' '🔴 AO VIVO E COM IMAGENS I A X B I ...' format, where 'AO VIVO' sits before the team names, separated by the letter 'I' (not a pipe)", () => {
+    expect(parseMatchTitle("🔴 AO VIVO E COM IMAGENS I BAHIA X PALMEIRAS I QUARTAS DE FINAL I BRASILEIRÃO FEMININO 2026")).toEqual({
+      homeTeamNameRaw: "BAHIA",
+      awayTeamNameRaw: "PALMEIRAS",
+    });
+    expect(parseMatchTitle("🔴 AO VIVO E COM IMAGENS I ACADÉMICO VISEU X PORTO I LIGA PORTUGAL 2026/27")).toEqual({
+      homeTeamNameRaw: "ACADÉMICO VISEU",
+      awayTeamNameRaw: "PORTO",
+    });
+  });
+
   it("returns null for non-match content (interviews, other sports formats)", () => {
     expect(parseMatchTitle("AO VIVO: SPATEN FIGHT NIGHT 3 | LUTA | ge tv")).toBeNull();
     expect(parseMatchTitle("AO VIVO! UBUNTU RECEBE A EX-JUDOCA EDINANCI FERNANDES DA SILVA | ge.globo")).toBeNull();

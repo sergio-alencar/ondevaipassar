@@ -4,12 +4,19 @@ import { matches } from "../db/schema.js";
 import { fetchUpcomingStreams } from "../sources/youtube/adapter.js";
 import { attachBroadcastsFromStreams, runBroadcastSource } from "./attachBroadcasts.js";
 import type { MatchCandidate } from "./broadcastMatching.js";
+import { resolveFemininoTeamId } from "./femininoTeamResolver.js";
 
 // Every broadcaster we track that only ever announces matches via a YouTube
 // livestream (never gives us a real fixtures feed) — one more entry here is
 // the whole diff for tracking a new one, same channelId as
 // packages/shared/src/channel.ts's canonical registry.
-const TRACKED_CHANNELS: { channelId: string; youtubeChannelId: string; sourceId: string }[] = [
+//
+// `division` defaults to men's football (the shared resolveTeamId, see
+// fetchUpcomingStreams's own default) — only set `division: "feminino"`
+// for a channel confirmed live to broadcast Brasileirão Feminino under a
+// team name that would otherwise collide with the men's roster (e.g.
+// "Bahia"). Never guess this: check the channel's own /streams tab first.
+const TRACKED_CHANNELS: { channelId: string; youtubeChannelId: string; sourceId: string; division?: "feminino" }[] = [
   { channelId: "cazetv", youtubeChannelId: "UCZiYbVptd3PVPf4f6eR6UaQ", sourceId: "youtube-cazetv" },
   { channelId: "goat", youtubeChannelId: "UC_oToDrJ6uca7d1dFVBmLtg", sourceId: "youtube-goat" },
   { channelId: "getv", youtubeChannelId: "UCgCKagVhzGnZcuP9bSMgMCg", sourceId: "youtube-getv" },
@@ -33,10 +40,27 @@ const TRACKED_CHANNELS: { channelId: string; youtubeChannelId: string; sourceId:
   // confirmed end-to-end against a real stream yet; added on the strength
   // of the channel id itself being real, same as every other entry here.
   { channelId: "fpftv", youtubeChannelId: "UCb74ViTMFgndOaTehM5PVdg", sourceId: "youtube-fpftv" },
+  // Sérgio reported NSports' link falling back to the channel's generic
+  // /streams page instead of the specific match — root cause: futnatv's own
+  // "YouTube (NSports)" mention (see futnatvEnrichment.ts/broadcastText.ts)
+  // only carries a real watch URL when futnatv's own `youtubeUrl` field is
+  // populated for that game, which it often isn't (confirmed live: two real
+  // Brasileirão Feminino games both had `youtubeUrl: null` despite
+  // mentioning NSports). Tracking the channel directly here, same as every
+  // other entry, doesn't depend on futnatv having that field filled in.
+  // Channel id verified live (fetched https://www.youtube.com/@NSports,
+  // real externalId, title "N Sports" — not guessed). division: "feminino"
+  // because its own /streams tab (confirmed live) covers Brasileirão
+  // Feminino specifically (e.g. "🔴 AO VIVO E COM IMAGENS I BAHIA X
+  // PALMEIRAS I QUARTAS DE FINAL I BRASILEIRÃO FEMININO 2026") — using the
+  // shared men's resolver here would either silently fail to match or,
+  // worse, attach this stream to a men's fixture of the same team name.
+  { channelId: "nsports", youtubeChannelId: "UCf9WJPpsh5BHDY-OeISgIqA", sourceId: "youtube-nsports", division: "feminino" },
 ];
 
 async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], apiKey: string, allMatches: MatchCandidate[]): Promise<void> {
-  const { streams, channelLogoUrl } = await fetchUpcomingStreams(channel.youtubeChannelId, apiKey);
+  const resolveTeamIdFn = channel.division === "feminino" ? resolveFemininoTeamId : undefined;
+  const { streams, channelLogoUrl } = await fetchUpcomingStreams(channel.youtubeChannelId, apiKey, resolveTeamIdFn);
   await attachBroadcastsFromStreams({
     sourceId: channel.sourceId,
     channelId: channel.channelId,
