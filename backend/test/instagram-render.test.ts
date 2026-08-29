@@ -1,5 +1,5 @@
 import type { MatchView } from "@ondevaipassar/shared";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderMatchImage } from "../src/instagram/renderImage.js";
 
 function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
@@ -27,7 +27,48 @@ function isPng(buffer: Buffer): boolean {
   return buffer.subarray(0, 8).equals(PNG_SIGNATURE);
 }
 
+const SVG_CREST = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"/></svg>');
+
 describe("renderMatchImage", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  // Real bug found live: Elversberg/Hamburgo/Paraná (untracked opponents,
+  // no local crest file) rendered with the generic gray shield in every
+  // Instagram post — assets.ts's crestArt never tried the source's own
+  // hotlinked crest URL the way the frontend's TeamCrest does. Confirms
+  // the fetch actually happens and its result reaches the render, not just
+  // that the render doesn't throw.
+  it("fetches the source's own hotlinked crest for an untracked opponent on an allowed host", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ "content-type": "image/svg+xml" }),
+      arrayBuffer: async () => SVG_CREST.buffer.slice(SVG_CREST.byteOffset, SVG_CREST.byteOffset + SVG_CREST.byteLength),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const png = await renderMatchImage(
+      buildMatch({ awayTeamId: null, awayTeamName: "Visitante", awayTeamCrestUrl: "https://s.sde.globo.com/media/organizations/x.svg" }),
+    );
+
+    expect(fetchMock).toHaveBeenCalledWith("https://s.sde.globo.com/media/organizations/x.svg", expect.anything());
+    expect(isPng(png)).toBe(true);
+  });
+
+  it("falls back to the generic shield when the hotlinked crest fetch fails, without throwing", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: false, headers: new Headers(), arrayBuffer: async () => new ArrayBuffer(0) }),
+    );
+
+    const png = await renderMatchImage(
+      buildMatch({ awayTeamId: null, awayTeamName: "Visitante", awayTeamCrestUrl: "https://s.sde.globo.com/media/organizations/x.svg" }),
+    );
+
+    expect(isPng(png)).toBe(true);
+  });
+
   it("renders a valid, non-empty PNG for a match with local crest art on both sides", async () => {
     const png = await renderMatchImage(buildMatch());
     expect(isPng(png)).toBe(true);

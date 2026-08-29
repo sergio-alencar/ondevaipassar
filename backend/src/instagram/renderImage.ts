@@ -28,11 +28,16 @@ readFileSync(fileURLToPath(new URL("../../../node_modules/harfbuzzjs/hb.wasm", i
 readFileSync(fileURLToPath(new URL("../../../node_modules/satori/yoga.wasm", import.meta.url)));
 
 export async function renderMatchImage(match: MatchView): Promise<Buffer> {
+  const [homeCrest, awayCrest] = await Promise.all([
+    crestArt(match.homeTeamId, match.homeTeamCrestUrl),
+    crestArt(match.awayTeamId, match.awayTeamCrestUrl),
+  ]);
+
   const tree = buildMatchImageTree({
     homeTeamName: match.homeTeamName,
     awayTeamName: match.awayTeamName,
-    homeCrest: crestArt(match.homeTeamId),
-    awayCrest: crestArt(match.awayTeamId),
+    homeCrest,
+    awayCrest,
     competitionName: match.competitionName,
     kickoffLabel: formatKickoffLabel(match.kickoffUtc, match.kickoffTimeConfirmed),
     channels: match.broadcasts.map((broadcast) => ({

@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { findTeamById } from "@ondevaipassar/shared";
+import { isAllowedCrestUrl } from "../api/routes/crestProxy.js";
 import { cropSvgToContent } from "../lib/svgCrop.js";
 
 const ASSETS_DIR = fileURLToPath(new URL("./assets/", import.meta.url));
@@ -34,15 +35,50 @@ const FALLBACK_CREST = loadCrestArt(readFileSync(`${ASSETS_DIR}icons/escudo-cinz
 export const WORDMARK = readSvgDataUri(`${ASSETS_DIR}icons/logo-3-purple.svg`);
 export const VERSUS_ICON = readSvgDataUri(`${ASSETS_DIR}icons/versus.svg`);
 
-/** Local crest art (data URI + real content aspect ratio, see CrestArt) for a tracked team, falling back to the generic gray shield for an untracked opponent or a tracked team we don't have local art for yet — same cascade as the frontend's TeamCrest, minus the source-provided-URL step (no hotlinking into an Instagram post). */
-export function crestArt(teamId: string | null): CrestArt {
-  const crestFile = teamId ? findTeamById(teamId)?.crestFile : undefined;
-  if (!crestFile) return FALLBACK_CREST;
+/**
+ * Fetches a hotlinked crest (same allowlisted hosts as crestProxy.ts — an
+ * untracked opponent's crest only ever exists as ge.globo's/OneFootball's
+ * own URL, never ours to store) and turns it into CrestArt. SVG gets the
+ * same viewBox crop local art already gets; a raster crest (OneFootball's
+ * are PNG, see crestProxy.ts) is embedded as-is — Satori renders a raster
+ * `<img>` fine (see channelLogoDataUri's own comment on that), and this
+ * project has no image-dimension library to compute its real aspect ratio,
+ * so it defaults to 1 (square), close enough for the badge-style crests
+ * actually seen from these two sources. Returns null on any failure
+ * (disallowed host, network error, timeout) — caller falls back to the
+ * generic shield, same as a tracked team missing its local file.
+ */
+async function fetchHotlinkedCrestArt(sourceUrl: string): Promise<CrestArt | null> {
+  if (!isAllowedCrestUrl(sourceUrl)) return null;
   try {
-    return loadCrestArt(readFileSync(`${ASSETS_DIR}crests/${crestFile}`));
+    const response = await fetch(sourceUrl, { signal: AbortSignal.timeout(5000) });
+    if (!response.ok) return null;
+    const contentType = response.headers.get("content-type") ?? "";
+    const body = Buffer.from(await response.arrayBuffer());
+    if (!contentType.includes("svg")) {
+      return { dataUri: `data:${contentType || "application/octet-stream"};base64,${body.toString("base64")}`, aspectRatio: 1 };
+    }
+    return loadCrestArt(body);
   } catch {
-    return FALLBACK_CREST;
+    return null;
   }
+}
+
+/** Local crest art (data URI + real content aspect ratio, see CrestArt) for a tracked team; for an untracked opponent, fetches the source's own hotlinked crest (see fetchHotlinkedCrestArt) when one was given; falls back to the generic gray shield when neither is available. */
+export async function crestArt(teamId: string | null, sourceCrestUrl?: string | null): Promise<CrestArt> {
+  const crestFile = teamId ? findTeamById(teamId)?.crestFile : undefined;
+  if (crestFile) {
+    try {
+      return loadCrestArt(readFileSync(`${ASSETS_DIR}crests/${crestFile}`));
+    } catch {
+      // fall through to the source-hotlink / generic-shield cascade below
+    }
+  }
+  if (sourceCrestUrl) {
+    const hotlinked = await fetchHotlinkedCrestArt(sourceCrestUrl);
+    if (hotlinked) return hotlinked;
+  }
+  return FALLBACK_CREST;
 }
 
 // Curated square badge/icon art (each channel's real app icon or Instagram
