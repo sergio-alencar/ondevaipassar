@@ -6,9 +6,19 @@ import { env } from "../config/env.js";
 // originally written against): the account authorizes the app directly,
 // and the dashboard hands out an already-long-lived (60-day) token.
 const GRAPH_API_BASE = "https://graph.instagram.com/v25.0";
-// Meta's own guidance for polling container status: "once per minute, for
-// no more than 5 minutes."
-const POLL_INTERVAL_MS = 60000;
+// Meta's own guidance says "once per minute, for no more than 5 minutes" —
+// but a full 60s sleep between checks, done sequentially for every match in
+// one Vercel function invocation, is what actually caused a real production
+// bug: Sérgio reported only 7 of 15 tracked matches getting posted one day.
+// A single container needing even one extra poll cycle could burn the
+// function's entire time budget on its own, and Vercel kills the whole
+// invocation mid-flight with no chance to record an error for anything
+// after it. Polling a lightweight status read every few seconds instead
+// (this is a read, not a write — Meta's real rate-limit concern is
+// hammering write endpoints, not this) keeps each match's total posting
+// time from dominating the run. POLL_TIMEOUT_MS (the real safety ceiling)
+// is unchanged.
+const POLL_INTERVAL_MS = 3000;
 const POLL_TIMEOUT_MS = 5 * 60000;
 
 export interface GraphApiClient {

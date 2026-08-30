@@ -12,7 +12,20 @@ export interface PostingSummary {
   attempted: number;
   published: number;
   failed: number;
+  /** Candidates this run didn't even get to (out of time) — 0 in the normal case. Rerun the endpoint to pick up where it left off; excludeAlreadyPublished means it's always safe to just call it again. */
+  skipped: number;
 }
+
+// Vercel kills the whole function invocation mid-flight once its own
+// maxDuration is up — no exception to catch, no chance to record anything
+// for whatever match was mid-post at that instant, which is exactly what
+// caused a real production bug (7 of 15 tracked matches posted, the rest
+// just vanished with no error logged). maxDuration is configured to 60s
+// (see backend/vercel.json) — this budget deliberately stays well under
+// that, so there's still time left to finish whatever match is already
+// in flight (create -> poll -> publish -> DB write) plus return a response,
+// instead of stopping so late the platform kills it anyway.
+const TIME_BUDGET_MS = 45000;
 
 async function excludeAlreadyPublished(matches: MatchView[]): Promise<MatchView[]> {
   if (matches.length === 0) return [];
@@ -40,9 +53,20 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
   const candidates = onlyMatchId
     ? await excludeAlreadyPublished(await getMatchViews({ id: onlyMatchId }))
     : await getCandidateMatches();
-  const summary: PostingSummary = { attempted: candidates.length, published: 0, failed: 0 };
+  const summary: PostingSummary = { attempted: 0, published: 0, failed: 0, skipped: 0 };
+  const runStartedAt = Date.now();
 
   for (const match of candidates) {
+    // Stop BEFORE starting a new match, not after — half-starting one we
+    // don't have time to finish is worse than just leaving it for the next
+    // run (which excludeAlreadyPublished makes safe to trigger any time).
+    if (Date.now() - runStartedAt > TIME_BUDGET_MS) {
+      summary.skipped = candidates.length - summary.attempted;
+      console.log(`[instagram] time budget reached, stopping early with ${summary.skipped} candidate(s) left for next run`);
+      break;
+    }
+    summary.attempted++;
+
     const caption = buildCaption(match);
     // The cache-busting `v` param isn't read by the route — it's there so
     // a *re*-post of the same match (e.g. after fixing a rendering bug and
