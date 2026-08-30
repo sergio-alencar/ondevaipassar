@@ -1,0 +1,56 @@
+name: Instagram daily post
+
+# GitHub Actions is the orchestrator, not a replacement for Vercel — the
+# actual posting logic still lives in the backend (/api/cron-instagram-post),
+# still runs as a normal Vercel serverless function. This workflow exists
+# because that function has a real, unavoidable duration ceiling on Vercel's
+# free Hobby plan (60s, see backend/vercel.json), and a single busy day can
+# need several calls to get through every match — this loops until the
+# endpoint itself reports nothing's left (`skipped: 0`), so no one has to
+# notice and re-trigger it by hand. Real bug this fixes: 2026-08-30, 15
+# tracked matches in one day, only 7 posted from a single Vercel Cron firing.
+on:
+  schedule:
+    # 10:10 UTC — 10 minutes after /api/cron-ingest (still on Vercel Cron,
+    # 10:00 UTC, see backend/vercel.json), so the day's matches/broadcasts
+    # are already fresh. GitHub's own cron scheduling isn't second-precise
+    # (can slip by several minutes under load, a documented GitHub
+    # limitation) — the 10-minute gap is deliberate slack, not just rounding.
+    - cron: "10 10 * * *"
+  # Manual "run now" button in the Actions tab — also the replacement for
+  # manually curling the endpoint with a rotated CRON_SECRET, which is how
+  # this got triggered by hand all through this project's early sessions.
+  workflow_dispatch: {}
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post today's matches, retrying until nothing's left
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          MAX_ATTEMPTS=15
+          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+            http_code=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              "https://api.ondevaipassar.com/api/cron-instagram-post")
+            body=$(cat /tmp/response.json)
+            echo "attempt $attempt/$MAX_ATTEMPTS: HTTP $http_code -> $body"
+
+            if [ "$http_code" != "200" ]; then
+              echo "::error::cron-instagram-post returned HTTP $http_code"
+              exit 1
+            fi
+
+            skipped=$(echo "$body" | jq -r '.skipped // 0')
+            if [ "$skipped" = "0" ]; then
+              echo "All of today's matches posted (or none were pending)."
+              exit 0
+            fi
+
+            sleep 5
+          done
+
+          echo "::warning::Instagram posting still had matches pending after $MAX_ATTEMPTS attempts — check manually."

@@ -15,11 +15,17 @@ const querySchema = z.object({
 const resetQuerySchema = z.object({ matchId: z.string() });
 
 /**
- * Triggered by Vercel Cron daily, shortly after /api/cron-ingest so the
- * day's matches are already fresh (see vercel.json). Same auth pattern as
- * the ingest cron: Vercel sends `Authorization: Bearer $CRON_SECRET` on
- * cron-triggered requests. Single path segment, not "/api/cron/instagram-post"
- * — see the comment on /api/cron-ingest in cron.ts for why.
+ * Triggered by a GitHub Actions workflow (.github/workflows/instagram-post.yml),
+ * not Vercel Cron — this route's own maxDuration ceiling (60s, see
+ * vercel.json) means a single call can't reliably post every match on a
+ * busy day (real bug: 15 tracked matches one day, only 7 posted from one
+ * Vercel Cron firing), so the workflow calls this repeatedly until the
+ * response says nothing's left (`skipped: 0`). Still just a normal bearer
+ * check against CRON_SECRET — doesn't care who's calling, so it's equally
+ * safe to trigger by hand (see instagramCron.ts's own querySchema for the
+ * single-match escape hatch). Single path segment, not
+ * "/api/cron/instagram-post" — see the comment on /api/cron-ingest in
+ * cron.ts for why.
  */
 export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
   app.get("/api/cron-instagram-post", async (request, reply) => {
