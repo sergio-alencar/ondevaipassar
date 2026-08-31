@@ -11,12 +11,19 @@ name: Instagram daily post
 # tracked matches in one day, only 7 posted from a single Vercel Cron firing.
 on:
   schedule:
-    # 10:10 UTC — 10 minutes after /api/cron-ingest (still on Vercel Cron,
-    # 10:00 UTC, see backend/vercel.json), so the day's matches/broadcasts
-    # are already fresh. GitHub's own cron scheduling isn't second-precise
-    # (can slip by several minutes under load, a documented GitHub
-    # limitation) — the 10-minute gap is deliberate slack, not just rounding.
-    - cron: "10 10 * * *"
+    # 10:17 UTC — real bug found live 2026-08-31: the schedule trigger
+    # never fired at all that morning (confirmed via run history — zero
+    # scheduled runs, only the manual test from the day before). GitHub's
+    # own docs say scheduled runs are best-effort and can be delayed OR
+    # DROPPED during high load, "including the start of every hour" — and
+    # explicitly recommend picking a non-round minute to reduce that risk.
+    # :17 (not :00/:10/:15, all popular round numbers) plus a healthy
+    # 17-minute gap after /api/cron-ingest (still on Vercel Cron, 10:00
+    # UTC, see backend/vercel.json). This alone doesn't GUARANTEE a fire
+    # every day — GitHub's own docs call scheduled runs best-effort, full
+    # stop. Worth pairing with a redundant trigger from somewhere else
+    # (e.g. Vercel Cron hitting the same endpoint once) if this happens again.
+    - cron: "17 10 * * *"
   # Manual "run now" button in the Actions tab — also the replacement for
   # manually curling the endpoint with a rotated CRON_SECRET, which is how
   # this got triggered by hand all through this project's early sessions.
