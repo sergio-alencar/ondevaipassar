@@ -61,6 +61,7 @@ const CHANNELS: Channel[] = [
     id: "fpftv",
     displayName: "FPF TV",
     officialUrl: "https://www.youtube.com/@federacaopr/streams",
+    instagramHandle: "federacaopr",
   },
   {
     id: "getv",
@@ -95,17 +96,20 @@ const CHANNELS: Channel[] = [
     id: "nsports",
     displayName: "N Sports",
     officialUrl: "https://www.youtube.com/@NSports/streams",
+    instagramHandle: "nsports",
   },
   // Sérgio flagged both of these for Bundesliga coverage.
   {
     id: "jovempanesportes",
     displayName: "Jovem Pan Esportes",
     officialUrl: "https://www.youtube.com/@jovempanesportes/streams",
+    instagramHandle: "jovempanesportes",
   },
   {
     id: "romariotv",
     displayName: "Romário TV",
     officialUrl: "https://www.youtube.com/@RomarioTVoficial/streams",
+    instagramHandle: "romariotv_oficial",
   },
   {
     id: "paramountplus",
@@ -163,6 +167,7 @@ const CHANNELS: Channel[] = [
     id: "tvbrasil",
     displayName: "TV Brasil",
     officialUrl: "https://play.ebc.com.br/tvs",
+    instagramHandle: "tvbrasil",
   },
   {
     id: "uolesporte",
@@ -173,6 +178,7 @@ const CHANNELS: Channel[] = [
     id: "xsports",
     displayName: "XSports",
     officialUrl: "https://www.xsports.com.br",
+    instagramHandle: "xsports.brasil",
   },
   {
     id: "youtube",
