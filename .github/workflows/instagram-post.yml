@@ -9,20 +9,22 @@ name: Instagram daily post
 # endpoint itself reports nothing's left (`skipped: 0`), so no one has to
 # notice and re-trigger it by hand. Real bug this fixes: 2026-08-30, 15
 # tracked matches in one day, only 7 posted from a single Vercel Cron firing.
+#
+# Deliberately NOT the only trigger for this endpoint — Vercel Cron also
+# hits it once daily, 10:05 UTC (see backend/vercel.json), 12 minutes
+# before this workflow's own schedule below. Real bug found live
+# 2026-08-31: THIS workflow's own schedule trigger silently didn't fire at
+# all one morning (GitHub's own docs call scheduled runs best-effort, can
+# be delayed or dropped under load) — with only one scheduler, that's a
+# fully missed day; with two independent ones, either firing is enough to
+# make progress, and calling the endpoint twice in one morning is always
+# safe (see instagramCron.ts's own doc comment).
 on:
   schedule:
-    # 10:17 UTC — real bug found live 2026-08-31: the schedule trigger
-    # never fired at all that morning (confirmed via run history — zero
-    # scheduled runs, only the manual test from the day before). GitHub's
-    # own docs say scheduled runs are best-effort and can be delayed OR
-    # DROPPED during high load, "including the start of every hour" — and
-    # explicitly recommend picking a non-round minute to reduce that risk.
-    # :17 (not :00/:10/:15, all popular round numbers) plus a healthy
-    # 17-minute gap after /api/cron-ingest (still on Vercel Cron, 10:00
-    # UTC, see backend/vercel.json). This alone doesn't GUARANTEE a fire
-    # every day — GitHub's own docs call scheduled runs best-effort, full
-    # stop. Worth pairing with a redundant trigger from somewhere else
-    # (e.g. Vercel Cron hitting the same endpoint once) if this happens again.
+    # 10:17 UTC — not :00/:05/:10/:15 (all popular round numbers GitHub's
+    # own docs specifically warn cluster load onto), and 17 minutes after
+    # /api/cron-ingest (10:00 UTC) so the day's matches are fresh even if
+    # ingest itself runs a bit long.
     - cron: "17 10 * * *"
   # Manual "run now" button in the Actions tab — also the replacement for
   # manually curling the endpoint with a rotated CRON_SECRET, which is how

@@ -15,15 +15,27 @@ const querySchema = z.object({
 const resetQuerySchema = z.object({ matchId: z.string() });
 
 /**
- * Triggered by a GitHub Actions workflow (.github/workflows/instagram-post.yml),
- * not Vercel Cron — this route's own maxDuration ceiling (60s, see
- * vercel.json) means a single call can't reliably post every match on a
- * busy day (real bug: 15 tracked matches one day, only 7 posted from one
- * Vercel Cron firing), so the workflow calls this repeatedly until the
- * response says nothing's left (`skipped: 0`). Still just a normal bearer
- * check against CRON_SECRET — doesn't care who's calling, so it's equally
- * safe to trigger by hand (see instagramCron.ts's own querySchema for the
- * single-match escape hatch). Single path segment, not
+ * Triggered from TWO independent places on purpose, both daily, both
+ * shortly after /api/cron-ingest so the day's matches are fresh:
+ *
+ * 1. Vercel Cron itself, 10:05 UTC (see vercel.json) — a single call.
+ *    This route's own maxDuration ceiling (60s) means one call can't
+ *    reliably post every match on a busy day (real bug: 15 tracked
+ *    matches one day, only 7 posted from a single firing), so this alone
+ *    isn't enough on its own.
+ * 2. A GitHub Actions workflow (.github/workflows/instagram-post.yml),
+ *    10:17 UTC — calls this repeatedly until the response says nothing's
+ *    left (`skipped: 0`), covering whatever #1 didn't finish.
+ *
+ * Neither scheduler is fully trustworthy alone: GitHub's own docs call
+ * scheduled workflows best-effort (can be delayed or dropped under load —
+ * real bug found live: it silently didn't fire at all one morning), and
+ * Vercel Cron's single call can't finish a busy day by itself. Together,
+ * either one firing is enough to make progress, and calling this route
+ * twice (or more) in the same morning is always safe — it's just a normal
+ * bearer check against CRON_SECRET, doesn't care who's calling or how
+ * many times (see this file's own querySchema for the single-match
+ * escape hatch, same auth). Single path segment, not
  * "/api/cron/instagram-post" — see the comment on /api/cron-ingest in
  * cron.ts for why.
  */
