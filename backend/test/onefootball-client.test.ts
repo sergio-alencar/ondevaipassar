@@ -22,6 +22,14 @@ describe("parseCompetitionPage", () => {
     expect(bayern?.round).toBe(1);
   });
 
+  it("captures ottStreamType per card, genuinely mixed rather than uniform (real fixture: 26 cards at 2, 9 at 0, 1 at 1)", () => {
+    const cards = parseCompetitionPage(bundesligaHtml);
+    const values = new Set(cards.map((c) => c.card.ottStreamType));
+    expect(values).toEqual(new Set([0, 1, 2]));
+    const bayern = cards.find((c) => c.card.homeTeam.name === "Bayern de Munique");
+    expect(bayern?.card.ottStreamType).toBe(1); // confirms a card can be something other than 0/2
+  });
+
   it("returns an empty list when there's no __NEXT_DATA__ script at all", () => {
     expect(parseCompetitionPage("<html><body>nothing here</body></html>")).toEqual([]);
   });

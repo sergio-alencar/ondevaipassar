@@ -20,6 +20,18 @@ const matchCardSchema = z.object({
   kickoff: z.string(),
   homeTeam: teamRefSchema,
   awayTeam: teamRefSchema,
+  /**
+   * Per-match streamability signal — confirmed live against
+   * https://onefootball.com/pt-br/competicao/bundesliga-1/jogos on
+   * 2026-08-31 (36 of 45 cards `2`, the rest `0`, so genuinely mixed, not a
+   * blanket "everything streams"): `2` sits directly next to the page's own
+   * "Assista" (watch) button markup and a `"Assista de graça no
+   * OneFootball"` section header, `0` doesn't. Optional because it's an
+   * inference from one observed page, not a documented field — a future
+   * card missing it (or using a value we haven't seen) should still parse
+   * for fixture purposes, just without a broadcast attached.
+   */
+  ottStreamType: z.number().optional(),
 });
 
 export type MatchCard = z.infer<typeof matchCardSchema>;

@@ -91,6 +91,7 @@ const CHANNELS: Channel[] = [
     id: "hbomax",
     displayName: "HBO Max",
     officialUrl: "https://www.hbomax.com/br/pt/sports",
+    instagramHandle: "hbomaxbrasil",
   },
   {
     id: "nsports",
@@ -110,6 +111,18 @@ const CHANNELS: Channel[] = [
     displayName: "Romário TV",
     officialUrl: "https://www.youtube.com/@RomarioTVoficial/streams",
     instagramHandle: "romariotv_oficial",
+  },
+  // Free live streaming of some of its own tracked competitions — confirmed
+  // live for the Bundesliga (both divisions), signaled per-match by the
+  // scraped page's own "ottStreamType" field. See
+  // ingest/onefootballEnrichment.ts for how that gets turned into a real
+  // broadcast row, distinct from this source's older, broadcast-unrelated
+  // use as a fixture backfill (same file).
+  {
+    id: "onefootball",
+    displayName: "OneFootball",
+    officialUrl: "https://onefootball.com",
+    instagramHandle: "onefootball",
   },
   {
     id: "paramountplus",
@@ -247,6 +260,7 @@ const CHANNEL_ALIASES: Record<string, string> = {
   "record tv": "record",
   "hbo max": "hbomax",
   hbomax: "hbomax",
+  onefootball: "onefootball",
   sbt: "sbt",
   sportv: "sportv",
   "sportv 2": "sportv",

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db/client.js";
-import { matches, scrapeRuns } from "../db/schema.js";
+import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
 import { getErrorMessage } from "../lib/errors.js";
 import { fetchCompetitionMatchCards, type RoundMatchCard } from "../sources/onefootball/client.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
@@ -8,6 +8,10 @@ import { resolveTeamId } from "./teamResolver.js";
 
 const SOURCE_ID = "onefootball";
 const SOURCE_ID_PREFIX = `${SOURCE_ID}:`;
+// See schema.ts's own doc comment on ottStreamType for how this value was
+// identified — only value observed sitting next to the page's "Assista"
+// button markup.
+const STREAMABLE_OTT_TYPE = 2;
 // Same 1-day tolerance as broadcastMatching.ts, and the same reasoning:
 // absorbs a BRT-kickoff-crossing-midnight-UTC rollover without risking a
 // same-pair-rematch (e.g. a two-legged tie) matching the wrong leg.
@@ -106,6 +110,33 @@ export function findBackfillTargets(candidate: Candidate, coveringMatches: Match
 }
 
 /**
+ * Upserts a "onefootball" broadcast row onto every match id in
+ * `matchIds` — usually one, but `otherCovering` (an already-ingested match
+ * from some other source) is a filtered `allMatches`, which itself has no
+ * uniqueness guarantee beyond "same team pair, within a day," so this stays
+ * plural rather than assuming exactly one. No local `logoUrl` yet (same
+ * empty-string convention as every other source with no per-run avatar
+ * fetch, e.g. futnatvEnrichment.ts) — falls back to local static art if/when
+ * that's added under images/canais/onefootball.*. Returns how many rows it
+ * touched, for the caller's own summary log.
+ */
+async function attachOnefootballBroadcasts(matchIds: string[], sourceMatchId: string): Promise<number> {
+  if (matchIds.length === 0) return 0;
+
+  const now = new Date().toISOString();
+  const watchUrl = `https://onefootball.com/pt-br/match/${sourceMatchId}`;
+  const upserts = matchIds.map((matchId) =>
+    db
+      .insert(broadcasts)
+      .values({ id: `${matchId}__${SOURCE_ID}`, matchId, channelId: SOURCE_ID, logoUrl: "", watchUrl, sourceId: SOURCE_ID, createdAt: now })
+      .onConflictDoUpdate({ target: broadcasts.id, set: { watchUrl } }),
+  );
+  const [first, ...rest] = upserts;
+  await db.batch([first, ...rest]);
+  return matchIds.length;
+}
+
+/**
  * Supplementary FIXTURE source for the "Europa" division — genuinely
  * different in kind from every other source added this session, which
  * only ever attach a broadcast to a match ge.globo already created. 16 of
@@ -148,6 +179,15 @@ export function findBackfillTargets(candidate: Candidate, coveringMatches: Match
  * to read before deciding whether to write. Reuses runBroadcastSource
  * purely for its generic "run safely, record a scrape_runs row either
  * way" behavior — nothing broadcast-specific about it despite the name.
+ *
+ * Also attaches a real "onefootball" broadcast row (see
+ * STREAMABLE_OTT_TYPE) to whichever match row ends up representing this
+ * fixture — its own newly-created row, or (far more often, since
+ * ge.globo/other sources already cover most tracked teams) the existing
+ * `otherCovering` match this same card just deduped against. Genuinely new
+ * as of 2026-08-31: OneFootball was only ever used here as a fixture
+ * backfill before Sérgio pointed out it also streams matches for free
+ * (confirmed live for the Bundesliga).
  */
 export async function runOnefootballEnrichment(): Promise<void> {
   const startedAt = new Date().toISOString();
@@ -157,6 +197,7 @@ export async function runOnefootballEnrichment(): Promise<void> {
     let insertedCount = 0;
     let deletedCount = 0;
     let backfilledCount = 0;
+    let broadcastCount = 0;
 
     for (const competition of COMPETITIONS) {
       let cards: RoundMatchCard[];
@@ -186,6 +227,7 @@ export async function runOnefootballEnrichment(): Promise<void> {
         const covering = findCoveringMatches(candidate, allMatches);
         const ownCovering = covering.filter((match) => match.id.startsWith(SOURCE_ID_PREFIX));
         const otherCovering = covering.filter((match) => !match.id.startsWith(SOURCE_ID_PREFIX));
+        const id = `${SOURCE_ID}:${card.matchId}`;
 
         if (otherCovering.length > 0) {
           // A better source already has this fixture — never duplicate it,
@@ -210,10 +252,16 @@ export async function runOnefootballEnrichment(): Promise<void> {
             backfilledCount += backfillTargets.length;
           }
 
+          if (card.ottStreamType === STREAMABLE_OTT_TYPE) {
+            broadcastCount += await attachOnefootballBroadcasts(
+              otherCovering.map((match) => match.id),
+              card.matchId,
+            );
+          }
+
           continue;
         }
 
-        const id = `${SOURCE_ID}:${card.matchId}`;
         const now = new Date().toISOString();
         await db
           .insert(matches)
@@ -245,6 +293,10 @@ export async function runOnefootballEnrichment(): Promise<void> {
             },
           });
         insertedCount++;
+
+        if (card.ottStreamType === STREAMABLE_OTT_TYPE) {
+          broadcastCount += await attachOnefootballBroadcasts([id], card.matchId);
+        }
       }
     }
 
@@ -258,7 +310,7 @@ export async function runOnefootballEnrichment(): Promise<void> {
     });
 
     console.log(
-      `[${SOURCE_ID}] upserted ${insertedCount} matches, backfilled a kickoff time onto ${backfilledCount} existing ones, deleted ${deletedCount} now-redundant (${unresolvedCount} competition fetches failed)`,
+      `[${SOURCE_ID}] upserted ${insertedCount} matches, attached ${broadcastCount} broadcasts, backfilled a kickoff time onto ${backfilledCount} existing ones, deleted ${deletedCount} now-redundant (${unresolvedCount} competition fetches failed)`,
     );
   });
 }
