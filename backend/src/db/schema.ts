@@ -77,7 +77,12 @@ export const instagramPosts = sqliteTable("instagram_posts", {
   // lookup/uniqueness handling needed to guard against double-posting.
   id: text("id").primaryKey(),
   matchId: text("match_id").notNull(),
-  status: text("status").notNull(), // "published" | "failed"
+  // "published" | "failed" | "unknown". "unknown" means the error happened
+  // at or after the publish call, so we genuinely can't tell whether the
+  // post went live — never retried automatically, because retrying is what
+  // turned one ambiguous failure into dozens of duplicate posts (see
+  // poster.ts's own comment on AMBIGUOUS_PHASES).
+  status: text("status").notNull(),
   igMediaId: text("ig_media_id"),
   postedAt: text("posted_at"),
   errorMessage: text("error_message"),

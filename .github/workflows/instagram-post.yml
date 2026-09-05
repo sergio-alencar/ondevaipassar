@@ -54,9 +54,32 @@ jobs:
             fi
 
             skipped=$(echo "$body" | jq -r '.skipped // 0')
+            published=$(echo "$body" | jq -r '.published // 0')
+            blocked=$(echo "$body" | jq -r '.blocked // false')
+            unknown=$(echo "$body" | jq -r '.unknown // 0')
+
             if [ "$skipped" = "0" ]; then
               echo "All of today's matches posted (or none were pending)."
               exit 0
+            fi
+
+            # Meta blocked the account — every further attempt fails the same
+            # way, and each one risks publishing a duplicate we can't detect.
+            # Real incident (2026-09-05) this guard exists for: this loop ran
+            # all 15 attempts against a blocked account, each reporting
+            # published:0, while duplicate posts piled up on the profile.
+            if [ "$blocked" = "true" ]; then
+              echo "::error::Meta rate-limited the account — stopping instead of retrying. $skipped match(es) left unposted."
+              exit 1
+            fi
+
+            # No progress: nothing published this attempt, but something was
+            # attempted. Retrying a failure that never publishes is pointless,
+            # and retrying one that silently did publish is how duplicates
+            # happen — either way, stop and let a human look.
+            if [ "$published" = "0" ]; then
+              echo "::error::Attempt $attempt published nothing ($unknown ambiguous). Stopping to avoid duplicate posts — check the account and the logs."
+              exit 1
             fi
 
             sleep 5
