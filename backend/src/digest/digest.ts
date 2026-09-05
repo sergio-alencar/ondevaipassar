@@ -105,7 +105,11 @@ function buildMatchLine(match: MatchView, bold: boolean): MatchLine {
     return broadcast.displayName;
   });
 
-  return { text: `${time} — ${pairing} — Transmissão: ${channels.join(", ")}`, regionalDetail, usedRegionalMark };
+  // No "Transmissão:" label — it would repeat on every single line, and the
+  // header already says what the list is. The label survives only in
+  // NO_BROADCAST_TEXT, where "Transmissão a confirmar" is the information
+  // itself rather than a heading, and matches the site's own wording.
+  return { text: `${time} — ${pairing} — ${channels.join(", ")}`, regionalDetail, usedRegionalMark };
 }
 
 /**

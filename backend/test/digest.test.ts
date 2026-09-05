@@ -31,7 +31,7 @@ describe("buildDigest", () => {
         "⚽ *Onde assistir aos jogos de hoje — sábado, 5/set*",
         "",
         "*Campeonato Brasileiro Série A*",
-        "18h30 — *São Paulo x Atlético-MG* — Transmissão: Premiere",
+        "18h30 — *São Paulo x Atlético-MG* — Premiere",
         "",
         "Mais detalhes: https://ondevaipassar.com",
       ].join("\n"),
@@ -75,7 +75,7 @@ describe("buildDigest", () => {
       ],
       NOW,
     );
-    expect(digest).toContain("Transmissão: Globo");
+    expect(digest).toContain("— Globo");
     expect(digest).toContain("   📍 Globo em: RJ, ES, MG e BA");
     expect(digest).not.toContain("(regional)");
   });
@@ -89,7 +89,7 @@ describe("buildDigest", () => {
     } as Partial<MatchView>);
     const digest = buildDigest([withCaveat, { ...withCaveat, id: "b", kickoffUtc: "2026-09-05T23:00:00.000Z" }], NOW);
 
-    expect(digest).toContain("Transmissão: Globo (regional), Premiere");
+    expect(digest).toContain("— Globo (regional), Premiere");
     expect(digest.match(/= transmissão pela Globo pode variar/g)).toHaveLength(1);
   });
 
@@ -167,9 +167,10 @@ describe("buildThreadDigest", () => {
       buildMatch({ id: `m${index}`, kickoffUtc: `2026-09-05T${String(12 + index).padStart(2, "0")}:00:00.000Z` }),
     );
     for (const post of buildThreadDigest(many, NOW)) {
-      // Every pairing line that appears must carry its whole "Transmissão:" tail.
+      // A match line always ends in its channel list (or the "a confirmar"
+      // text) — never mid-pairing, which is what a bad split would produce.
       for (const line of post.split("\n")) {
-        if (line.includes(" x ") && line.includes("—")) expect(line).toMatch(/Transmissão/);
+        if (line.includes(" x ") && line.includes("—")) expect(line).toMatch(/—\s+\S.*$/);
       }
     }
   });
