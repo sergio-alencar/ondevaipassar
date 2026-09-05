@@ -1,3 +1,4 @@
+import { normalizeText } from "@ondevaipassar/shared";
 import { z } from "zod";
 
 // YouTube Data API v3's actual documented response shapes — much smaller
@@ -51,12 +52,28 @@ const TITLE_PATTERNS = [
   /AO VIVO E COM IMAGENS\s+I\s+(.+?)\s+X\s+(.+?)\s+I\s+/i,
 ];
 
+// Programming *about* a match, not the match itself — these carry the team
+// pair in exactly the same shape as a real broadcast title (and even start
+// with "AO VIVO:", because the studio show genuinely is live), so the
+// patterns above match them happily. Real bug this comes from: ge tv's
+// "AO VIVO: SÃO PAULO X ATLÉTICO MG | BRASILERÃO 2026 | PRÉ-JOGO |
+// Premiere" got attached as a ge TV broadcast of a match that only aired on
+// Premiere — the title itself names the real broadcaster in its last
+// segment. Checked against accent-stripped text, so "PRE-JOGO"/"PRÉ JOGO"
+// are covered too. Deliberately anchored on the PRÉ/PÓS prefix rather than
+// the word "JOGO" alone: "JOGO COMPLETO: SANTOS X PALMEIRAS ... | ge tv" is
+// a real ge TV broadcast and must keep matching.
+const NON_BROADCAST_PATTERNS = [/\bpre[\s-]?jogo\b/, /\bpos[\s-]?jogo\b/];
+
 export interface ParsedStreamTitle {
   homeTeamNameRaw: string;
   awayTeamNameRaw: string;
 }
 
 export function parseMatchTitle(title: string): ParsedStreamTitle | null {
+  const normalized = normalizeText(title);
+  if (NON_BROADCAST_PATTERNS.some((pattern) => pattern.test(normalized))) return null;
+
   for (const pattern of TITLE_PATTERNS) {
     const match = pattern.exec(title);
     if (match) return { homeTeamNameRaw: match[1].trim(), awayTeamNameRaw: match[2].trim() };

@@ -61,4 +61,40 @@ describe("parseMatchTitle", () => {
     expect(parseMatchTitle("AO VIVO: SPATEN FIGHT NIGHT 3 | LUTA | ge tv")).toBeNull();
     expect(parseMatchTitle("AO VIVO! UBUNTU RECEBE A EX-JUDOCA EDINANCI FERNANDES DA SILVA | ge.globo")).toBeNull();
   });
+
+  // Real incident (2026-09-05): both of these were attached as ge TV
+  // broadcasts of matches that only aired on Premiere. A pre-game show is
+  // genuinely live and carries the team pair in the exact shape a real
+  // broadcast title uses — the giveaway is PRÉ-JOGO, and the last segment
+  // naming the actual broadcaster.
+  it("returns null for pre/post-game studio shows, which carry the team pair in the same shape as a real broadcast", () => {
+    expect(parseMatchTitle("AO VIVO: SÃO PAULO X ATLÉTICO MG | BRASILERÃO 2026 | PRÉ-JOGO | Premiere")).toBeNull();
+    expect(parseMatchTitle("AO VIVO: FLAMENGO X MIRASSOL | BRASILERÃO 2026 | PRÉ-JOGO | Premiere")).toBeNull();
+    expect(parseMatchTitle("FLAMENGO X BOTAFOGO | PÓS-JOGO | BRASILEIRÃO 2026")).toBeNull();
+    // accent- and separator-insensitive
+    expect(parseMatchTitle("AO VIVO: GRÊMIO X INTER | PRE JOGO | Premiere")).toBeNull();
+  });
+
+  // The other side of that fix: these are real ge TV broadcasts pulled from
+  // the channel's own live listing the same day, and must keep matching.
+  it("still parses real ge TV broadcasts", () => {
+    expect(parseMatchTitle("AO VIVO: FERROVIÁRIA X FLAMENGO | QUARTAS DE FINAL | BRASILEIRÃO FEMININO 2026 | ge tv")).toEqual({
+      homeTeamNameRaw: "FERROVIÁRIA",
+      awayTeamNameRaw: "FLAMENGO",
+    });
+    expect(parseMatchTitle("REMO X FLAMENGO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv")).toEqual({
+      homeTeamNameRaw: "REMO",
+      awayTeamNameRaw: "FLAMENGO",
+    });
+  });
+
+  // ge tv renames a stream to "JOGO COMPLETO:" once the match is over, and
+  // that renamed VOD matches no pattern (none of them accept that prefix) —
+  // correct, since only upcoming/live streams should ever attach. Pinned
+  // here because the rename is invisible from our side: the broadcast row
+  // was created while the title still said "AO VIVO:", so finding this
+  // title on an attached row is expected, not evidence of a bad match.
+  it("does not match a post-match 'JOGO COMPLETO' VOD rename", () => {
+    expect(parseMatchTitle("JOGO COMPLETO: SANTOS X PALMEIRAS | QUARTAS DE FINAL | COPA DO BRASIL 2026 | ge tv")).toBeNull();
+  });
 });

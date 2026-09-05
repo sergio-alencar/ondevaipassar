@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { broadcasts, scrapeRuns } from "../db/schema.js";
 import { getErrorMessage } from "../lib/errors.js";
@@ -12,6 +13,47 @@ export interface AttachBroadcastsParams<T extends TeamPairStream> {
   allMatches: MatchCandidate[];
   /** Extracts a per-broadcast direct link from the matched stream (e.g. a YouTube video URL for that exact match) — omitted for a source with no such per-stream link (e.g. Premiere's channel-grid schedule), in which case the broadcast falls back to the channel's own officialUrl at render time (see getMatchViews.ts). */
   getWatchUrl?: (stream: T) => string | undefined;
+}
+
+/**
+ * Deletes rows this source created for matches it no longer claims. Without
+ * this, a single bad attach is permanent: the enrichment sources only ever
+ * upsert, so correcting the code that produced a wrong row does nothing to
+ * the row itself. Real bug it comes from — a ge tv PRÉ-JOGO studio show
+ * attached as the broadcast of a match that only aired on Premiere
+ * (see sources/youtube/schema.ts's NON_BROADCAST_PATTERNS).
+ *
+ * Scoped to matches still comfortably in the future, because "not claimed
+ * this run" is only trustworthy that far out. These sources read a
+ * channel's UPCOMING streams (YouTube's eventType=upcoming), and a stream
+ * DROPS OUT of that listing the moment it actually goes live — so close to
+ * kickoff, absence means "it started", not "it was wrong", and deleting
+ * then would pull the broadcast exactly when viewers need it. The same
+ * reasoning covers matches already under way or past: never touched.
+ *
+ * The buffer is a blunt instrument. The precise version would compare video
+ * ids — a row whose stream is still listed but no longer parses as this
+ * match is definitively wrong, while a row whose stream simply vanished is
+ * ambiguous — but that needs the adapters to surface unparsed streams too,
+ * which they currently drop.
+ */
+const STALE_SAFETY_BUFFER_MS = 3 * 60 * 60 * 1000;
+
+async function removeStaleBroadcasts(sourceId: string, claimedMatchIds: string[], allMatches: MatchCandidate[]): Promise<number> {
+  const cutoff = new Date(Date.now() + STALE_SAFETY_BUFFER_MS).toISOString();
+  const upcomingIds = new Set(allMatches.filter((match) => match.kickoffUtc > cutoff).map((match) => match.id));
+  const claimed = new Set(claimedMatchIds);
+
+  const stale = (await db.select().from(broadcasts).where(eq(broadcasts.sourceId, sourceId))).filter(
+    (row) => upcomingIds.has(row.matchId) && !claimed.has(row.matchId),
+  );
+  if (stale.length === 0) return 0;
+
+  const deletes = stale.map((row) => db.delete(broadcasts).where(eq(broadcasts.id, row.id)));
+  const [first, ...rest] = deletes;
+  await db.batch([first, ...rest]);
+  for (const row of stale) console.log(`[${sourceId}] removed stale broadcast ${row.id}`);
+  return stale.length;
 }
 
 /**
@@ -68,6 +110,8 @@ export async function attachBroadcastsFromStreams<T extends TeamPairStream>(
     await db.batch([first, ...rest]);
   }
 
+  const removedCount = await removeStaleBroadcasts(sourceId, matchIds, allMatches);
+
   await db.insert(scrapeRuns).values({
     sourceId,
     startedAt,
@@ -77,7 +121,7 @@ export async function attachBroadcastsFromStreams<T extends TeamPairStream>(
     matchesUnresolved: unresolvedCount,
   });
 
-  console.log(`[${sourceId}] attached ${matchIds.length} broadcasts (${unresolvedCount} unresolved)`);
+  console.log(`[${sourceId}] attached ${matchIds.length} broadcasts, removed ${removedCount} stale (${unresolvedCount} unresolved)`);
 }
 
 /** Runs one source end to end (fetch -> attach) and records a "failed" scrape_runs row if either step throws — a source failing never throws past this point, so the next one in a loop still runs. */
