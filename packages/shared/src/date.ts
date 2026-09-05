@@ -31,11 +31,8 @@ export function startOfTodayInBrasiliaUtc(now: Date = new Date()): string {
   return `${format.format(now)}T03:00:00.000Z`;
 }
 
-// Compact, social-media-casual format ("segunda, 6/ago, 19h" / "...21h30")
-// — shared by the site (MatchCard.tsx) and the Instagram poster
-// (caption.ts, renderImage.ts) so a match's date/time reads identically
-// everywhere instead of drifting into two separately-maintained formats.
-export function formatKickoffLabel(kickoffUtc: string, kickoffTimeConfirmed: boolean): string {
+/** Just the date half of formatKickoffLabel ("sábado, 5/set") — the digest's own header needs it without a time attached. */
+export function formatDateLabel(kickoffUtc: string): string {
   const date = new Date(kickoffUtc);
   const timeZone = "America/Sao_Paulo";
 
@@ -46,12 +43,24 @@ export function formatKickoffLabel(kickoffUtc: string, kickoffTimeConfirmed: boo
   const day = new Intl.DateTimeFormat("pt-BR", { day: "numeric", timeZone }).format(date);
   // pt-BR gives "ago." for month:"short" — strip the trailing period.
   const month = new Intl.DateTimeFormat("pt-BR", { month: "short", timeZone }).format(date).replace(/\.$/, "");
-  const dateLabel = `${weekday}, ${day}/${month}`;
+  return `${weekday}, ${day}/${month}`;
+}
 
-  if (!kickoffTimeConfirmed) return `${dateLabel}, horário a confirmar`;
+/** Just the time half ("19h" / "21h30" / "horário a confirmar") — one line per match in the digest already carries the date in its own header. */
+export function formatTimeLabel(kickoffUtc: string, kickoffTimeConfirmed: boolean): string {
+  if (!kickoffTimeConfirmed) return "horário a confirmar";
 
+  const date = new Date(kickoffUtc);
+  const timeZone = "America/Sao_Paulo";
   const hour = Number(new Intl.DateTimeFormat("pt-BR", { hour: "numeric", hourCycle: "h23", timeZone }).format(date));
   const minute = Number(new Intl.DateTimeFormat("pt-BR", { minute: "numeric", timeZone }).format(date));
-  const timeLabel = minute === 0 ? `${hour}h` : `${hour}h${String(minute).padStart(2, "0")}`;
-  return `${dateLabel}, ${timeLabel}`;
+  return minute === 0 ? `${hour}h` : `${hour}h${String(minute).padStart(2, "0")}`;
+}
+
+// Compact, social-media-casual format ("segunda, 6/ago, 19h" / "...21h30")
+// — shared by the site (MatchCard.tsx) and the Instagram poster
+// (caption.ts, renderImage.ts) so a match's date/time reads identically
+// everywhere instead of drifting into two separately-maintained formats.
+export function formatKickoffLabel(kickoffUtc: string, kickoffTimeConfirmed: boolean): string {
+  return `${formatDateLabel(kickoffUtc)}, ${formatTimeLabel(kickoffUtc, kickoffTimeConfirmed)}`;
 }
