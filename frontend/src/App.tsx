@@ -5,6 +5,8 @@ import Footer from "./Components/Footer";
 import Home from "./pages/Home";
 import TeamPage from "./pages/TeamPage";
 import Sobre from "./pages/Sobre";
+import Digest from "./pages/Digest";
+import NotFound from "./pages/NotFound";
 import { MatchesProvider } from "./context/MatchesContext";
 import type { SelectedTeam } from "./types";
 
@@ -21,6 +23,9 @@ const App = () => {
             <Route path="/" element={<Home setSelectedTeam={setSelectedTeam} />} />
             <Route path="time/:teamId" element={<TeamPage setSelectedTeam={setSelectedTeam} />} />
             <Route path="sobre" element={<Sobre setSelectedTeam={setSelectedTeam} />} />
+            {/* Not linked from the menu or footer — operator tool, see Digest.tsx. */}
+            <Route path="digest" element={<Digest setSelectedTeam={setSelectedTeam} />} />
+            <Route path="*" element={<NotFound setSelectedTeam={setSelectedTeam} />} />
           </Routes>
         </main>
 
