@@ -151,13 +151,14 @@ function teamCrest(crest: TemplateCrest): SatoriElement {
   return h("img", { src: crest.dataUri, style: { width, height: CREST_SIZE, objectFit: "contain" } });
 }
 
-// Splits channels into as-equal-as-possible rows instead of greedily
+// Splits items into as-equal-as-possible rows instead of greedily
 // filling each row to `maxPerRow` — 5 channels at maxPerRow 3 previously
 // wrapped as 3+2 only by accident of flexWrap; a count like 7 would have
 // greedily gone 3+3+1. This spreads any remainder across the *earliest*
 // rows (standard balanced-chunking), so no row ever has more than one more
-// item than any other.
-function balancedRows<T>(items: T[], maxPerRow: number): T[][] {
+// item than any other. Shared with the carousel cover's crest grid, which
+// hit the same thing: 6 crests at 5 per row came out as 5 + 1 stranded.
+export function balancedRows<T>(items: T[], maxPerRow: number): T[][] {
   if (items.length <= maxPerRow) return items.length > 0 ? [items] : [];
   const rowCount = Math.ceil(items.length / maxPerRow);
   const base = Math.floor(items.length / rowCount);

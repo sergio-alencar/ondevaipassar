@@ -1,5 +1,5 @@
 import { abbreviateTeamName } from "./teamNameAbbreviation.js";
-import type { SatoriElement, TemplateChannel, TemplateCrest } from "./template.js";
+import { balancedRows, type SatoriElement, type TemplateChannel, type TemplateCrest } from "./template.js";
 
 // Same hand-built node helper as template.ts — see its own comment for why
 // there's no JSX here.
@@ -361,13 +361,14 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
   // the row grows wider and the tile smaller as the day gets busier.
   const CREST_AREA_HEIGHT = hasLogo ? 400 : 560;
   const CREST_GAP = 22;
-  const perRow = input.crests.length <= 10 ? 5 : input.crests.length <= 18 ? 6 : 7;
-  const rowCount = Math.ceil(input.crests.length / perRow);
-  const widthFit = Math.floor((CONTENT_WIDTH - CREST_GAP * (perRow - 1)) / perRow);
-  const heightFit = Math.floor((CREST_AREA_HEIGHT - CREST_GAP * (rowCount - 1)) / Math.max(rowCount, 1));
+  const maxPerRow = input.crests.length <= 10 ? 5 : input.crests.length <= 18 ? 6 : 7;
+  // Balanced, not greedy: 6 crests at 5 per row was rendering 5 and then a
+  // single stranded one on its own line.
+  const rows = balancedRows(input.crests, maxPerRow);
+  const widest = rows.reduce((most, row) => Math.max(most, row.length), 0);
+  const widthFit = Math.floor((CONTENT_WIDTH - CREST_GAP * (widest - 1)) / Math.max(widest, 1));
+  const heightFit = Math.floor((CREST_AREA_HEIGHT - CREST_GAP * (rows.length - 1)) / Math.max(rows.length, 1));
   const crestSize = Math.max(64, Math.min(hasLogo ? 130 : 160, widthFit, heightFit));
-  const rows: TemplateCrest[][] = [];
-  for (let i = 0; i < input.crests.length; i += perRow) rows.push(input.crests.slice(i, i + perRow));
 
   return h(
     "div",
