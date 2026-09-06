@@ -90,7 +90,7 @@ describe("buildDigest", () => {
     const digest = buildDigest([withCaveat, { ...withCaveat, id: "b", kickoffUtc: "2026-09-05T23:00:00.000Z" }], NOW);
 
     expect(digest).toContain("— Globo (regional), Premiere");
-    expect(digest.match(/= transmissão pela Globo pode variar/g)).toHaveLength(1);
+    expect(digest.match(/A transmissão pela Globo pode variar/g)).toHaveLength(1);
   });
 
   it("uses '(regional)', never a bare asterisk, so WhatsApp's own bold markup isn't broken", () => {

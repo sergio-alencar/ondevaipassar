@@ -1,4 +1,11 @@
-import { findCompetitionById, formatDateLabel, formatTimeLabel, type MatchView } from "@ondevaipassar/shared";
+import {
+  findCompetitionById,
+  formatDateLabel,
+  formatTimeLabel,
+  REGIONAL_CAVEAT_TEXT,
+  REGIONAL_PRACA_CAVEAT,
+  type MatchView,
+} from "@ondevaipassar/shared";
 
 const SITE_URL = "https://ondevaipassar.com";
 
@@ -20,7 +27,7 @@ const REGIONAL_MARK = "(regional)";
  */
 export type DigestDay = "hoje" | "amanhã";
 
-const REGIONAL_FOOTNOTE = `${REGIONAL_MARK} = transmissão pela Globo pode variar por região — confira a programação local`;
+const REGIONAL_FOOTNOTE = `${REGIONAL_MARK} — ${REGIONAL_CAVEAT_TEXT}`;
 
 interface CompetitionGroup {
   id: string;
@@ -95,7 +102,7 @@ function buildMatchLine(match: MatchView, bold: boolean): MatchLine {
 
   const channels = match.broadcasts.map((broadcast) => {
     if (broadcast.regionalDetail) {
-      regionalDetail ??= `   📍 ${broadcast.displayName} em: ${broadcast.regionalDetail}`;
+      regionalDetail ??= `   📍 ${broadcast.displayName} em: ${broadcast.regionalDetail} (${REGIONAL_PRACA_CAVEAT})`;
       return broadcast.displayName;
     }
     if (broadcast.regionalCaveat) {

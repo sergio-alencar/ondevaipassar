@@ -68,4 +68,30 @@ describe("parseBroadcastChannels", () => {
   it("returns an empty list for an empty string", () => {
     expect(parseBroadcastChannels("", null)).toEqual([]);
   });
+
+  // Real bug: every token inside the parentheses was uppercased and sorted
+  // in as if it were a state code, so prose came out looking like one.
+  it("keeps non-UF prose verbatim instead of sorting it in as if it were a state code", () => {
+    const [globo] = parseBroadcastChannels("Globo (PARTE DA REDE, RS e SP)", null);
+    expect(globo.regionalDetail).toBe("RS e SP, PARTE DA REDE");
+  });
+
+  // The worse half of that bug: an exception clause became an entry in an
+  // INCLUSION list, saying the match was on exactly where it wasn't.
+  it("never turns an exception clause into a place the match is available", () => {
+    const [globo] = parseBroadcastChannels("Globo (RJ, com exceção de Juiz de Fora)", null);
+    expect(globo.regionalDetail).toBe("RJ, com exceção de Juiz de Fora");
+    expect(globo.regionalDetail).not.toMatch(/^COM EXCEÇÃO/);
+  });
+
+  it("marks prose in an exclusion list as an exception, not as an included state", () => {
+    const [globo] = parseBroadcastChannels("Globo (menos MG e a região de Juiz de Fora)", null);
+    expect(globo.regionalDetail).toContain("exceto a região de Juiz de Fora");
+    expect(globo.regionalDetail).not.toContain("MG");
+  });
+
+  it("returns the prose alone when there is no UF at all to normalize", () => {
+    const [globo] = parseBroadcastChannels("Globo (parte da rede)", null);
+    expect(globo.regionalDetail).toBe("parte da rede");
+  });
 });

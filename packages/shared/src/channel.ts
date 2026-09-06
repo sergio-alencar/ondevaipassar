@@ -281,3 +281,22 @@ export function resolveChannelId(rawName: string): string | null {
 export function findChannelById(id: string): Channel | undefined {
   return CHANNELS.find((channel) => channel.id === id);
 }
+
+/**
+ * Shown when a broadcast varies by region and we have NO state list for it.
+ * Lives here rather than in each surface because the site, the Instagram
+ * caption and the daily digest must all say the same thing — they were
+ * three separate copies of this sentence before.
+ */
+export const REGIONAL_CAVEAT_TEXT = "A transmissão pela Globo pode variar por região — confira a programação local";
+
+/**
+ * Appended when we DO have a state list. Globo's coverage splits below
+ * state level — the Juiz de Fora region carries RJ's feed rather than the
+ * rest of MG's, and that pattern repeats across the country — and no source
+ * we have expresses that granularity (futnatv, the only one with regional
+ * data at all, stops at the UF). So a state list is a real answer but not a
+ * complete one, and saying so is better than implying precision we don't
+ * have.
+ */
+export const REGIONAL_PRACA_CAVEAT = "pode variar por praça dentro do estado";

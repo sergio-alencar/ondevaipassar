@@ -1,4 +1,4 @@
-import type { MatchView } from "@ondevaipassar/shared";
+import { REGIONAL_CAVEAT_TEXT, REGIONAL_PRACA_CAVEAT, type MatchView } from "@ondevaipassar/shared";
 import { channelLogoUrl } from "../lib/assets";
 import { textColorClass } from "../lib/colors";
 
@@ -7,13 +7,14 @@ interface MatchBroadcastsProps {
   fallbackColor?: string;
 }
 
-const REGIONAL_CAVEAT_TEXT = " — pode variar por região, confira a programação local";
+const REGIONAL_TOOLTIP_SUFFIX = " — pode variar por região, confira a programação local";
 // The tooltip alone (title attribute) is easy to miss — it needs a hover
 // most people never try, and doesn't work at all on mobile without a long
 // press. This adds a visible marker on the logo itself plus an explicit
 // caption below the row, so the caveat doesn't depend on discovering a
 // hidden hover state.
-const REGIONAL_CAVEAT_CAPTION = "A transmissão pela Globo pode variar por região — confira a programação local";
+// Texto único, vindo de packages/shared — o site, a legenda do Instagram
+// e o digest diário precisam dizer a mesma coisa.
 
 // Every channel now ships curated square icon art (see channelLogoUrl), so
 // one square box fits all — no more per-shape "wide vs square" sizing.
@@ -42,8 +43,8 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
   // so the generic caption stays as the fallback.
   const regionalDetailBroadcast = broadcasts.find((broadcast) => broadcast.regionalDetail);
   const regionalCaveatCaption = regionalDetailBroadcast
-    ? `${regionalDetailBroadcast.displayName} disponível em: ${regionalDetailBroadcast.regionalDetail}`
-    : REGIONAL_CAVEAT_CAPTION;
+    ? `${regionalDetailBroadcast.displayName} disponível em: ${regionalDetailBroadcast.regionalDetail} (${REGIONAL_PRACA_CAVEAT})`
+    : REGIONAL_CAVEAT_TEXT;
 
   return (
     <div>
@@ -52,7 +53,7 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
           const tooltipSuffix = broadcast.regionalDetail
             ? `: ${broadcast.regionalDetail}`
             : broadcast.regionalCaveat
-              ? REGIONAL_CAVEAT_TEXT
+              ? REGIONAL_TOOLTIP_SUFFIX
               : "";
 
           return (

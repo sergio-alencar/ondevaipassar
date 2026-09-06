@@ -1,10 +1,4 @@
-import { formatKickoffLabel, type MatchView } from "@ondevaipassar/shared";
-
-// Same wording/precedence as the frontend's MatchBroadcasts.tsx: the real
-// per-state text (futnatv's own, see futnatvEnrichment.ts) beats the
-// generic brush-off whenever we actually have it for one of the match's
-// broadcasts.
-const REGIONAL_CAVEAT_CAPTION = "A transmissão pela Globo pode variar por região — confira a programação local";
+import { formatKickoffLabel, REGIONAL_CAVEAT_TEXT, REGIONAL_PRACA_CAVEAT, type MatchView } from "@ondevaipassar/shared";
 
 export function buildCaption(match: MatchView): string {
   const channels = match.broadcasts.map((broadcast) => broadcast.displayName).join(", ");
@@ -21,9 +15,9 @@ export function buildCaption(match: MatchView): string {
 
   const regionalDetailBroadcast = match.broadcasts.find((broadcast) => broadcast.regionalDetail);
   if (regionalDetailBroadcast) {
-    lines.push(`* ${regionalDetailBroadcast.displayName} disponível em: ${regionalDetailBroadcast.regionalDetail}`);
+    lines.push(`* ${regionalDetailBroadcast.displayName} disponível em: ${regionalDetailBroadcast.regionalDetail} (${REGIONAL_PRACA_CAVEAT})`);
   } else if (match.broadcasts.some((broadcast) => broadcast.regionalCaveat)) {
-    lines.push(`* ${REGIONAL_CAVEAT_CAPTION}`);
+    lines.push(`* ${REGIONAL_CAVEAT_TEXT}`);
   }
 
   // Omitted entirely when no broadcast in this match has a verified handle
