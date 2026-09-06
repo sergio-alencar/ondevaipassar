@@ -101,16 +101,6 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
                   </span>
                 )}
               </a>
-              {broadcast.alternateUrl && (
-                <a
-                  href={broadcast.alternateUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-gray-500 underline hover:text-gray-700"
-                >
-                  outro link
-                </a>
-              )}
             </div>
           );
         })}

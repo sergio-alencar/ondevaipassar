@@ -4,8 +4,6 @@ export interface BroadcastView {
   channelId: string;
   displayName: string;
   url: string;
-  /** A second, equally valid place to find this channel's programming (see Channel.alternateUrl) — shown as a secondary link alongside url, not a fallback for it. */
-  alternateUrl?: string;
   /** Prefer a local asset for this channel when we have one; this is the fallback (source-provided) logo, e.g. for channels like ge TV we don't have local art for. */
   logoUrl: string;
   /** Instagram handle (no "@"), for tagging the broadcaster in the poster's caption — undefined until manually verified for that channel (see Channel.instagramHandle). */

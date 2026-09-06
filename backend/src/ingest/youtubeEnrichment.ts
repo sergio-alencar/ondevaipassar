@@ -84,7 +84,7 @@ const TRACKED_CHANNELS: { channelId: string; youtubeChannelId: string; sourceId:
 
 async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], apiKey: string, allMatches: MatchCandidate[]): Promise<void> {
   const resolveTeamIdFn = channel.division === "feminino" ? resolveFemininoTeamId : undefined;
-  const { streams, channelLogoUrl } = await fetchUpcomingStreams(channel.youtubeChannelId, apiKey, resolveTeamIdFn);
+  const { streams, channelLogoUrl } = await fetchUpcomingStreams(channel.youtubeChannelId, apiKey, resolveTeamIdFn, channel.division);
   await attachBroadcastsFromStreams({
     sourceId: channel.sourceId,
     channelId: channel.channelId,

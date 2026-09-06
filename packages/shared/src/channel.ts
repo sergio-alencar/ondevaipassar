@@ -4,8 +4,6 @@ export interface Channel {
   id: string;
   displayName: string;
   officialUrl: string;
-  /** A second, equally valid place to find this channel's programming (e.g. a channel with two separate YouTube destinations) — shown as a secondary link alongside officialUrl, not a fallback for it. */
-  alternateUrl?: string;
   /** True when the source can't tell us whether this actually airs in the viewer's specific region (true today only for "globo" — ge.globo's data has no region/UF field, every entry just says "check local listings"). */
   regionalCaveat?: boolean;
   /** Handle (no "@"), for tagging the broadcaster in the Instagram poster's caption — manually verified against each channel's real profile, not guessed. */
@@ -151,8 +149,11 @@ const CHANNELS: Channel[] = [
   {
     id: "sbt",
     displayName: "SBT",
+    // SBT also streams from its main channel (youtube.com/@sbt/streams), and
+    // that used to render as an "outro link" under the logo. Sérgio asked
+    // for it gone: a second link there reads as a second broadcast rather
+    // than another door to the same one.
     officialUrl: "https://www.youtube.com/@SBTSports/streams",
-    alternateUrl: "https://www.youtube.com/@sbt/streams",
     instagramHandle: "sbt",
   },
   {

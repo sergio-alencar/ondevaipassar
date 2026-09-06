@@ -1,6 +1,6 @@
 import { resolveTeamId } from "../../ingest/teamResolver.js";
 import { fetchChannelAvatarUrl, fetchScheduledStartTimes, searchUpcomingVideos } from "./client.js";
-import { parseMatchTitle } from "./schema.js";
+import { isWomensCompetitionTitle, parseMatchTitle } from "./schema.js";
 
 export interface YoutubeStream {
   videoId: string;
@@ -27,6 +27,11 @@ export interface YoutubeChannelFetchResult {
  * a match record — see ingest/youtubeEnrichment.ts for how the result gets
  * attached to matches ge.globo already ingested.
  *
+ * `division` guards the other half of that same hazard: with the men's
+ * resolver, a title naming a WOMEN'S competition is skipped outright,
+ * because the club name in it resolves to the men's side of the same
+ * institution and would attach to the wrong fixture.
+ *
  * `resolveTeamIdFn` defaults to the shared men's-only resolver, but a
  * channel that broadcasts Brasileirão Feminino (N Sports, confirmed live —
  * its titles literally include "BRASILEIRÃO FEMININO") must pass
@@ -40,6 +45,7 @@ export async function fetchUpcomingStreams(
   youtubeChannelId: string,
   apiKey: string,
   resolveTeamIdFn: (rawName: string) => string | null = resolveTeamId,
+  division?: "feminino",
 ): Promise<YoutubeChannelFetchResult> {
   const [videos, channelLogoUrl] = await Promise.all([
     searchUpcomingVideos(youtubeChannelId, apiKey),
@@ -50,6 +56,11 @@ export async function fetchUpcomingStreams(
   for (const video of videos) {
     const titleMatch = parseMatchTitle(video.title);
     if (!titleMatch) continue; // not a match stream (interview, highlights, a different sport, etc.)
+    // A women's match read through the men's registry lands on the men's
+    // side of the same club — the real bug behind this check (see
+    // isWomensCompetitionTitle). Channels that DO broadcast women's
+    // football pass the Feminino resolver and keep these.
+    if (division !== "feminino" && isWomensCompetitionTitle(video.title)) continue;
     candidates.push({ videoId: video.videoId, ...titleMatch });
   }
 

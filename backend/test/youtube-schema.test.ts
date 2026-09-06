@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseMatchTitle } from "../src/sources/youtube/schema.js";
+import { isWomensCompetitionTitle, parseMatchTitle } from "../src/sources/youtube/schema.js";
 
 describe("parseMatchTitle", () => {
   it("parses ge tv / CazéTV's 'AO VIVO: A X B |' format", () => {
@@ -96,5 +96,27 @@ describe("parseMatchTitle", () => {
   // title on an attached row is expected, not evidence of a bad match.
   it("does not match a post-match 'JOGO COMPLETO' VOD rename", () => {
     expect(parseMatchTitle("JOGO COMPLETO: SANTOS X PALMEIRAS | QUARTAS DE FINAL | COPA DO BRASIL 2026 | ge tv")).toBeNull();
+  });
+});
+
+// Real bug (2026-09-06): Canal GOAT's women's Brighton x Arsenal was
+// attached to that day's men's Arsenal x Chelsea. Brighton isn't tracked so
+// it became a wildcard, and "ARSENAL" resolved straight into the men's
+// registry — club names are shared between the two sides of a club, so the
+// competition in the title is the only thing telling them apart.
+describe("isWomensCompetitionTitle", () => {
+  it("recognizes the real title behind the incident", () => {
+    expect(isWomensCompetitionTitle("AO VIVO: BRIGHTON X ARSENAL | WSL - WOMEN'S SUPER LEAGUE")).toBe(true);
+  });
+
+  it("recognizes the other markers that actually appear", () => {
+    expect(isWomensCompetitionTitle("🔴 AO VIVO I BAHIA X PALMEIRAS I BRASILEIRÃO FEMININO 2026")).toBe(true);
+    expect(isWomensCompetitionTitle("AO VIVO: PORTLAND X GOTHAM | NWSL")).toBe(true);
+    expect(isWomensCompetitionTitle("AO VIVO: LYON X PSG | UEFA WOMEN'S CHAMPIONS LEAGUE")).toBe(true);
+  });
+
+  it("does not flag a men's title", () => {
+    expect(isWomensCompetitionTitle("AO VIVO: ARSENAL X CHELSEA | PREMIER LEAGUE")).toBe(false);
+    expect(isWomensCompetitionTitle("CRB X CRICIÚMA | AO VIVO E COM IMAGENS | SÉRIE B")).toBe(false);
   });
 });

@@ -94,6 +94,25 @@ const TRACKED_EUROPEAN_TEAMS: { teamId: string; onefootballId: string }[] = [
   { teamId: "tottenham", onefootballId: "202" },
 ];
 
+// Enough to cut the wall-clock cost without hammering onefootball.com with
+// all 30 pages at once.
+const FETCH_CONCURRENCY = 6;
+
+/** Runs `task` over every item with at most `limit` in flight, returning results in the input's order. */
+async function mapWithConcurrency<T, R>(items: T[], limit: number, task: (item: T) => Promise<R>): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let next = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    for (;;) {
+      const index = next++;
+      if (index >= items.length) return;
+      results[index] = await task(items[index]);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
 /** One page to scrape, plus how to tell which competition each of its cards belongs to. */
 interface PageSource {
   label: string;
@@ -325,12 +344,24 @@ export async function runOnefootballEnrichment(): Promise<void> {
     let backfilledCount = 0;
     let broadcastCount = 0;
 
-    for (const page of buildPageSources()) {
-      let cards: RoundMatchCard[];
+    // Fetched up front and concurrently, then processed strictly in order.
+    // Sequential fetching put this source at ~30s of pure network on its
+    // own (a competition page alone takes ~2.3s, and there are 10 of them
+    // plus 20 team pages), which pushed the whole cron past its 60s
+    // ceiling and cut off everything after it — futnatv, which owns the
+    // regional detail, never ran. Only the network moves: the DB reads and
+    // writes below stay in the same order, which is what the dedup relies on.
+    const fetched = await mapWithConcurrency(buildPageSources(), FETCH_CONCURRENCY, async (page) => {
       try {
-        cards = await page.fetch();
+        return { page, cards: await page.fetch() };
       } catch (error) {
         console.error(`[${SOURCE_ID}] failed to fetch ${page.label}:`, getErrorMessage(error));
+        return { page, cards: null };
+      }
+    });
+
+    for (const { page, cards } of fetched) {
+      if (cards === null) {
         unresolvedCount++;
         continue;
       }

@@ -65,6 +65,21 @@ const TITLE_PATTERNS = [
 // a real ge TV broadcast and must keep matching.
 const NON_BROADCAST_PATTERNS = [/\bpre[\s-]?jogo\b/, /\bpos[\s-]?jogo\b/];
 
+// Markers that a title is a WOMEN'S match. Real bug this comes from: Canal
+// GOAT's "AO VIVO: BRIGHTON X ARSENAL | WSL - WOMEN'S SUPER LEAGUE"
+// resolved "ARSENAL" through the men's registry (Brighton isn't tracked,
+// so it became a wildcard) and got attached to that day's men's Arsenal x
+// Chelsea. Club names are shared across the men's and women's sides of the
+// same institution, so the competition named in the title is the only
+// thing separating them.
+const WOMENS_TITLE_PATTERNS = [/\bwsl\b/, /\bnwsl\b/, /\bwomen/, /\bfeminin[ao]\b/];
+
+/** True when the title names a women's competition — see WOMENS_TITLE_PATTERNS for why that has to be checked separately from the team names. */
+export function isWomensCompetitionTitle(title: string): boolean {
+  const normalized = normalizeText(title);
+  return WOMENS_TITLE_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
 export interface ParsedStreamTitle {
   homeTeamNameRaw: string;
   awayTeamNameRaw: string;
