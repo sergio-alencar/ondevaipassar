@@ -25,7 +25,6 @@ const POLL_TIMEOUT_MS = 5 * 60000;
 export const MAX_CAROUSEL_ITEMS = 10;
 
 export interface GraphApiClient {
-  createContainer(imageUrl: string, caption: string): Promise<string>;
   /** One slide of a future carousel: same media container, but flagged so it can't be published on its own and carries no caption of its own. */
   createCarouselItem(imageUrl: string): Promise<string>;
   /** The container that ties the slides together and carries the caption for the whole post. */
@@ -43,20 +42,15 @@ async function fetchJson(url: string, init?: RequestInit): Promise<Record<string
   return body;
 }
 
-/** Real implementation of the 3-step async publish flow: create a media container pointing at a public image URL, poll until Instagram finishes processing it, then publish it. */
+/**
+ * Real implementation of the async publish flow: create one container per
+ * slide, poll each until Instagram finishes processing it, tie them
+ * together in a carousel container carrying the caption, then publish that.
+ *
+ * There's no single-image path any more: every post this project makes has
+ * a cover slide, so it's always at least two items.
+ */
 export const realGraphApiClient: GraphApiClient = {
-  async createContainer(imageUrl, caption) {
-    const accountId = env.INSTAGRAM_USER_ID;
-    const token = env.INSTAGRAM_ACCESS_TOKEN;
-    if (!accountId || !token) throw new Error("INSTAGRAM_USER_ID/INSTAGRAM_ACCESS_TOKEN not configured");
-
-    const params = new URLSearchParams({ image_url: imageUrl, caption, access_token: token });
-    const body = await fetchJson(`${GRAPH_API_BASE}/${accountId}/media`, { method: "POST", body: params });
-    const containerId = body.id;
-    if (typeof containerId !== "string") throw new Error(`Unexpected container-creation response: ${JSON.stringify(body)}`);
-    return containerId;
-  },
-
   async createCarouselItem(imageUrl) {
     const accountId = env.INSTAGRAM_USER_ID;
     const token = env.INSTAGRAM_ACCESS_TOKEN;

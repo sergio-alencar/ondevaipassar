@@ -171,13 +171,12 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
       }
 
       phase = "create";
-      // A "carousel" of one is rejected by Meta (minimum 2), and a lone
-      // match shouldn't become a swipeable post anyway - it goes out as
-      // the ordinary single-image post this pipeline always made.
-      const containerId =
-        childIds.length === 1
-          ? await graphApi.createContainer(imageUrls[0], caption)
-          : await graphApi.createCarousel(childIds, caption);
+      // Always a carousel: the cover is an image of its own, so even a
+      // group of one match is cover + 1 slide = 2 items, which clears
+      // Meta's minimum. There used to be a single-image branch here for
+      // "a lone match", but it could never run — and its comment claimed
+      // the opposite of what the pipeline actually did.
+      const containerId = await graphApi.createCarousel(childIds, caption);
       phase = "poll";
       await graphApi.pollUntilFinished(containerId);
       phase = "publish";
