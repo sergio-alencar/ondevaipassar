@@ -77,7 +77,7 @@ export const COMPETITIONS: Competition[] = [
   // agenda source is ever added (none is yet — this round-hub source
   // hardcodes competitionId directly, never resolves it from raw text, so
   // the risk doesn't apply here). A distinct id sidesteps it either way.
-  { id: "serie-a-italiana", displayName: "Campeonato Italiano (Serie A)", type: "national-league", foreign: true, shortName: "Italiano" },
+  { id: "serie-a-italiana", displayName: "Campeonato Italiano", type: "national-league", foreign: true, shortName: "Italiano" },
   // Raw name on ge.globo's own team-agenda pages (confirmed live, Real
   // Madrid's own agenda) is literally "Champions League" — no accent/collision
   // risk with anything else tracked here, unlike the Italian Serie A case above.

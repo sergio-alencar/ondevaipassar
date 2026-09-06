@@ -157,13 +157,20 @@ export async function runFemininoEnrichment(): Promise<void> {
         .insert(broadcasts)
         .values({ id: `${matchId}__${channelId}`, matchId, channelId, logoUrl: "", watchUrl, regionalDetail, sourceId: SOURCE_ID, createdAt: now });
 
-      const updateFields: { watchUrl?: string; regionalDetail?: string } = {};
+      // watchUrl only when we have one: other sources write that same field
+      // on this same row (youtube enrichment, see attachBroadcasts.ts), and
+      // clearing theirs would lose a working link.
+      //
+      // regionalDetail ALWAYS, null included: this enrichment and its
+      // Feminino twin are the only writers of that field, and they cover
+      // disjoint matches, so each is the sole authority on the rows it
+      // touches. Skipping the null left a broadcast that STOPPED being
+      // regional carrying its old state list forever — the site would go on
+      // naming states for a match that now airs nationwide.
+      const updateFields: { watchUrl?: string; regionalDetail: string | null } = { regionalDetail };
       if (watchUrl) updateFields.watchUrl = watchUrl;
-      if (regionalDetail) updateFields.regionalDetail = regionalDetail;
 
-      return Object.keys(updateFields).length > 0
-        ? insert.onConflictDoUpdate({ target: broadcasts.id, set: updateFields })
-        : insert.onConflictDoNothing({ target: broadcasts.id });
+      return insert.onConflictDoUpdate({ target: broadcasts.id, set: updateFields });
     });
 
     const upserts = [...matchUpserts, ...broadcastUpserts];
