@@ -10,6 +10,7 @@ import { Resvg } from "@resvg/resvg-js";
 import satori from "satori";
 import type { ReactNode } from "react";
 import { channelLogoDataUri, competitionLogoDataUri, crestArt, loadFonts, WORDMARK, WORDMARK_WHITE } from "./assets.js";
+import { EUROPE_GROUP_ID, EUROPE_GROUP_NAME } from "./postGroups.js";
 import {
   buildCoverTree,
   buildSlideTree,
@@ -121,53 +122,69 @@ export function chunkIntoSlides(matches: MatchView[]): MatchView[][] {
   return slides;
 }
 
-/**
- * Every image of one competition's carousel, in order: a cover, then the
- * matches 3 to a slide. Returned as buffers so the caller decides what to
- * do with them — write to disk for review, or upload.
- */
-export async function renderCarouselImages(competitionId: string, competitionName: string, matches: MatchView[]): Promise<Buffer[]> {
-  const dateLabel = formatDateLabel(matches[0].kickoffUtc);
-  // "SÉRIE A", not "CAMPEONATO BRASILEIRO SÉRIE A" — Sérgio's call, and it
-  // lets the header fit on one line. The Italian-league collision the
-  // registry warns about is a data-resolution concern, not a reader one:
-  // nobody looking at a Brasileirão carousel reads "Série A" as Italy.
-  const shortName = findCompetitionById(competitionId)?.shortName ?? competitionName;
-  // Only worth naming per match when the post actually mixes competitions —
-  // on a Série A post every slide would just repeat the header.
-  const mixed = new Set(matches.map((match) => match.competitionId)).size > 1;
-  const crests = await Promise.all(
-    matches.flatMap((match) => [crestArt(match.homeTeamId, match.homeTeamCrestUrl), crestArt(match.awayTeamId, match.awayTeamCrestUrl)]),
-  );
+/** Header/cover name for a group: the competition's short name, or the synthetic one for the combined European post. */
+function groupName(competitionId: string, matches: MatchView[]): string {
+  if (competitionId === EUROPE_GROUP_ID) return EUROPE_GROUP_NAME;
+  const competition = findCompetitionById(competitionId);
+  return competition?.shortName ?? competition?.displayName ?? matches[0].competitionName;
+}
 
-  const cover = await render(
+/** The carousel's first image. `matches` is the whole group, since the cover shows every club playing. */
+export async function renderCoverImage(competitionId: string, matches: MatchView[]): Promise<Buffer> {
+  const crests = await Promise.all(
+    matches.flatMap((match) => [
+      crestArt(match.homeTeamId, match.homeTeamCrestUrl),
+      crestArt(match.awayTeamId, match.awayTeamCrestUrl),
+    ]),
+  );
+  return render(
     buildCoverTree({
-      competitionName,
-      dateLabel,
+      competitionName: groupName(competitionId, matches),
+      dateLabel: formatDateLabel(matches[0].kickoffUtc),
       matchCount: matches.length,
       competitionLogoDataUri: competitionLogoDataUri(competitionId),
       crests,
       wordmarkDataUri: WORDMARK_WHITE,
     }),
   );
+}
 
+/** One slide of matches. `matches` is just that slide's own share of the group. */
+export async function renderSlideImage(
+  competitionId: string,
+  matches: MatchView[],
+  slideLabel: string | null,
+  mixed: boolean,
+): Promise<Buffer> {
+  const notes = buildRegionalNotes(matches);
+  const slideMatches = await Promise.all(matches.map((match) => toSlideMatch(match, mixed, notes)));
+  return render(
+    buildSlideTree({
+      competitionName: groupName(competitionId, matches),
+      dateLabel: formatDateLabel(matches[0].kickoffUtc),
+      matches: slideMatches,
+      wordmarkDataUri: WORDMARK,
+      slideLabel,
+      regionalNotes: notes.lines,
+    }),
+  );
+}
+
+/**
+ * Every image of one competition's carousel, in order: a cover, then the
+ * matches 2 to a slide. Used by scripts/carousel-preview.ts to render a
+ * whole day locally; the poster itself goes through the per-image
+ * functions above, via /api/instagram-slide.
+ */
+export async function renderCarouselImages(competitionId: string, matches: MatchView[]): Promise<Buffer[]> {
   const slides = chunkIntoSlides(matches);
-  const rendered: Buffer[] = [cover];
+  const mixed = new Set(matches.map((match) => match.competitionId)).size > 1;
+
+  const images = [await renderCoverImage(competitionId, matches)];
   for (const [index, slideMatches] of slides.entries()) {
-    const notes = buildRegionalNotes(slideMatches);
-    const slideMatchInputs = await Promise.all(slideMatches.map((match) => toSlideMatch(match, mixed, notes)));
-    rendered.push(
-      await render(
-        buildSlideTree({
-          competitionName: shortName,
-          dateLabel,
-          matches: slideMatchInputs,
-          wordmarkDataUri: WORDMARK,
-          slideLabel: slides.length > 1 ? `${index + 1}/${slides.length}` : null,
-          regionalNotes: notes.lines,
-        }),
-      ),
+    images.push(
+      await renderSlideImage(competitionId, slideMatches, slides.length > 1 ? `${index + 1}/${slides.length}` : null, mixed),
     );
   }
-  return rendered;
+  return images;
 }

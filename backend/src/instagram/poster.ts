@@ -1,12 +1,14 @@
-import { findCompetitionById, isTodayInBrasilia, type MatchView } from "@ondevaipassar/shared";
+import { isTodayInBrasilia, type MatchView } from "@ondevaipassar/shared";
 import { env } from "../config/env.js";
 import { db } from "../db/client.js";
 import { instagramPosts } from "../db/schema.js";
 import { getErrorMessage } from "../lib/errors.js";
 import { getMatchViews } from "../matches/getMatchViews.js";
 import { buildCarouselCaption } from "./caption.js";
-import { MAX_CAROUSEL_ITEMS, realGraphApiClient, type GraphApiClient } from "./graphApiClient.js";
-import { renderMatchImage } from "./renderImage.js";
+import { realGraphApiClient, type GraphApiClient } from "./graphApiClient.js";
+import { groupIntoPosts } from "./postGroups.js";
+import { chunkIntoSlides, renderCarouselImages } from "./renderCarousel.js";
+
 
 export interface PostingSummary {
   /** Carousels attempted, not matches — one post now covers a whole competition. */
@@ -69,75 +71,6 @@ async function getCandidateMatches(): Promise<MatchView[]> {
   return excludeAlreadyPublished(todaysMatches);
 }
 
-/** Synthetic competition id for the combined European post — also the filename of its logo (see assets.ts's competitionLogoDataUri). */
-export const EUROPE_GROUP_ID = "europa";
-export const EUROPE_GROUP_NAME = "Jogos da Europa";
-
-/** One post: a competition's matches for the day, already chunked to what a single carousel can hold. */
-export interface PostGroup {
-  competitionId: string;
-  competitionName: string;
-  matches: MatchView[];
-  part: number;
-  totalParts: number;
-}
-
-/**
- * One carousel per competition per day, instead of one post per match.
- * Sergio asked for this on feed-quality grounds, but it also cuts directly
- * at the failure hit on 2026-09-05: publishing is the rate-limited action,
- * and this turns ~20 publishes a day into ~5.
- *
- * A competition with more matches than a carousel holds is split across
- * numbered posts rather than dropping any. Competition ORDER follows the
- * same rule as the digest (Brazilian before foreign, Serie A/B/C pinned),
- * so the account posts the biggest draw first on a busy morning - which is
- * also what survives if the run is cut short.
- */
-export function groupIntoPosts(matches: MatchView[]): PostGroup[] {
-  const byCompetition = new Map<string, MatchView[]>();
-  for (const match of matches) {
-    // Every foreign competition lands in one post. Split by competition,
-    // the European side produced a stream of one- and two-match carousels
-    // (Premier League, LaLiga, Serie A, Champions, Liga Europa, EFL Cup...)
-    // on a normal midweek — Sérgio asked for a single "jogos da Europa"
-    // instead. Each slide still names the competition of the match on it,
-    // so nothing is lost by merging.
-    const key = findCompetitionById(match.competitionId)?.foreign === true ? EUROPE_GROUP_ID : match.competitionId;
-    byCompetition.set(key, [...(byCompetition.get(key) ?? []), match]);
-  }
-
-  const ordered = [...byCompetition.entries()].sort(([a], [b]) => {
-    const foreign = Number(a === EUROPE_GROUP_ID) - Number(b === EUROPE_GROUP_ID);
-    if (foreign !== 0) return foreign;
-    return (
-      (findCompetitionById(a)?.priority ?? Number.MAX_SAFE_INTEGER) -
-      (findCompetitionById(b)?.priority ?? Number.MAX_SAFE_INTEGER)
-    );
-  });
-
-  const groups: PostGroup[] = [];
-  for (const [competitionId, competitionMatches] of ordered) {
-    const chunks: MatchView[][] = [];
-    for (let i = 0; i < competitionMatches.length; i += MAX_CAROUSEL_ITEMS) {
-      chunks.push(competitionMatches.slice(i, i + MAX_CAROUSEL_ITEMS));
-    }
-    chunks.forEach((chunk, index) =>
-      groups.push({
-        competitionId,
-        competitionName:
-          competitionId === EUROPE_GROUP_ID
-            ? EUROPE_GROUP_NAME
-            : (findCompetitionById(competitionId)?.displayName ?? competitionMatches[0].competitionName),
-        matches: chunk,
-        part: index + 1,
-        totalParts: chunks.length,
-      }),
-    );
-  }
-  return groups;
-}
-
 export interface RunPostingOptions {
   graphApi?: GraphApiClient;
   /** Restrict to exactly one match, bypassing the "today" + "has a broadcast" filter — for a controlled, single real test post before trusting the unattended daily run against every match. Still respects the already-published guard. */
@@ -178,25 +111,44 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
     summary.attempted++;
 
     const caption = buildCarouselCaption(group.competitionName, group.matches, group.part, group.totalParts);
-    // The cache-busting `v` param isn't read by the route - it's there so
-    // a *re*-post of the same match (e.g. after fixing a rendering bug and
-    // manually deleting/redoing a bad post) gets a URL Instagram has never
-    // fetched before. Confirmed live: a same-day repost of an
-    // already-fixed match still went out with the old broken art, because
-    // Instagram's own fetch of the identical previous URL was cached.
-    const imageUrls = group.matches.map(
-      (match) => `${env.PUBLIC_BASE_URL}/api/instagram-preview?matchId=${encodeURIComponent(match.id)}&v=${Date.now()}`,
-    );
+    const slides = chunkIntoSlides(group.matches);
+    // Every match on the slide is passed explicitly rather than the route
+    // working the grouping out again — an ingest landing between this read
+    // and Instagram's fetch would otherwise hand it a different slide than
+    // the caption describes.
+    //
+    // The cache-busting `v` param isn't read by the route: a *re*-post of
+    // the same matches (after fixing a rendering bug, say) needs a URL
+    // Instagram has never fetched before. Confirmed live: a same-day repost
+    // still went out with the old broken art, from Instagram's own cache of
+    // the identical previous URL.
+    const version = Date.now();
+    const slideUrl = (params: Record<string, string>): string => {
+      const query = new URLSearchParams({ ...params, competitionId: group.competitionId, v: String(version) });
+      return `${env.PUBLIC_BASE_URL}/api/instagram-slide?${query.toString()}`;
+    };
+    const mixed = new Set(group.matches.map((match) => match.competitionId)).size > 1;
+
+    const imageUrls = [
+      slideUrl({ kind: "cover", matchIds: group.matches.map((match) => match.id).join(",") }),
+      ...slides.map((slideMatches, index) =>
+        slideUrl({
+          kind: "slide",
+          matchIds: slideMatches.map((match) => match.id).join(","),
+          mixed: String(mixed),
+          ...(slides.length > 1 ? { slideLabel: `${index + 1}/${slides.length}` } : {}),
+        }),
+      ),
+    ];
 
     if (env.INSTAGRAM_DRY_RUN) {
       // Exercises the real rendering path (catches template/asset errors)
       // without ever touching the Graph API or writing DB state - safe to
       // run repeatedly against real data.
-      for (const match of group.matches) {
-        const png = await renderMatchImage(match);
-        console.log(`[instagram dry-run] slide ${match.id}: rendered ${png.length} bytes`);
-      }
-      console.log(`[instagram dry-run] ${group.competitionId} (${group.matches.length} slides)\n${caption}`);
+      const rendered = await renderCarouselImages(group.competitionId, group.matches);
+      console.log(
+        `[instagram dry-run] ${group.competitionId}: ${rendered.length} images (${rendered.map((png) => png.length).join(", ")} bytes)\n${caption}`,
+      );
       summary.published++;
       summary.matchesPublished += group.matches.length;
       continue;

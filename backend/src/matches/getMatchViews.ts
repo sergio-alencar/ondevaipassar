@@ -5,6 +5,8 @@ import { broadcasts, matches } from "../db/schema.js";
 
 export interface GetMatchViewsQuery {
   id?: string;
+  /** Exactly these matches, in the order given — how the Instagram slide route asks for the matches the poster grouped, rather than re-deriving the grouping and risking a different answer. */
+  ids?: string[];
   teamId?: string;
   competitionId?: string;
   from?: string;
@@ -17,6 +19,19 @@ export async function getMatchViews(query: GetMatchViewsQuery): Promise<MatchVie
   // that's already kicking off) — no other filter makes sense combined with it.
   if (query.id) {
     return buildMatchViews([eq(matches.id, query.id)]);
+  }
+
+  if (query.ids) {
+    if (query.ids.length === 0) return [];
+    const found = await buildMatchViews([inArray(matches.id, query.ids)]);
+    // Caller's order, not the DB's: a slide's matches are laid out in the
+    // order the poster chose, and a missing one is simply absent rather
+    // than shifting everything after it.
+    const byId = new Map(found.map((match) => [match.id, match]));
+    return query.ids.flatMap((id) => {
+      const match = byId.get(id);
+      return match ? [match] : [];
+    });
   }
 
   const { teamId, competitionId, to } = query;

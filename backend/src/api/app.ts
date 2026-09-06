@@ -10,6 +10,7 @@ import { cronRoutes } from "./routes/cron.js";
 import { healthRoutes } from "./routes/health.js";
 import { instagramCronRoutes } from "./routes/instagramCron.js";
 import { instagramPreviewRoutes } from "./routes/instagramPreview.js";
+import { instagramSlideRoutes } from "./routes/instagramSlide.js";
 import { matchesRoutes } from "./routes/matches.js";
 import { teamsRoutes } from "./routes/teams.js";
 
@@ -29,6 +30,7 @@ export async function buildApp() {
   await app.register(cronRoutes);
   await app.register(instagramCronRoutes);
   await app.register(instagramPreviewRoutes);
+  await app.register(instagramSlideRoutes);
   await app.register(crestProxyRoutes);
   await app.register(digestRoutes);
 

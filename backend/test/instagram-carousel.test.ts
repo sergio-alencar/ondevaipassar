@@ -2,7 +2,7 @@ import type { MatchView } from "@ondevaipassar/shared";
 import { describe, expect, it } from "vitest";
 import { buildCarouselCaption } from "../src/instagram/caption.js";
 import { MAX_CAROUSEL_ITEMS } from "../src/instagram/graphApiClient.js";
-import { EUROPE_GROUP_ID, groupIntoPosts } from "../src/instagram/poster.js";
+import { EUROPE_GROUP_ID, groupIntoPosts } from "../src/instagram/postGroups.js";
 
 function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
   return {
