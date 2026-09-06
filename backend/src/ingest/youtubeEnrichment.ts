@@ -71,6 +71,15 @@ const TRACKED_CHANNELS: { channelId: string; youtubeChannelId: string; sourceId:
   // both — neither channel's real content is Feminino.
   { channelId: "jovempanesportes", youtubeChannelId: "UCv-Nx8pSfG_LxbViMz14RWQ", sourceId: "youtube-jovempanesportes" },
   { channelId: "romariotv", youtubeChannelId: "UCDUmY6hhe6qOzf_syVE-8Gg", sourceId: "youtube-romariotv" },
+  // Sérgio reported Borussia Dortmund x Villarreal (Champions) missing from
+  // the site while it was right there on this channel — the channel simply
+  // wasn't tracked. Its titles already match an existing TITLE_PATTERNS
+  // entry ("AO VIVO: BORUSSIA DORTMUND X VILLARREAL | UEFA CHAMPIONS LEAGUE
+  // 2026-27 (COM IMAGENS)"), so no new regex was needed. Channel id
+  // verified live from https://www.youtube.com/@TNTSportsBR (real
+  // externalId, not guessed). Note this also produces an HBO Max broadcast
+  // for free: see ingest/channelMirroring.ts.
+  { channelId: "tntsports", youtubeChannelId: "UCs-6sCz2LJm1PrWQN4ErsPw", sourceId: "youtube-tntsports" },
 ];
 
 async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], apiKey: string, allMatches: MatchCandidate[]): Promise<void> {

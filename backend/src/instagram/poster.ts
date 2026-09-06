@@ -69,6 +69,10 @@ async function getCandidateMatches(): Promise<MatchView[]> {
   return excludeAlreadyPublished(todaysMatches);
 }
 
+/** Synthetic competition id for the combined European post — also the filename of its logo (see assets.ts's competitionLogoDataUri). */
+export const EUROPE_GROUP_ID = "europa";
+export const EUROPE_GROUP_NAME = "Jogos da Europa";
+
 /** One post: a competition's matches for the day, already chunked to what a single carousel can hold. */
 export interface PostGroup {
   competitionId: string;
@@ -93,15 +97,23 @@ export interface PostGroup {
 export function groupIntoPosts(matches: MatchView[]): PostGroup[] {
   const byCompetition = new Map<string, MatchView[]>();
   for (const match of matches) {
-    byCompetition.set(match.competitionId, [...(byCompetition.get(match.competitionId) ?? []), match]);
+    // Every foreign competition lands in one post. Split by competition,
+    // the European side produced a stream of one- and two-match carousels
+    // (Premier League, LaLiga, Serie A, Champions, Liga Europa, EFL Cup...)
+    // on a normal midweek — Sérgio asked for a single "jogos da Europa"
+    // instead. Each slide still names the competition of the match on it,
+    // so nothing is lost by merging.
+    const key = findCompetitionById(match.competitionId)?.foreign === true ? EUROPE_GROUP_ID : match.competitionId;
+    byCompetition.set(key, [...(byCompetition.get(key) ?? []), match]);
   }
 
   const ordered = [...byCompetition.entries()].sort(([a], [b]) => {
-    const ca = findCompetitionById(a);
-    const cb = findCompetitionById(b);
-    const foreign = Number(ca?.foreign === true) - Number(cb?.foreign === true);
+    const foreign = Number(a === EUROPE_GROUP_ID) - Number(b === EUROPE_GROUP_ID);
     if (foreign !== 0) return foreign;
-    return (ca?.priority ?? Number.MAX_SAFE_INTEGER) - (cb?.priority ?? Number.MAX_SAFE_INTEGER);
+    return (
+      (findCompetitionById(a)?.priority ?? Number.MAX_SAFE_INTEGER) -
+      (findCompetitionById(b)?.priority ?? Number.MAX_SAFE_INTEGER)
+    );
   });
 
   const groups: PostGroup[] = [];
@@ -113,7 +125,10 @@ export function groupIntoPosts(matches: MatchView[]): PostGroup[] {
     chunks.forEach((chunk, index) =>
       groups.push({
         competitionId,
-        competitionName: findCompetitionById(competitionId)?.displayName ?? competitionMatches[0].competitionName,
+        competitionName:
+          competitionId === EUROPE_GROUP_ID
+            ? EUROPE_GROUP_NAME
+            : (findCompetitionById(competitionId)?.displayName ?? competitionMatches[0].competitionName),
         matches: chunk,
         part: index + 1,
         totalParts: chunks.length,

@@ -64,6 +64,8 @@ const FALLBACK_CREST = loadCrestArt(readFileSync(`${ASSETS_DIR}icons/escudo-cinz
 // plain white canvas. logo-3-purple.svg is a derived copy (fill="white" ->
 // fill="#581c87", nothing else changed) made just for this corner mark.
 export const WORDMARK = readSvgDataUri(`${ASSETS_DIR}icons/logo-3-purple.svg`);
+/** The original white-fill wordmark — for the carousel cover, which sits on the brand purple and would swallow the purple one. */
+export const WORDMARK_WHITE = readSvgDataUri(`${ASSETS_DIR}icons/logo-3.svg`);
 export const VERSUS_ICON = readSvgDataUri(`${ASSETS_DIR}icons/versus.svg`);
 
 /**
@@ -127,6 +129,20 @@ const RASTER_FORMATS: Array<{ ext: string; mime: string }> = [
   { ext: "jpg", mime: "image/jpeg" },
   { ext: "jpeg", mime: "image/jpeg" },
 ];
+
+/**
+ * Competition logo, or null when we don't ship art for it. Files are named
+ * by Competition.id, plus "europa" for the combined European carousel (see
+ * poster.ts). A competition with no logo falls back to the cover's crest
+ * strip rather than leaving a hole.
+ */
+export function competitionLogoDataUri(competitionId: string): string | null {
+  try {
+    return readRasterDataUri(`${ASSETS_DIR}competitions/${competitionId}.png`, "image/png");
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Local channel logo, or null when we don't ship art for this channel yet

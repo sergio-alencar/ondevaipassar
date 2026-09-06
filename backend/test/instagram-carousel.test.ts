@@ -2,7 +2,7 @@ import type { MatchView } from "@ondevaipassar/shared";
 import { describe, expect, it } from "vitest";
 import { buildCarouselCaption } from "../src/instagram/caption.js";
 import { MAX_CAROUSEL_ITEMS } from "../src/instagram/graphApiClient.js";
-import { groupIntoPosts } from "../src/instagram/poster.js";
+import { EUROPE_GROUP_ID, groupIntoPosts } from "../src/instagram/poster.js";
 
 function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
   return {
@@ -31,13 +31,28 @@ describe("groupIntoPosts", () => {
     expect(groups[0].matches).toHaveLength(3);
   });
 
-  it("separates competitions, Brazilian first and Série A before B", () => {
+  it("separates Brazilian competitions, Série A before B, with Europe last", () => {
     const groups = groupIntoPosts([
       buildMatch({ id: "eu", competitionId: "premier-league", competitionName: "Premier League" }),
       buildMatch({ id: "b", competitionId: "brasileirao-serie-b", competitionName: "Campeonato Brasileiro Série B" }),
       buildMatch({ id: "a" }),
     ]);
-    expect(groups.map((g) => g.competitionId)).toEqual(["brasileirao-serie-a", "brasileirao-serie-b", "premier-league"]);
+    expect(groups.map((g) => g.competitionId)).toEqual(["brasileirao-serie-a", "brasileirao-serie-b", EUROPE_GROUP_ID]);
+  });
+
+  // Split by competition, a normal midweek produced a stream of one- and
+  // two-match European carousels. They go out as a single post instead.
+  it("merges every foreign competition into one post", () => {
+    const groups = groupIntoPosts([
+      buildMatch({ id: "pl", competitionId: "premier-league", competitionName: "Premier League" }),
+      buildMatch({ id: "ucl", competitionId: "champions-league", competitionName: "Champions League" }),
+      buildMatch({ id: "efl", competitionId: "efl-cup", competitionName: "Copa da Liga Inglesa" }),
+      buildMatch({ id: "br" }),
+    ]);
+    const europa = groups.find((g) => g.competitionId === EUROPE_GROUP_ID);
+    expect(europa?.matches).toHaveLength(3);
+    expect(europa?.competitionName).toBe("Jogos da Europa");
+    expect(groups).toHaveLength(2);
   });
 
   // A carousel holds 10; a full Série A round is 10 matches and a busy
