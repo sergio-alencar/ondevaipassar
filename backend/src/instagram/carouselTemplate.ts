@@ -285,26 +285,28 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
         // frontend/public/images/campeonatos), so the marks sit directly on
         // the brand purple. The earlier white card existed only because the
         // first set was drawn for light backgrounds and vanished here.
+        // Logo alone when we have one: it already names the competition,
+        // and the title under it was saying the same thing twice. The name
+        // stays as the fallback for a competition with no art.
         ...(hasLogo
-          ? [h("img", { src: input.competitionLogoDataUri as string, style: { height: 330, objectFit: "contain" } })]
-          : []),
-        h(
-          "div",
-          {
-            style: {
-              display: "flex",
-              color: "#ffffff",
-              // Uppercase, per Sérgio - and sized down when the name is long
-              // enough that three big words would wrap into a wall.
-              fontSize: input.competitionName.length > 22 ? 66 : 86,
-              fontWeight: 700,
-              textAlign: "center",
-              lineHeight: 1.05,
-              letterSpacing: 1,
-            },
-          },
-          input.competitionName.toUpperCase(),
-        ),
+          ? [h("img", { src: input.competitionLogoDataUri as string, style: { height: 400, objectFit: "contain" } })]
+          : [
+              h(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    color: "#ffffff",
+                    fontSize: input.competitionName.length > 22 ? 66 : 86,
+                    fontWeight: 700,
+                    textAlign: "center",
+                    lineHeight: 1.05,
+                    letterSpacing: 1,
+                  },
+                },
+                input.competitionName.toUpperCase(),
+              ),
+            ]),
         h("div", { style: { display: "flex", color: "#e9d5ff", fontSize: 44 } }, input.dateLabel.toUpperCase()),
       ]),
       h(
