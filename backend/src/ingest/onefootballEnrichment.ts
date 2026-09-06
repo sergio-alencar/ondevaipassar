@@ -7,6 +7,7 @@ import type { MatchCard } from "../sources/onefootball/schema.js";
 import { resolveCompetitionId } from "./competitionResolver.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
 import { resolveTeamId } from "./teamResolver.js";
+import { normalizeText } from "@ondevaipassar/shared";
 
 const SOURCE_ID = "onefootball";
 const SOURCE_ID_PREFIX = `${SOURCE_ID}:`;
@@ -24,7 +25,7 @@ const DATE_TOLERANCE_DAYS = 1;
 // several plausible-looking slugs silently served Bundesliga's own content
 // instead of 404ing, confirmed live against "ligue-1" specifically, so
 // only slugs pulled from a real page's own links to itself were trusted).
-const COMPETITIONS: { slug: string; competitionId: string }[] = [
+const COMPETITIONS: { slug: string; competitionId: string; fullCoverage?: boolean }[] = [
   { slug: "premier-league-9", competitionId: "premier-league" },
   { slug: "laliga-10", competitionId: "la-liga" },
   { slug: "bundesliga-1", competitionId: "bundesliga" },
@@ -40,6 +41,20 @@ const COMPETITIONS: { slug: string; competitionId: string }[] = [
   { slug: "brasileirao-betano-16", competitionId: "brasileirao-serie-a" },
   { slug: "brasileirao-serie-b-superbet-119", competitionId: "brasileirao-serie-b" },
   { slug: "brasileirao-serie-c-195", competitionId: "brasileirao-serie-c" },
+  // Ingested WHOLE, unlike everything above: every match enters, including
+  // the ones where neither club is tracked. Sérgio's reasoning, and it's
+  // right — Fenerbahçe x Roma draws a Brazilian audience without either
+  // club being one of the 20 we follow, and hand-maintaining a club list
+  // can't keep up with a 36-team Champions League that reshuffles yearly.
+  // The five domestic European leagues stay tracked-clubs-only: those are
+  // followed for the clubs, not for the competition.
+  //
+  // Both slugs came from a real match page's own link to its competition,
+  // never guessed — and guessing here is genuinely dangerous:
+  // "champions-league-12" returns HTTP 200 and quietly serves the World
+  // Cup, because only the trailing number is real.
+  { slug: "uefa-liga-dos-campeoes-5", competitionId: "champions-league", fullCoverage: true },
+  { slug: "uefa-liga-europa-7", competitionId: "europa-league", fullCoverage: true },
 ];
 
 /**
@@ -85,6 +100,8 @@ interface PageSource {
   fetch: () => Promise<RoundMatchCard[]>;
   /** null means "can't tell" — the card is skipped rather than filed under a guess. */
   competitionIdFor: (card: MatchCard) => string | null;
+  /** Take every match on this page, even one where neither club is tracked. */
+  fullCoverage: boolean;
 }
 
 function buildPageSources(): PageSource[] {
@@ -95,12 +112,17 @@ function buildPageSources(): PageSource[] {
       // A competition page is one competition throughout; its cards carry
       // an empty competitionName.
       competitionIdFor: () => competition.competitionId,
+      fullCoverage: competition.fullCoverage === true,
     })),
     ...TRACKED_EUROPEAN_TEAMS.map((team) => ({
       label: `time ${team.teamId}`,
       fetch: () => fetchTeamMatchCards(team.onefootballId),
       competitionIdFor: (card: MatchCard) =>
         card.competitionName ? resolveCompetitionId(card.competitionName) : null,
+      // A team page is fetched *because* of the club on it, so a match with
+      // no tracked side there would be a resolver failure, not a fixture
+      // we want.
+      fullCoverage: false,
     })),
   ];
 }
@@ -108,6 +130,9 @@ function buildPageSources(): PageSource[] {
 export interface Candidate {
   homeTeamId: string | null;
   awayTeamId: string | null;
+  /** Needed to dedup a fixture where NEITHER club is tracked — the ids are both null there, so they can't tell two different matches apart. */
+  homeTeamNameRaw: string;
+  awayTeamNameRaw: string;
   kickoffUtc: string;
 }
 
@@ -115,6 +140,8 @@ export interface MatchRow {
   id: string;
   homeTeamId: string | null;
   awayTeamId: string | null;
+  homeTeamNameRaw: string;
+  awayTeamNameRaw: string;
   kickoffUtc: string;
   kickoffTimeConfirmed: boolean;
   round: number | null;
@@ -145,16 +172,50 @@ function daysBetween(a: CalendarDate, b: CalendarDate): number {
   return Math.abs(Date.UTC(a.year, a.month - 1, a.day) - Date.UTC(b.year, b.month - 1, b.day)) / msPerDay;
 }
 
-/** Every already-ingested match (any source) whose team pair + date could plausibly be the same real fixture as `candidate`. Exported for direct unit testing — this is the correctness-critical piece deciding whether a fixture gets duplicated. */
-export function findCoveringMatches(candidate: Candidate, allMatches: MatchRow[]): MatchRow[] {
-  if (candidate.homeTeamId === null && candidate.awayTeamId === null) return [];
+function namesMatch(a: string, b: string): boolean {
+  return normalizeText(a) === normalizeText(b);
+}
 
+/**
+ * Every already-ingested match (any source) whose team pair + date could
+ * plausibly be the same real fixture as `candidate`. Exported for direct
+ * unit testing — this is the correctness-critical piece deciding whether a
+ * fixture gets duplicated.
+ *
+ * Two regimes, because a null team id means different things depending on
+ * how many of them there are:
+ *
+ * - At least one side tracked: a null on the OTHER side is a wildcard
+ *   ("some untracked opponent"), which is what lets a ge.globo row with an
+ *   unnamed opponent still be recognised as the same fixture.
+ * - Neither side tracked: wildcards on both sides would match every match
+ *   that day, so the raw names are compared instead. This regime only
+ *   exists because the European cups are now ingested whole (see
+ *   FULL_COVERAGE_COMPETITIONS), which is the first time fixtures with two
+ *   untracked clubs get created at all.
+ */
+export function findCoveringMatches(candidate: Candidate, allMatches: MatchRow[]): MatchRow[] {
   const candidateDate = toBrtCalendarDate(candidate.kickoffUtc);
+  const withinTolerance = (match: MatchRow): boolean =>
+    daysBetween(toBrtCalendarDate(match.kickoffUtc), candidateDate) <= DATE_TOLERANCE_DAYS;
+
+  if (candidate.homeTeamId === null && candidate.awayTeamId === null) {
+    return allMatches.filter((match) => {
+      const sameOrder =
+        namesMatch(candidate.homeTeamNameRaw, match.homeTeamNameRaw) &&
+        namesMatch(candidate.awayTeamNameRaw, match.awayTeamNameRaw);
+      const swappedOrder =
+        namesMatch(candidate.homeTeamNameRaw, match.awayTeamNameRaw) &&
+        namesMatch(candidate.awayTeamNameRaw, match.homeTeamNameRaw);
+      return (sameOrder || swappedOrder) && withinTolerance(match);
+    });
+  }
+
   return allMatches.filter((match) => {
     const sameOrder = teamMatches(candidate.homeTeamId, match.homeTeamId) && teamMatches(candidate.awayTeamId, match.awayTeamId);
     const swappedOrder = teamMatches(candidate.homeTeamId, match.awayTeamId) && teamMatches(candidate.awayTeamId, match.homeTeamId);
     if (!sameOrder && !swappedOrder) return false;
-    return daysBetween(toBrtCalendarDate(match.kickoffUtc), candidateDate) <= DATE_TOLERANCE_DAYS;
+    return withinTolerance(match);
   });
 }
 
@@ -285,9 +346,14 @@ export async function runOnefootballEnrichment(): Promise<void> {
         const candidate: Candidate = {
           homeTeamId: resolveTeamId(card.homeTeam.name),
           awayTeamId: resolveTeamId(card.awayTeam.name),
+          homeTeamNameRaw: card.homeTeam.name,
+          awayTeamNameRaw: card.awayTeam.name,
           kickoffUtc: card.kickoff,
         };
-        if (candidate.homeTeamId === null && candidate.awayTeamId === null) continue; // neither side a team we track — not our concern
+        // Neither side tracked: normally not our concern, but a
+        // full-coverage competition takes the match anyway (its clubs are
+        // the point, not our roster).
+        if (candidate.homeTeamId === null && candidate.awayTeamId === null && !page.fullCoverage) continue;
 
         const competitionId = page.competitionIdFor(card);
         if (competitionId === null) continue; // no competition name on the card — never file it under a guess

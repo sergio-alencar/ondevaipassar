@@ -5,6 +5,8 @@ function buildCandidate(overrides: Partial<Candidate> = {}): Candidate {
   return {
     homeTeamId: "bayern_munique",
     awayTeamId: null,
+    homeTeamNameRaw: "Bayern de Munique",
+    awayTeamNameRaw: "Adversário",
     kickoffUtc: "2026-08-28T18:30:00Z",
     ...overrides,
   };
@@ -15,6 +17,8 @@ function buildMatch(overrides: Partial<MatchRow> = {}): MatchRow {
     id: "ge-globo:1",
     homeTeamId: "bayern_munique",
     awayTeamId: null,
+    homeTeamNameRaw: "Bayern de Munique",
+    awayTeamNameRaw: "Adversário",
     kickoffUtc: "2026-08-28T18:30:00.000Z",
     kickoffTimeConfirmed: true,
     round: null,
@@ -41,9 +45,48 @@ describe("findCoveringMatches", () => {
     expect(covering).toEqual([]);
   });
 
-  it("never wildcard-matches when neither side of the candidate is tracked", () => {
-    const covering = findCoveringMatches(buildCandidate({ homeTeamId: null, awayTeamId: null }), [buildMatch()]);
-    expect(covering).toEqual([]);
+  // Two untracked clubs is now a real case (the European cups are ingested
+  // whole), so this can't just bail — but wildcarding both sides would
+  // match every fixture that day, so it falls back to the raw names.
+  it("dedups two untracked clubs by their raw names", () => {
+    const candidate = buildCandidate({
+      homeTeamId: null,
+      awayTeamId: null,
+      homeTeamNameRaw: "Bodo/Glimt",
+      awayTeamNameRaw: "Copenhague",
+    });
+    const same = buildMatch({
+      id: "onefootball:1",
+      homeTeamId: null,
+      awayTeamId: null,
+      homeTeamNameRaw: "Bodo/Glimt",
+      awayTeamNameRaw: "Copenhague",
+    });
+    expect(findCoveringMatches(candidate, [same]).map((m) => m.id)).toEqual(["onefootball:1"]);
+  });
+
+  it("matches two untracked clubs regardless of home/away order, and never a different pair", () => {
+    const candidate = buildCandidate({
+      homeTeamId: null,
+      awayTeamId: null,
+      homeTeamNameRaw: "Bodo/Glimt",
+      awayTeamNameRaw: "Copenhague",
+    });
+    const swapped = buildMatch({
+      id: "swapped",
+      homeTeamId: null,
+      awayTeamId: null,
+      homeTeamNameRaw: "Copenhague",
+      awayTeamNameRaw: "Bodo/Glimt",
+    });
+    const outro = buildMatch({
+      id: "outro",
+      homeTeamId: null,
+      awayTeamId: null,
+      homeTeamNameRaw: "Slavia Praga",
+      awayTeamNameRaw: "Bodo/Glimt",
+    });
+    expect(findCoveringMatches(candidate, [swapped, outro]).map((m) => m.id)).toEqual(["swapped"]);
   });
 
   it("tolerates a 1-day gap between the candidate's and the existing match's date", () => {

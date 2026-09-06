@@ -280,28 +280,13 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
           { style: { display: "flex", color: "#e9d5ff", fontSize: 40, fontWeight: 700, letterSpacing: 4 } },
           "ONDE ASSISTIR",
         ),
-        // White card behind the logo, always: these are third-party marks
-        // drawn for a light background (the Brasileirão's own wordmark is
-        // near-black and vanished against the purple), and a card is both
-        // the fix and a deliberate-looking one.
+        // No card behind the logo: Sérgio supplied light-text variants
+        // built for a dark background (the "-2" files in
+        // frontend/public/images/campeonatos), so the marks sit directly on
+        // the brand purple. The earlier white card existed only because the
+        // first set was drawn for light backgrounds and vanished here.
         ...(hasLogo
-          ? [
-              h(
-                "div",
-                {
-                  style: {
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 340,
-                    height: 340,
-                    borderRadius: 40,
-                    backgroundColor: "#ffffff",
-                  },
-                },
-                h("img", { src: input.competitionLogoDataUri as string, style: { width: 268, height: 268, objectFit: "contain" } }),
-              ),
-            ]
+          ? [h("img", { src: input.competitionLogoDataUri as string, style: { height: 330, objectFit: "contain" } })]
           : []),
         h(
           "div",
