@@ -1,16 +1,19 @@
-import { isTodayInBrasilia, type MatchView } from "@ondevaipassar/shared";
+import { findCompetitionById, isTodayInBrasilia, type MatchView } from "@ondevaipassar/shared";
 import { env } from "../config/env.js";
 import { db } from "../db/client.js";
 import { instagramPosts } from "../db/schema.js";
 import { getErrorMessage } from "../lib/errors.js";
 import { getMatchViews } from "../matches/getMatchViews.js";
-import { buildCaption } from "./caption.js";
-import { realGraphApiClient, type GraphApiClient } from "./graphApiClient.js";
+import { buildCarouselCaption } from "./caption.js";
+import { MAX_CAROUSEL_ITEMS, realGraphApiClient, type GraphApiClient } from "./graphApiClient.js";
 import { renderMatchImage } from "./renderImage.js";
 
 export interface PostingSummary {
+  /** Carousels attempted, not matches — one post now covers a whole competition. */
   attempted: number;
+  /** Carousels published. matchesPublished counts the matches inside them. */
   published: number;
+  matchesPublished: number;
   failed: number;
   /** Errors thrown at or after the publish call — the post may well be live on Instagram, so these are never retried automatically. Needs a human to look at the account and either delete a stray post or reset the match (see /api/cron-instagram-reset). */
   unknown: number;
@@ -66,6 +69,60 @@ async function getCandidateMatches(): Promise<MatchView[]> {
   return excludeAlreadyPublished(todaysMatches);
 }
 
+/** One post: a competition's matches for the day, already chunked to what a single carousel can hold. */
+export interface PostGroup {
+  competitionId: string;
+  competitionName: string;
+  matches: MatchView[];
+  part: number;
+  totalParts: number;
+}
+
+/**
+ * One carousel per competition per day, instead of one post per match.
+ * Sergio asked for this on feed-quality grounds, but it also cuts directly
+ * at the failure hit on 2026-09-05: publishing is the rate-limited action,
+ * and this turns ~20 publishes a day into ~5.
+ *
+ * A competition with more matches than a carousel holds is split across
+ * numbered posts rather than dropping any. Competition ORDER follows the
+ * same rule as the digest (Brazilian before foreign, Serie A/B/C pinned),
+ * so the account posts the biggest draw first on a busy morning - which is
+ * also what survives if the run is cut short.
+ */
+export function groupIntoPosts(matches: MatchView[]): PostGroup[] {
+  const byCompetition = new Map<string, MatchView[]>();
+  for (const match of matches) {
+    byCompetition.set(match.competitionId, [...(byCompetition.get(match.competitionId) ?? []), match]);
+  }
+
+  const ordered = [...byCompetition.entries()].sort(([a], [b]) => {
+    const ca = findCompetitionById(a);
+    const cb = findCompetitionById(b);
+    const foreign = Number(ca?.foreign === true) - Number(cb?.foreign === true);
+    if (foreign !== 0) return foreign;
+    return (ca?.priority ?? Number.MAX_SAFE_INTEGER) - (cb?.priority ?? Number.MAX_SAFE_INTEGER);
+  });
+
+  const groups: PostGroup[] = [];
+  for (const [competitionId, competitionMatches] of ordered) {
+    const chunks: MatchView[][] = [];
+    for (let i = 0; i < competitionMatches.length; i += MAX_CAROUSEL_ITEMS) {
+      chunks.push(competitionMatches.slice(i, i + MAX_CAROUSEL_ITEMS));
+    }
+    chunks.forEach((chunk, index) =>
+      groups.push({
+        competitionId,
+        competitionName: findCompetitionById(competitionId)?.displayName ?? competitionMatches[0].competitionName,
+        matches: chunk,
+        part: index + 1,
+        totalParts: chunks.length,
+      }),
+    );
+  }
+  return groups;
+}
+
 export interface RunPostingOptions {
   graphApi?: GraphApiClient;
   /** Restrict to exactly one match, bypassing the "today" + "has a broadcast" filter — for a controlled, single real test post before trusting the unattended daily run against every match. Still respects the already-published guard. */
@@ -77,36 +134,56 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
   const candidates = onlyMatchId
     ? await excludeAlreadyPublished(await getMatchViews({ id: onlyMatchId }))
     : await getCandidateMatches();
-  const summary: PostingSummary = { attempted: 0, published: 0, failed: 0, unknown: 0, skipped: 0, blocked: false };
+  const groups = groupIntoPosts(candidates);
+  const summary: PostingSummary = {
+    attempted: 0,
+    published: 0,
+    matchesPublished: 0,
+    failed: 0,
+    unknown: 0,
+    skipped: 0,
+    blocked: false,
+  };
   const runStartedAt = Date.now();
 
-  for (const match of candidates) {
-    // Stop BEFORE starting a new match, not after — half-starting one we
-    // don't have time to finish is worse than just leaving it for the next
-    // run (which excludeAlreadyPublished makes safe to trigger any time).
+  const remainingMatches = (postsDone: number): number =>
+    groups.slice(postsDone).reduce((total, group) => total + group.matches.length, 0);
+
+  for (const group of groups) {
+    // Stop BEFORE starting a post we may not be able to finish - a
+    // half-built carousel leaves orphan containers and, worse, an
+    // ambiguous publish. The next run picks these up: every match still
+    // has no instagram_posts row, so excludeAlreadyPublished lets them
+    // through again.
     if (Date.now() - runStartedAt > TIME_BUDGET_MS) {
-      summary.skipped = candidates.length - summary.attempted;
-      console.log(`[instagram] time budget reached, stopping early with ${summary.skipped} candidate(s) left for next run`);
+      summary.skipped = remainingMatches(summary.attempted);
+      console.log(`[instagram] time budget reached, stopping early with ${summary.skipped} match(es) left for next run`);
       break;
     }
     summary.attempted++;
 
-    const caption = buildCaption(match);
-    // The cache-busting `v` param isn't read by the route — it's there so
+    const caption = buildCarouselCaption(group.competitionName, group.matches, group.part, group.totalParts);
+    // The cache-busting `v` param isn't read by the route - it's there so
     // a *re*-post of the same match (e.g. after fixing a rendering bug and
     // manually deleting/redoing a bad post) gets a URL Instagram has never
     // fetched before. Confirmed live: a same-day repost of an
     // already-fixed match still went out with the old broken art, because
     // Instagram's own fetch of the identical previous URL was cached.
-    const imageUrl = `${env.PUBLIC_BASE_URL}/api/instagram-preview?matchId=${encodeURIComponent(match.id)}&v=${Date.now()}`;
+    const imageUrls = group.matches.map(
+      (match) => `${env.PUBLIC_BASE_URL}/api/instagram-preview?matchId=${encodeURIComponent(match.id)}&v=${Date.now()}`,
+    );
 
     if (env.INSTAGRAM_DRY_RUN) {
       // Exercises the real rendering path (catches template/asset errors)
-      // without ever touching the Graph API or writing DB state — safe to
+      // without ever touching the Graph API or writing DB state - safe to
       // run repeatedly against real data.
-      const png = await renderMatchImage(match);
-      console.log(`[instagram dry-run] ${match.id}: rendered ${png.length} bytes\n${caption}\nimage: ${imageUrl}`);
+      for (const match of group.matches) {
+        const png = await renderMatchImage(match);
+        console.log(`[instagram dry-run] slide ${match.id}: rendered ${png.length} bytes`);
+      }
+      console.log(`[instagram dry-run] ${group.competitionId} (${group.matches.length} slides)\n${caption}`);
       summary.published++;
+      summary.matchesPublished += group.matches.length;
       continue;
     }
 
@@ -117,48 +194,73 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
     // single blocked account turned into dozens of duplicates).
     let phase: "create" | "poll" | "publish" | "record" = "create";
     try {
-      const containerId = await graphApi.createContainer(imageUrl, caption);
+      const childIds: string[] = [];
+      for (const imageUrl of imageUrls) {
+        childIds.push(await graphApi.createCarouselItem(imageUrl));
+      }
+      phase = "poll";
+      for (const childId of childIds) {
+        await graphApi.pollUntilFinished(childId);
+      }
+
+      phase = "create";
+      // A "carousel" of one is rejected by Meta (minimum 2), and a lone
+      // match shouldn't become a swipeable post anyway - it goes out as
+      // the ordinary single-image post this pipeline always made.
+      const containerId =
+        childIds.length === 1
+          ? await graphApi.createContainer(imageUrls[0], caption)
+          : await graphApi.createCarousel(childIds, caption);
       phase = "poll";
       await graphApi.pollUntilFinished(containerId);
       phase = "publish";
       const igMediaId = await graphApi.publishContainer(containerId);
       phase = "record";
 
-      await db
-        .insert(instagramPosts)
-        .values({
-          id: match.id,
-          matchId: match.id,
-          status: "published",
-          igMediaId,
-          postedAt: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-        })
-        .onConflictDoUpdate({
-          target: instagramPosts.id,
-          set: { status: "published", igMediaId, postedAt: new Date().toISOString(), errorMessage: null },
-        });
+      // One row per match, all sharing the carousel's media id: the
+      // already-posted guard and /api/cron-instagram-reset both work per
+      // match and stay unchanged by the switch to grouped posts.
+      const now = new Date().toISOString();
+      const rows = group.matches.map((match) =>
+        db
+          .insert(instagramPosts)
+          .values({ id: match.id, matchId: match.id, status: "published", igMediaId, postedAt: now, createdAt: now })
+          .onConflictDoUpdate({
+            target: instagramPosts.id,
+            set: { status: "published", igMediaId, postedAt: now, errorMessage: null },
+          }),
+      );
+      const [first, ...rest] = rows;
+      await db.batch([first, ...rest]);
+
       summary.published++;
+      summary.matchesPublished += group.matches.length;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       const ambiguous = phase === "publish" || phase === "record";
       const status = ambiguous ? "unknown" : "failed";
 
-      await db
-        .insert(instagramPosts)
-        .values({ id: match.id, matchId: match.id, status, errorMessage, createdAt: new Date().toISOString() })
-        .onConflictDoUpdate({ target: instagramPosts.id, set: { status, errorMessage } });
-      console.error(`[instagram] ${status} while posting match ${match.id} (phase: ${phase}):`, error);
+      const now = new Date().toISOString();
+      const rows = group.matches.map((match) =>
+        db
+          .insert(instagramPosts)
+          .values({ id: match.id, matchId: match.id, status, errorMessage, createdAt: now })
+          .onConflictDoUpdate({ target: instagramPosts.id, set: { status, errorMessage } }),
+      );
+      const [first, ...rest] = rows;
+      await db.batch([first, ...rest]);
+
+      console.error(`[instagram] ${status} while posting ${group.competitionId} (phase: ${phase}):`, error);
       if (ambiguous) summary.unknown++;
       else summary.failed++;
 
       if (isRateLimited(error)) {
-        // Every remaining candidate would hit the same block, and each one
-        // risks another ambiguous state. Stop the whole run and let the
-        // caller (the GitHub Actions loop) see `blocked` and stop retrying.
+        // Every remaining post would hit the same block, and each one risks
+        // another ambiguous state. Stop the whole run and let the caller
+        // (the GitHub Actions loop) see `blocked` and stop retrying.
         summary.blocked = true;
-        summary.skipped = candidates.length - summary.attempted;
-        console.error(`[instagram] rate-limited by Meta, aborting run with ${summary.skipped} candidate(s) untouched`);
+        summary.skipped = remainingMatches(summary.attempted);
+        console.error(`[instagram] rate-limited by Meta, aborting run with ${summary.skipped} match(es) untouched`);
         break;
       }
     }

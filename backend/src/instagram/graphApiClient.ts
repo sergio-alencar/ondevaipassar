@@ -21,8 +21,15 @@ const GRAPH_API_BASE = "https://graph.instagram.com/v25.0";
 const POLL_INTERVAL_MS = 3000;
 const POLL_TIMEOUT_MS = 5 * 60000;
 
+/** Instagram's own ceiling for a carousel. Meta is rolling out 20 gradually, but it isn't guaranteed per account, so a competition with more matches than this is split across posts rather than risking a rejected container. */
+export const MAX_CAROUSEL_ITEMS = 10;
+
 export interface GraphApiClient {
   createContainer(imageUrl: string, caption: string): Promise<string>;
+  /** One slide of a future carousel: same media container, but flagged so it can't be published on its own and carries no caption of its own. */
+  createCarouselItem(imageUrl: string): Promise<string>;
+  /** The container that ties the slides together and carries the caption for the whole post. */
+  createCarousel(childIds: string[], caption: string): Promise<string>;
   pollUntilFinished(containerId: string): Promise<void>;
   publishContainer(containerId: string): Promise<string>;
 }
@@ -47,6 +54,32 @@ export const realGraphApiClient: GraphApiClient = {
     const body = await fetchJson(`${GRAPH_API_BASE}/${accountId}/media`, { method: "POST", body: params });
     const containerId = body.id;
     if (typeof containerId !== "string") throw new Error(`Unexpected container-creation response: ${JSON.stringify(body)}`);
+    return containerId;
+  },
+
+  async createCarouselItem(imageUrl) {
+    const accountId = env.INSTAGRAM_USER_ID;
+    const token = env.INSTAGRAM_ACCESS_TOKEN;
+    if (!accountId || !token) throw new Error("INSTAGRAM_USER_ID/INSTAGRAM_ACCESS_TOKEN not configured");
+
+    const params = new URLSearchParams({ image_url: imageUrl, is_carousel_item: "true", access_token: token });
+    const body = await fetchJson(`${GRAPH_API_BASE}/${accountId}/media`, { method: "POST", body: params });
+    const containerId = body.id;
+    if (typeof containerId !== "string") throw new Error(`Unexpected carousel-item response: ${JSON.stringify(body)}`);
+    return containerId;
+  },
+
+  async createCarousel(childIds, caption) {
+    const accountId = env.INSTAGRAM_USER_ID;
+    const token = env.INSTAGRAM_ACCESS_TOKEN;
+    if (!accountId || !token) throw new Error("INSTAGRAM_USER_ID/INSTAGRAM_ACCESS_TOKEN not configured");
+    if (childIds.length < 2) throw new Error(`A carousel needs at least 2 items, got ${childIds.length}`);
+    if (childIds.length > MAX_CAROUSEL_ITEMS) throw new Error(`A carousel takes at most ${MAX_CAROUSEL_ITEMS} items, got ${childIds.length}`);
+
+    const params = new URLSearchParams({ media_type: "CAROUSEL", children: childIds.join(","), caption, access_token: token });
+    const body = await fetchJson(`${GRAPH_API_BASE}/${accountId}/media`, { method: "POST", body: params });
+    const containerId = body.id;
+    if (typeof containerId !== "string") throw new Error(`Unexpected carousel-container response: ${JSON.stringify(body)}`);
     return containerId;
   },
 
