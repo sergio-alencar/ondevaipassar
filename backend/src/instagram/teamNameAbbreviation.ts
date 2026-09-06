@@ -24,8 +24,43 @@ const WORD_ABBREVIATIONS: Record<string, string> = {
   associacao: "Assoc.",
 };
 
-/** Shortens recurring long words in a team name via the curated dictionary above; words with no entry pass through unchanged. */
+// Whole-name shortenings, checked before the per-word pass above. These
+// are the names Brazilian coverage actually uses day to day, not
+// inventions — "Man City", not "M. City". Sérgio supplied the first five;
+// the rest came from listing every team name that has actually appeared in
+// our own data at 13+ characters, so this shortens names we really render
+// rather than ones imagined. Keyed by normalizeText'd name.
+//
+// Deliberately NOT applied to the site or the digest: those have room, and
+// a team page saying "Man City" where the club is listed as "Manchester
+// City" would read as a different thing. This is only for the image, where
+// a long pairing forces the whole block down a size tier.
+const FULL_NAME_ABBREVIATIONS: Record<string, string> = {
+  "manchester city": "Man City",
+  "manchester united": "Man United",
+  "bayern de munique": "FC Bayern",
+  "paris saint-germain": "PSG",
+  "nottingham forest": "Notts Forest",
+  // Below: from our own rendered data, using each club's common Brazilian
+  // short name. Left alone on purpose — "Athletic Bilbao" (Athletic alone
+  // collides with Série B's Athletic Club), "Racing Santander" (Racing
+  // alone collides with Racing Club), "Inter de Milão" (the "de Milão" is
+  // what separates it from Internacional).
+  "borussia dortmund": "Dortmund",
+  "bayer leverkusen": "Leverkusen",
+  "vfb stuttgart": "Stuttgart",
+  "psv eindhoven": "PSV",
+  "afc bournemouth": "Bournemouth",
+  "coventry city fc": "Coventry",
+  "coventry city": "Coventry",
+  "stade brestois 29": "Brest",
+};
+
+/** Shortens a team name for the image: a whole-name entry if there is one, else the per-word dictionary; anything with neither passes through unchanged. */
 export function abbreviateTeamName(name: string): string {
+  const full = FULL_NAME_ABBREVIATIONS[normalizeText(name)];
+  if (full) return full;
+
   return name
     .split(" ")
     .map((word) => WORD_ABBREVIATIONS[normalizeText(word)] ?? word)
