@@ -27,21 +27,35 @@ async function render(tree: SatoriElement): Promise<Buffer> {
   return new Resvg(svg, { fitTo: { mode: "width", value: PORTRAIT_WIDTH } }).render().asPng();
 }
 
-async function toSlideMatch(match: MatchView, showCompetition: boolean): Promise<SlideMatch> {
+/**
+ * Drops the "(Fem.)" that distinguishes a women's team from the men's side
+ * of the same club. The registry needs it — "Grêmio" and "Grêmio (Fem.)"
+ * are two rows — but inside a Brasileirão Feminino carousel every match is
+ * women's football, so it's noise on every line.
+ */
+function displayTeamName(name: string): string {
+  return name.replace(/\s*\(Fem\.\)\s*$/i, "");
+}
+
+async function toSlideMatch(match: MatchView, showCompetition: boolean, notes: SlideNotes): Promise<SlideMatch> {
   const [homeCrest, awayCrest] = await Promise.all([
     crestArt(match.homeTeamId, match.homeTeamCrestUrl),
     crestArt(match.awayTeamId, match.awayTeamCrestUrl),
   ]);
   return {
-    homeTeamName: match.homeTeamName,
-    awayTeamName: match.awayTeamName,
+    homeTeamName: displayTeamName(match.homeTeamName),
+    awayTeamName: displayTeamName(match.awayTeamName),
     homeCrest,
     awayCrest,
     timeLabel: formatTimeLabel(match.kickoffUtc, match.kickoffTimeConfirmed),
     channels: match.broadcasts.map((broadcast) => ({
       displayName: broadcast.displayName,
       logoDataUri: channelLogoDataUri(broadcast.channelId),
-      hasRegionalNote: Boolean(broadcast.regionalDetail) || broadcast.regionalCaveat === true,
+      regionalMarker: broadcast.regionalDetail
+        ? notes.markerFor(broadcast.regionalDetail)
+        : broadcast.regionalCaveat
+          ? "*"
+          : "",
     })),
     competitionLabel: showCompetition
       ? (findCompetitionById(match.competitionId)?.shortName ?? match.competitionName)
@@ -55,18 +69,49 @@ async function toSlideMatch(match: MatchView, showCompetition: boolean): Promise
  * as the site and the digest (packages/shared), so a reader who checks both
  * doesn't get two different answers.
  */
-function buildRegionalNotes(matches: MatchView[]): string[] {
-  const notes = new Set<string>();
+/** "*", "**", ... — one per distinct note on a slide, so two Globo entries with different state lists aren't both marked with the same asterisk. */
+function marker(index: number): string {
+  return "*".repeat(index + 1);
+}
+
+interface SlideNotes {
+  /** The footnote lines, markers included, in the order they're marked. */
+  lines: string[];
+  /** Marker for a given regionalDetail, or "" for a broadcast that needs none. */
+  markerFor: (regionalDetail: string | null | undefined) => string;
+}
+
+function buildRegionalNotes(matches: MatchView[]): SlideNotes {
+  const details: string[] = [];
+  const names = new Map<string, string>();
+  let genericOnly = false;
+
   for (const match of matches) {
     for (const broadcast of match.broadcasts) {
       if (broadcast.regionalDetail) {
-        notes.add(`${broadcast.displayName} em: ${broadcast.regionalDetail} (${REGIONAL_PRACA_CAVEAT})`);
+        if (!details.includes(broadcast.regionalDetail)) details.push(broadcast.regionalDetail);
+        names.set(broadcast.regionalDetail, broadcast.displayName);
       } else if (broadcast.regionalCaveat) {
-        notes.add(REGIONAL_CAVEAT_TEXT);
+        genericOnly = true;
       }
     }
   }
-  return [...notes];
+
+  const lines = details.map((detail, index) => `${marker(index)} ${names.get(detail)} em: ${detail}`);
+  if (genericOnly) lines.push(REGIONAL_CAVEAT_TEXT);
+  // The "varies by praça" caveat applies to every line above equally, so it
+  // goes once at the end instead of being repeated on each — with two Globo
+  // entries on one slide it was printed twice.
+  if (details.length > 0) lines.push(`A cobertura ${REGIONAL_PRACA_CAVEAT}.`);
+
+  return {
+    lines,
+    markerFor: (detail) => {
+      if (!detail) return "";
+      const index = details.indexOf(detail);
+      return index === -1 ? "" : marker(index);
+    },
+  };
 }
 
 /** Splits a competition's matches into slides of at most MATCHES_PER_SLIDE. */
@@ -83,6 +128,11 @@ export function chunkIntoSlides(matches: MatchView[]): MatchView[][] {
  */
 export async function renderCarouselImages(competitionId: string, competitionName: string, matches: MatchView[]): Promise<Buffer[]> {
   const dateLabel = formatDateLabel(matches[0].kickoffUtc);
+  // "SÉRIE A", not "CAMPEONATO BRASILEIRO SÉRIE A" — Sérgio's call, and it
+  // lets the header fit on one line. The Italian-league collision the
+  // registry warns about is a data-resolution concern, not a reader one:
+  // nobody looking at a Brasileirão carousel reads "Série A" as Italy.
+  const shortName = findCompetitionById(competitionId)?.shortName ?? competitionName;
   // Only worth naming per match when the post actually mixes competitions —
   // on a Série A post every slide would just repeat the header.
   const mixed = new Set(matches.map((match) => match.competitionId)).size > 1;
@@ -104,16 +154,17 @@ export async function renderCarouselImages(competitionId: string, competitionNam
   const slides = chunkIntoSlides(matches);
   const rendered: Buffer[] = [cover];
   for (const [index, slideMatches] of slides.entries()) {
-    const slideMatchInputs = await Promise.all(slideMatches.map((match) => toSlideMatch(match, mixed)));
+    const notes = buildRegionalNotes(slideMatches);
+    const slideMatchInputs = await Promise.all(slideMatches.map((match) => toSlideMatch(match, mixed, notes)));
     rendered.push(
       await render(
         buildSlideTree({
-          competitionName,
+          competitionName: shortName,
           dateLabel,
           matches: slideMatchInputs,
           wordmarkDataUri: WORDMARK,
           slideLabel: slides.length > 1 ? `${index + 1}/${slides.length}` : null,
-          regionalNotes: buildRegionalNotes(slideMatches),
+          regionalNotes: notes.lines,
         }),
       ),
     );

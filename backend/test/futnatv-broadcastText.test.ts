@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { parseBroadcastChannels } from "../src/sources/futnatv/broadcastText.js";
 
+const ALL_UF_CODES = [
+  "AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS",
+  "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC",
+  "SE", "SP", "TO",
+];
+
 describe("parseBroadcastChannels", () => {
   it("parses a single bare channel name", () => {
     expect(parseBroadcastChannels("TV Brasil", null)).toEqual([{ channelNameRaw: "TV Brasil", watchUrl: null, regionalDetail: null }]);
@@ -27,13 +33,13 @@ describe("parseBroadcastChannels", () => {
     ]);
   });
 
-  it("inverts Globo's own exclusion-list wording into an alphabetical inclusion list against the full 27-UF reference (real example: 'menos X, Y e Z')", () => {
+  it("resolves Globo's own exclusion wording against the 27-UF reference, then words it whichever way is shorter (real example: 'menos X, Y e Z')", () => {
     const result = parseBroadcastChannels("Globo (menos SP, CE, MS e PR), Premiere e YouTube (GE TV)", "https://youtube.com/watch?v=x");
     expect(result[0]).toEqual({
       channelNameRaw: "Globo",
       watchUrl: null,
       regionalDetail:
-        "AC, AL, AM, AP, BA, DF, ES, GO, MA, MG, MT, PA, PB, PE, PI, RJ, RN, RO, RR, RS, SC, SE e TO",
+        "todo o Brasil, menos CE, MS, PR e SP",
     });
   });
 
@@ -47,7 +53,7 @@ describe("parseBroadcastChannels", () => {
         channelNameRaw: "Globo",
         watchUrl: null,
         regionalDetail:
-          "AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PI, RJ, RN, RO, RR, SC, SE e TO",
+          "todo o Brasil, menos PE, PR, RS e SP",
       },
       { channelNameRaw: "SporTV", watchUrl: null, regionalDetail: null },
       { channelNameRaw: "TV Brasil", watchUrl: null, regionalDetail: null },
@@ -84,14 +90,33 @@ describe("parseBroadcastChannels", () => {
     expect(globo.regionalDetail).not.toMatch(/^COM EXCEÇÃO/);
   });
 
-  it("marks prose in an exclusion list as an exception, not as an included state", () => {
+  it("keeps prose in an exclusion list on the excluded side, never the included one", () => {
     const [globo] = parseBroadcastChannels("Globo (menos MG e a região de Juiz de Fora)", null);
-    expect(globo.regionalDetail).toContain("exceto a região de Juiz de Fora");
-    expect(globo.regionalDetail).not.toContain("MG");
+    expect(globo.regionalDetail).toBe("todo o Brasil, menos MG e a região de Juiz de Fora");
   });
 
   it("returns the prose alone when there is no UF at all to normalize", () => {
     const [globo] = parseBroadcastChannels("Globo (parte da rede)", null);
     expect(globo.regionalDetail).toBe("parte da rede");
+  });
+
+  // Sérgio's call: 23 UF codes in a row is a wall nobody reads, and the
+  // same fact fits in a glance stated as an exclusion.
+  it("words a near-national broadcast as an exclusion instead of listing 23 states", () => {
+    const [globo] = parseBroadcastChannels(
+      "Globo (RJ, AC, AL, AP, AM, BA, CE, ES, GO, MA, MG, MS, MT, PA, PB, PI, RN, RO, RR, SC, SE, TO, DF)",
+      null,
+    );
+    expect(globo.regionalDetail).toBe("todo o Brasil, menos PE, PR, RS e SP");
+  });
+
+  it("keeps the plain list when that's the shorter way to say it", () => {
+    const [globo] = parseBroadcastChannels("Globo (RS, SP, PE e PR)", null);
+    expect(globo.regionalDetail).toBe("PE, PR, RS e SP");
+  });
+
+  it("says 'todo o Brasil' rather than naming all 27 states", () => {
+    const [globo] = parseBroadcastChannels(`Globo (${ALL_UF_CODES.join(", ")})`, null);
+    expect(globo.regionalDetail).toBe("todo o Brasil");
   });
 });

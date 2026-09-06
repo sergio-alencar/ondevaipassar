@@ -38,9 +38,9 @@ const GRAY_200 = "#e5e7eb";
 const SIDE_PADDING = 64;
 const CONTENT_WIDTH = PORTRAIT_WIDTH - 2 * SIDE_PADDING;
 
-/** A channel on a slide, plus whether its coverage carries a regional note (the asterisk and the footnote at the foot of the slide). */
+/** A channel on a slide, plus its footnote marker ("*", "**") — empty when its coverage carries no regional note. */
 export interface SlideChannel extends TemplateChannel {
-  hasRegionalNote: boolean;
+  regionalMarker: string;
 }
 
 export interface SlideMatch {
@@ -89,12 +89,12 @@ function channelTile(channel: SlideChannel, tileSize: number): SatoriElement {
         channel.displayName,
       );
 
-  if (!channel.hasRegionalNote) return art;
+  if (!channel.regionalMarker) return art;
   // The asterisk rides alongside the logo rather than on top of it, so it
   // never covers the art it's marking.
   return h("div", { style: { display: "flex", alignItems: "flex-start", gap: 2 } }, [
     art,
-    h("div", { style: { display: "flex", color: GRAY_900, fontSize: 40, fontWeight: 700 } }, "*"),
+    h("div", { style: { display: "flex", color: GRAY_900, fontSize: 40, fontWeight: 700 } }, channel.regionalMarker),
   ]);
 }
 
@@ -111,26 +111,23 @@ function channelStrip(channels: SlideChannel[], tileSize: number): SatoriElement
  * the square template uses, since two full names plus an "x" on one line
  * is what overflows first at this width.
  */
-const MIN_CREST = 150;
+const MIN_CREST = 110;
 // Capped so a slide carrying a single match doesn't render a crest three
 // times the size of the same crest on a 3-match slide — the block would
 // otherwise just grow into whatever vertical space it was given.
-const MAX_CREST = 245;
+const MAX_CREST = 180;
 
-// Everything in a block except the crests: the name, the kick-off, the
-// channel strip, the optional competition label and the gaps between them.
-// The crest gets whatever is left, which is what keeps a block inside its
-// box no matter how the surrounding sizes are tuned.
-const BLOCK_FIXED_HEIGHT = 58 + 56 + 104 + 40;
+// Everything in a block except the crests: the pairing line, the channel
+// strip, the optional competition label and the gaps between them. The
+// crest gets whatever is left, which is what keeps a block inside its box
+// no matter how the surrounding sizes are tuned.
+const BLOCK_FIXED_HEIGHT = 60 + 132 + 34;
 
 function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
   const labelHeight = match.competitionLabel ? 44 : 0;
   const crestBudget = blockHeight - BLOCK_FIXED_HEIGHT - labelHeight;
   const crestSize = Math.min(MAX_CREST, Math.max(MIN_CREST, crestBudget));
 
-  // Stacked, per Sérgio: crests, then names, then kick-off, then channels —
-  // each on its own line. Time and channels used to share a row, which
-  // pushed the channel logos small to fit beside the text.
   return h(
     "div",
     {
@@ -141,7 +138,7 @@ function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
         justifyContent: "center",
         width: CONTENT_WIDTH,
         height: blockHeight,
-        gap: 10,
+        gap: 14,
       },
     },
     [
@@ -154,23 +151,24 @@ function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
             ),
           ]
         : []),
-      h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 30 } }, [
+      h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 26 } }, [
         crest(match.homeCrest, crestSize),
-        h("div", { style: { display: "flex", color: GRAY_600, fontSize: 42, fontWeight: 700 } }, "x"),
+        h("div", { style: { display: "flex", color: GRAY_600, fontSize: 38, fontWeight: 700 } }, "x"),
         crest(match.awayCrest, crestSize),
       ]),
-      h(
-        "div",
-        { style: { display: "flex", color: GRAY_900, fontSize: 48, fontWeight: 700, textAlign: "center" } },
-        `${abbreviateTeamName(match.homeTeamName)} x ${abbreviateTeamName(match.awayTeamName)}`,
-      ),
-      h(
-        "div",
-        { style: { display: "flex", color: PURPLE, fontSize: 46, fontWeight: 700 } },
-        // "18H30", not "18h30" — Sérgio asked for the H uppercase here.
-        match.timeLabel.toUpperCase(),
-      ),
-      channelStrip(match.channels, 104),
+      // Kick-off and the pairing on one line, all caps — "16H30" with the H
+      // uppercase, per Sérgio.
+      h("div", { style: { display: "flex", alignItems: "baseline", justifyContent: "center", gap: 18 } }, [
+        h("div", { style: { display: "flex", color: PURPLE, fontSize: 46, fontWeight: 700 } }, match.timeLabel.toUpperCase()),
+        h(
+          "div",
+          { style: { display: "flex", color: GRAY_900, fontSize: 46, fontWeight: 700, textAlign: "center" } },
+          `${abbreviateTeamName(match.homeTeamName)} X ${abbreviateTeamName(match.awayTeamName)}`.toUpperCase(),
+        ),
+      ]),
+      // The channel art is the answer the whole project exists to give, so
+      // it gets the largest tile the block can carry.
+      channelStrip(match.channels, 132),
     ],
   );
 }
@@ -188,7 +186,7 @@ export interface SlideInput {
 
 /** A slide carrying 2-3 matches. */
 export function buildSlideTree(input: SlideInput): SatoriElement {
-  const headerHeight = 190;
+  const headerHeight = 150;
   const footerHeight = 96;
   // Sized from the notes' own WRAPPED line count, not just how many notes
   // there are: a full-state list ("AC, AL, AM, ...") runs to two lines at
@@ -230,16 +228,20 @@ export function buildSlideTree(input: SlideInput): SatoriElement {
           },
         },
         [
-          h(
-            "div",
-            { style: { display: "flex", color: PURPLE, fontSize: 52, fontWeight: 700, textAlign: "center" } },
-            input.competitionName.toUpperCase(),
-          ),
-          h(
-            "div",
-            { style: { display: "flex", color: GRAY_600, fontSize: 38, fontWeight: 700 } },
-            input.dateLabel.toUpperCase(),
-          ),
+          // One line, now that the competition name is the short form
+          // ("SÉRIE A", not "CAMPEONATO BRASILEIRO SÉRIE A").
+          h("div", { style: { display: "flex", alignItems: "baseline", justifyContent: "center", gap: 20 } }, [
+            h(
+              "div",
+              { style: { display: "flex", color: PURPLE, fontSize: 50, fontWeight: 700 } },
+              input.competitionName.toUpperCase(),
+            ),
+            h(
+              "div",
+              { style: { display: "flex", color: GRAY_600, fontSize: 38, fontWeight: 700 } },
+              input.dateLabel.toUpperCase(),
+            ),
+          ]),
         ],
       ),
       h(
@@ -280,8 +282,10 @@ export function buildSlideTree(input: SlideInput): SatoriElement {
                   gap: 6,
                 },
               },
+              // The lines arrive already marked (or deliberately unmarked,
+              // for the caveat that applies to all of them).
               input.regionalNotes.map((note) =>
-                h("div", { style: { display: "flex", color: GRAY_600, fontSize: 26 } }, `* ${note}`),
+                h("div", { style: { display: "flex", color: GRAY_600, fontSize: 26 } }, note),
               ),
             ),
           ]
@@ -319,10 +323,16 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
   // With a logo carrying the identity, the crests are a supporting strip
   // (one row); without one they ARE the artwork, so they get two rows at a
   // bigger size.
+  // Up to 10 crests in two rows of 5, and a "+N" chip for the rest. A busy
+  // Sunday is 10 Série A matches = 20 crests: shrinking them all to fit
+  // would make every one illegible, and silently showing the first few
+  // would misrepresent how much is on. Ten reads as a crowd and the chip
+  // says how big the crowd actually is.
   const perRow = 5;
-  const rowCount = hasLogo ? 1 : 2;
-  const crestSize = hasLogo ? 150 : 190;
-  const shown = input.crests.slice(0, perRow * rowCount);
+  const maxShown = perRow * 2;
+  const crestSize = hasLogo ? 130 : 160;
+  const shown = input.crests.slice(0, maxShown);
+  const remaining = input.crests.length - shown.length;
   const rows: TemplateCrest[][] = [];
   for (let i = 0; i < shown.length; i += perRow) rows.push(shown.slice(i, i + perRow));
 
@@ -374,11 +384,34 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
       h(
         "div",
         { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 30 } },
-        rows.map((row) =>
+        rows.map((row, rowIndex) =>
           h(
             "div",
             { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 30 } },
-            row.map((art) => crest(art, crestSize)),
+            [
+              ...row.map((art) => crest(art, crestSize)),
+              // The chip rides at the end of the last row rather than on a
+              // line of its own, so it reads as "and more of these".
+              ...(remaining > 0 && rowIndex === rows.length - 1
+                ? [
+                    h(
+                      "div",
+                      {
+                        style: {
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          height: crestSize,
+                          color: "#e9d5ff",
+                          fontSize: 44,
+                          fontWeight: 700,
+                        },
+                      },
+                      `+${remaining}`,
+                    ),
+                  ]
+                : []),
+            ],
           ),
         ),
       ),
