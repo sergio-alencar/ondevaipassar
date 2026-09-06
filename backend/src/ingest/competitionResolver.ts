@@ -31,6 +31,18 @@ const COMPETITION_ALIASES: Record<string, string> = {
   // ge.globo's own raw spelling (all caps, no space), not a typo here.
   "premier league": "premier-league",
   laliga: "la-liga",
+  // OneFootball's own spellings, confirmed live across all 20 tracked
+  // European clubs' fixture pages. "serie a" is the Italian league here:
+  // no Brazilian source produces that exact string (ge.globo, the only
+  // caller of this resolver, says "Campeonato Brasileiro" for Série A) —
+  // but it IS the collision the serie-a-italiana registry entry warns
+  // about, so anything new that resolves competition names from Brazilian
+  // free text has to be checked against this line.
+  "serie a": "serie-a-italiana",
+  "uefa liga dos campeoes": "champions-league",
+  "uefa liga europa": "europa-league",
+  "dfb-pokal": "dfb-pokal",
+  "efl cup": "efl-cup",
 };
 
 /** Resolves a raw championship name to our canonical Competition.id. Unrecognized names get a stable slugified stopgap id rather than being dropped — so a new competition shows up immediately, and promoting it to a registry entry (packages/shared/src/competition.ts) is a pure addition, not a rename. */

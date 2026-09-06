@@ -2,7 +2,9 @@ import { eq } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
 import { getErrorMessage } from "../lib/errors.js";
-import { fetchCompetitionMatchCards, type RoundMatchCard } from "../sources/onefootball/client.js";
+import { fetchCompetitionMatchCards, fetchTeamMatchCards, type RoundMatchCard } from "../sources/onefootball/client.js";
+import type { MatchCard } from "../sources/onefootball/schema.js";
+import { resolveCompetitionId } from "./competitionResolver.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
 import { resolveTeamId } from "./teamResolver.js";
 
@@ -39,6 +41,69 @@ const COMPETITIONS: { slug: string; competitionId: string }[] = [
   { slug: "brasileirao-serie-b-superbet-119", competitionId: "brasileirao-serie-b" },
   { slug: "brasileirao-serie-c-195", competitionId: "brasileirao-serie-c" },
 ];
+
+/**
+ * OneFootball's own numeric club ids for the 20 tracked European clubs.
+ * Every id was verified live against the served page's own <title> ("Jogos
+ * do Bayern de Munique") — necessary, not paranoid: the club's name in the
+ * URL is decorative, so a wrong id quietly returns a DIFFERENT club's
+ * fixtures with a 200 and no other signal (see fetchTeamMatchCards).
+ *
+ * These pages are what brings in the cups: a competition page only ever
+ * covers its own league, so before this the tracked European clubs showed
+ * league fixtures only — no Champions League, no Liga Europa, no domestic
+ * cup. Confirmed live across all 20: Premier League, Serie A, LaLiga,
+ * Bundesliga, Ligue 1, UEFA Liga dos Campeões, UEFA Liga Europa, EFL Cup
+ * and DFB-Pokal all appear.
+ */
+const TRACKED_EUROPEAN_TEAMS: { teamId: string; onefootballId: string }[] = [
+  { teamId: "arsenal", onefootballId: "2" },
+  { teamId: "aston_villa", onefootballId: "199" },
+  { teamId: "atletico_madrid", onefootballId: "3" },
+  { teamId: "barcelona", onefootballId: "5" },
+  { teamId: "bayer_leverkusen", onefootballId: "162" },
+  { teamId: "bayern_munique", onefootballId: "6" },
+  { teamId: "borussia_dortmund", onefootballId: "155" },
+  { teamId: "chelsea", onefootballId: "9" },
+  { teamId: "inter_de_milao", onefootballId: "16" },
+  { teamId: "juventus", onefootballId: "17" },
+  { teamId: "liverpool", onefootballId: "18" },
+  { teamId: "manchester_city", onefootballId: "209" },
+  { teamId: "manchester_united", onefootballId: "21" },
+  { teamId: "milan", onefootballId: "23" },
+  { teamId: "napoli", onefootballId: "191" },
+  { teamId: "newcastle", onefootballId: "207" },
+  { teamId: "nottingham_forest", onefootballId: "577" },
+  { teamId: "paris_saint_germain", onefootballId: "263" },
+  { teamId: "real_madrid", onefootballId: "26" },
+  { teamId: "tottenham", onefootballId: "202" },
+];
+
+/** One page to scrape, plus how to tell which competition each of its cards belongs to. */
+interface PageSource {
+  label: string;
+  fetch: () => Promise<RoundMatchCard[]>;
+  /** null means "can't tell" — the card is skipped rather than filed under a guess. */
+  competitionIdFor: (card: MatchCard) => string | null;
+}
+
+function buildPageSources(): PageSource[] {
+  return [
+    ...COMPETITIONS.map((competition) => ({
+      label: `competição ${competition.slug}`,
+      fetch: () => fetchCompetitionMatchCards(competition.slug),
+      // A competition page is one competition throughout; its cards carry
+      // an empty competitionName.
+      competitionIdFor: () => competition.competitionId,
+    })),
+    ...TRACKED_EUROPEAN_TEAMS.map((team) => ({
+      label: `time ${team.teamId}`,
+      fetch: () => fetchTeamMatchCards(team.onefootballId),
+      competitionIdFor: (card: MatchCard) =>
+        card.competitionName ? resolveCompetitionId(card.competitionName) : null,
+    })),
+  ];
+}
 
 export interface Candidate {
   homeTeamId: string | null;
@@ -199,21 +264,21 @@ export async function runOnefootballEnrichment(): Promise<void> {
     let backfilledCount = 0;
     let broadcastCount = 0;
 
-    for (const competition of COMPETITIONS) {
+    for (const page of buildPageSources()) {
       let cards: RoundMatchCard[];
       try {
-        cards = await fetchCompetitionMatchCards(competition.slug);
+        cards = await page.fetch();
       } catch (error) {
-        console.error(`[${SOURCE_ID}] failed to fetch competition ${competition.slug}:`, getErrorMessage(error));
+        console.error(`[${SOURCE_ID}] failed to fetch ${page.label}:`, getErrorMessage(error));
         unresolvedCount++;
         continue;
       }
 
-      // Re-read on every competition, not once up front — this loop can
-      // both insert and delete matches rows, and a later competition's own
-      // dedup check needs to see what an earlier one in this same run just
-      // did (unlikely to matter across different leagues in practice, but
-      // cheap to get right rather than assume).
+      // Re-read on every page, not once up front — this loop can both
+      // insert and delete matches rows, and a later page's own dedup check
+      // needs to see what an earlier one in this same run just did. That
+      // matters much more now that team pages are in the mix: two clubs
+      // playing each other are two pages carrying the same fixture.
       const allMatches: MatchRow[] = await db.select().from(matches);
 
       for (const { card, round } of cards) {
@@ -223,6 +288,9 @@ export async function runOnefootballEnrichment(): Promise<void> {
           kickoffUtc: card.kickoff,
         };
         if (candidate.homeTeamId === null && candidate.awayTeamId === null) continue; // neither side a team we track — not our concern
+
+        const competitionId = page.competitionIdFor(card);
+        if (competitionId === null) continue; // no competition name on the card — never file it under a guess
 
         const covering = findCoveringMatches(candidate, allMatches);
         const ownCovering = covering.filter((match) => match.id.startsWith(SOURCE_ID_PREFIX));
@@ -267,7 +335,7 @@ export async function runOnefootballEnrichment(): Promise<void> {
           .insert(matches)
           .values({
             id,
-            competitionId: competition.competitionId,
+            competitionId,
             homeTeamId: candidate.homeTeamId,
             homeTeamNameRaw: card.homeTeam.name,
             homeTeamCrestUrl: card.homeTeam.imageObject.path,

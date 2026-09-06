@@ -50,6 +50,13 @@ const FREE_TEXT_ALIASES: Record<string, string> = {
   // displayName keeps the full "Bayer Leverkusen".
   leverkusen: "bayer_leverkusen",
   psg: "paris_saint_germain",
+  // OneFootball's own spellings, confirmed live on its Premier League and
+  // La Liga pages. Both clubs were being silently dropped from that source:
+  // resolveTeamId returned null, so their fixtures never got in (and,
+  // where the other side of the tie did resolve, the dedup against an
+  // existing ge.globo row couldn't work either).
+  "fc barcelona": "barcelona",
+  "liverpool fc": "liverpool",
   // Genuinely ambiguous with "Internacional" (the Brazilian club, also
   // tracked) — resolved this way deliberately: every Brazilian source in
   // this codebase spells that one out in full ("Internacional", never bare

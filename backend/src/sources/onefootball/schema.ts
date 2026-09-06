@@ -32,6 +32,14 @@ const matchCardSchema = z.object({
    * for fixture purposes, just without a broadcast attached.
    */
   ottStreamType: z.number().optional(),
+  /**
+   * Empty string on a competition page (every match there is that same
+   * competition, named once at the page level), but populated on a TEAM
+   * page, where one list mixes league, national cup and European cup — the
+   * whole reason team pages are worth fetching. Optional so a card missing
+   * it still parses.
+   */
+  competitionName: z.string().optional(),
 });
 
 export type MatchCard = z.infer<typeof matchCardSchema>;

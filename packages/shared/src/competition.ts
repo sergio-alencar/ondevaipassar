@@ -82,6 +82,14 @@ export const COMPETITIONS: Competition[] = [
   // Madrid's own agenda) is literally "Champions League" — no accent/collision
   // risk with anything else tracked here, unlike the Italian Serie A case above.
   { id: "champions-league", displayName: "Champions League", type: "continental", foreign: true, shortName: "Champions" },
+  // Confirmed live on the 20 tracked European clubs' own OneFootball
+  // fixture pages (see ingest/onefootballEnrichment.ts) — until that source
+  // was added, only the five domestic leagues came through, so these clubs'
+  // cup runs simply weren't on the site. Names are the ones Brazilian
+  // coverage uses, not literal translations of the local ones.
+  { id: "europa-league", displayName: "Liga Europa", type: "continental", foreign: true, shortName: "Liga Europa" },
+  { id: "dfb-pokal", displayName: "Copa da Alemanha", type: "national-cup", foreign: true, shortName: "Copa da Alemanha" },
+  { id: "efl-cup", displayName: "Copa da Liga Inglesa", type: "national-cup", foreign: true, shortName: "EFL Cup" },
 ];
 
 export function findCompetitionById(id: string): Competition | undefined {

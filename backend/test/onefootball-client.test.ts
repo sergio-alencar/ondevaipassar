@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { parseCompetitionPage } from "../src/sources/onefootball/client.js";
+import { parseCompetitionPage, parseTeamPage } from "../src/sources/onefootball/client.js";
 
 const bundesligaHtml = readFileSync(new URL("./fixtures/onefootball-bundesliga.html", import.meta.url), "utf-8");
+const bayernHtml = readFileSync(new URL("./fixtures/onefootball-time-bayern.html", import.meta.url), "utf-8");
 
 describe("parseCompetitionPage", () => {
   it("parses real match cards across every round on the page, not just the first", () => {
@@ -36,5 +37,25 @@ describe("parseCompetitionPage", () => {
 
   it("returns an empty list when the script tag has unparseable json", () => {
     expect(parseCompetitionPage('<script id="__NEXT_DATA__" type="application/json">not json</script>')).toEqual([]);
+  });
+});
+
+describe("parseTeamPage", () => {
+  it("returns a club's fixtures across every competition, which is what competition pages can't do", () => {
+    const comps = new Set(parseTeamPage(bayernHtml).map((c) => c.card.competitionName));
+    expect(comps).toContain("Bundesliga");
+    expect(comps).toContain("UEFA Liga dos Campeões");
+    expect(comps).toContain("DFB-Pokal");
+  });
+
+  // A team page groups by MONTH ("setembro 2026"), not by round. Reading a
+  // round out of that header pulls the year: every match would be recorded
+  // as round 2026.
+  it("never reads a round number out of a team page's month headers", () => {
+    for (const { round } of parseTeamPage(bayernHtml)) expect(round).toBeNull();
+  });
+
+  it("still reads rounds on a competition page, where the header really is one", () => {
+    expect(new Set(parseCompetitionPage(bundesligaHtml).map((c) => c.round))).toEqual(new Set([1, 2, 3, 4]));
   });
 });

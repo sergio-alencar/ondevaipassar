@@ -27,8 +27,13 @@ function findByCase(value: unknown, targetCase: string, results: unknown[] = [])
   return results;
 }
 
-/** Pure parse of one competition page's already-fetched html. */
-export function parseCompetitionPage(html: string): RoundMatchCard[] {
+/**
+ * Pure parse of an already-fetched page's html. `readRound` is false for a
+ * team page, whose section headers are MONTHS ("setembro 2026") rather than
+ * rounds — running the round extractor over those would happily pull "2026"
+ * out and record it as the round number.
+ */
+function parsePage(html: string, readRound: boolean): RoundMatchCard[] {
   const scriptMatch = html.match(NEXT_DATA_PATTERN);
   if (!scriptMatch) return [];
 
@@ -47,7 +52,7 @@ export function parseCompetitionPage(html: string): RoundMatchCard[] {
 
     for (const rawList of appender.lists) {
       const list = rawList as { matchCards?: unknown[]; sectionHeader?: { subtitle?: string } };
-      const roundMatch = list.sectionHeader?.subtitle?.match(ROUND_NUMBER_PATTERN);
+      const roundMatch = readRound ? list.sectionHeader?.subtitle?.match(ROUND_NUMBER_PATTERN) : null;
       const round = roundMatch ? Number(roundMatch[0]) : null;
 
       for (const rawCard of list.matchCards ?? []) {
@@ -58,6 +63,11 @@ export function parseCompetitionPage(html: string): RoundMatchCard[] {
   }
 
   return results;
+}
+
+/** Pure parse of one competition page's already-fetched html. */
+export function parseCompetitionPage(html: string): RoundMatchCard[] {
+  return parsePage(html, true);
 }
 
 /**
@@ -71,4 +81,28 @@ export function parseCompetitionPage(html: string): RoundMatchCard[] {
 export async function fetchCompetitionMatchCards(competitionSlug: string): Promise<RoundMatchCard[]> {
   const html = await fetchText(`https://onefootball.com/pt-br/competicao/${competitionSlug}/jogos`);
   return parseCompetitionPage(html);
+}
+
+/** Pure parse of one team page's already-fetched html. */
+export function parseTeamPage(html: string): RoundMatchCard[] {
+  return parsePage(html, false);
+}
+
+/**
+ * One club's whole upcoming schedule, across every competition it's in —
+ * league, national cup and European cup together, each card naming its own
+ * competition. This is what the per-competition pages above can't give:
+ * they'd need one known slug per cup, and a wrong slug doesn't 404, it
+ * silently serves another competition entirely.
+ *
+ * `teamId` is OneFootball's own numeric club id. The name part of the URL
+ * slug is decorative — confirmed live, "qualquer-nome-errado-6" serves
+ * Bayern de Munique just as "bayern-de-munique-6" does — which cuts both
+ * ways: a WRONG id serves some other club's fixtures with no error at all,
+ * so every id in TRACKED_EUROPEAN_TEAMS was verified against the page's own
+ * title before being written down.
+ */
+export async function fetchTeamMatchCards(teamId: string): Promise<RoundMatchCard[]> {
+  const html = await fetchText(`https://onefootball.com/pt-br/time/t-${teamId}/jogos`);
+  return parsePage(html, false);
 }
