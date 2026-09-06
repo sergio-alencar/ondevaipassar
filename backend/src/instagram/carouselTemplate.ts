@@ -62,12 +62,19 @@ function crest(art: TemplateCrest, size: number): SatoriElement {
   });
 }
 
-/** One channel: its logo (or its name, when we don't ship art), carrying an asterisk when its coverage varies by region. */
+const YELLOW = "#facc15";
+
+/**
+ * One channel: its logo (or its name, when we don't ship art). A regional
+ * caveat shows as the same yellow badge the site puts on the logo
+ * (MatchBroadcasts.tsx), overlapping its corner — as a sibling in the row
+ * it opened a gap between that logo and the next one.
+ */
 function channelTile(channel: SlideChannel, tileSize: number): SatoriElement {
   const art = channel.logoDataUri
     ? h("img", {
         src: channel.logoDataUri,
-        style: { width: tileSize, height: tileSize, objectFit: "contain", borderRadius: 12 },
+        style: { width: tileSize, height: tileSize, objectFit: "contain", borderRadius: 14 },
       })
     : // No local art for this channel yet — its name still has to show,
       // otherwise the slide would silently drop a broadcaster.
@@ -79,7 +86,7 @@ function channelTile(channel: SlideChannel, tileSize: number): SatoriElement {
             alignItems: "center",
             height: tileSize,
             padding: "0 18px",
-            borderRadius: 12,
+            borderRadius: 14,
             backgroundColor: GRAY_200,
             color: GRAY_900,
             fontSize: 30,
@@ -90,11 +97,32 @@ function channelTile(channel: SlideChannel, tileSize: number): SatoriElement {
       );
 
   if (!channel.regionalMarker) return art;
-  // The asterisk rides alongside the logo rather than on top of it, so it
-  // never covers the art it's marking.
-  return h("div", { style: { display: "flex", alignItems: "flex-start", gap: 2 } }, [
+
+  const badge = Math.round(tileSize * 0.34);
+  return h("div", { style: { display: "flex", position: "relative" } }, [
     art,
-    h("div", { style: { display: "flex", color: GRAY_900, fontSize: 40, fontWeight: 700 } }, channel.regionalMarker),
+    h(
+      "div",
+      {
+        style: {
+          position: "absolute",
+          top: -6,
+          right: -6,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minWidth: badge,
+          height: badge,
+          padding: "0 8px",
+          borderRadius: badge,
+          backgroundColor: YELLOW,
+          color: GRAY_900,
+          fontSize: Math.round(badge * 0.78),
+          fontWeight: 700,
+        },
+      },
+      channel.regionalMarker,
+    ),
   ]);
 }
 
@@ -163,7 +191,9 @@ function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
         h(
           "div",
           { style: { display: "flex", color: GRAY_900, fontSize: 46, fontWeight: 700, textAlign: "center" } },
-          `${abbreviateTeamName(match.homeTeamName)} X ${abbreviateTeamName(match.awayTeamName)}`.toUpperCase(),
+          // Names upper-cased individually so the "x" between them stays
+          // lower-case, per Sérgio.
+          `${abbreviateTeamName(match.homeTeamName).toUpperCase()} x ${abbreviateTeamName(match.awayTeamName).toUpperCase()}`,
         ),
       ]),
       // The channel art is the answer the whole project exists to give, so
@@ -230,15 +260,18 @@ export function buildSlideTree(input: SlideInput): SatoriElement {
         [
           // One line, now that the competition name is the short form
           // ("SÉRIE A", not "CAMPEONATO BRASILEIRO SÉRIE A").
-          h("div", { style: { display: "flex", alignItems: "baseline", justifyContent: "center", gap: 20 } }, [
+          // Same size and centre-aligned: at two different sizes on a
+          // baseline they read as one sitting higher than the other.
+          h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 18 } }, [
             h(
               "div",
-              { style: { display: "flex", color: PURPLE, fontSize: 50, fontWeight: 700 } },
+              { style: { display: "flex", color: PURPLE, fontSize: 44, fontWeight: 700 } },
               input.competitionName.toUpperCase(),
             ),
+            h("div", { style: { display: "flex", color: GRAY_200, fontSize: 44, fontWeight: 700 } }, "|"),
             h(
               "div",
-              { style: { display: "flex", color: GRAY_600, fontSize: 38, fontWeight: 700 } },
+              { style: { display: "flex", color: GRAY_600, fontSize: 44, fontWeight: 700 } },
               input.dateLabel.toUpperCase(),
             ),
           ]),
@@ -298,7 +331,7 @@ export function buildSlideTree(input: SlideInput): SatoriElement {
           h(
             "div",
             { style: { display: "flex", color: GRAY_600, fontSize: 28 } },
-            input.slideLabel ?? "ondevaipassar.com",
+            input.slideLabel ?? "ONDEVAIPASSAR.COM",
           ),
         ],
       ),
@@ -323,18 +356,18 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
   // With a logo carrying the identity, the crests are a supporting strip
   // (one row); without one they ARE the artwork, so they get two rows at a
   // bigger size.
-  // Up to 10 crests in two rows of 5, and a "+N" chip for the rest. A busy
-  // Sunday is 10 Série A matches = 20 crests: shrinking them all to fit
-  // would make every one illegible, and silently showing the first few
-  // would misrepresent how much is on. Ten reads as a crowd and the chip
-  // says how big the crowd actually is.
-  const perRow = 5;
-  const maxShown = perRow * 2;
-  const crestSize = hasLogo ? 130 : 160;
-  const shown = input.crests.slice(0, maxShown);
-  const remaining = input.crests.length - shown.length;
+  // Every club playing that day, never a "+N": Sérgio's call. The crests
+  // shrink to fit instead, within a floor that keeps them recognisable —
+  // the row grows wider and the tile smaller as the day gets busier.
+  const CREST_AREA_HEIGHT = hasLogo ? 400 : 560;
+  const CREST_GAP = 22;
+  const perRow = input.crests.length <= 10 ? 5 : input.crests.length <= 18 ? 6 : 7;
+  const rowCount = Math.ceil(input.crests.length / perRow);
+  const widthFit = Math.floor((CONTENT_WIDTH - CREST_GAP * (perRow - 1)) / perRow);
+  const heightFit = Math.floor((CREST_AREA_HEIGHT - CREST_GAP * (rowCount - 1)) / Math.max(rowCount, 1));
+  const crestSize = Math.max(64, Math.min(hasLogo ? 130 : 160, widthFit, heightFit));
   const rows: TemplateCrest[][] = [];
-  for (let i = 0; i < shown.length; i += perRow) rows.push(shown.slice(i, i + perRow));
+  for (let i = 0; i < input.crests.length; i += perRow) rows.push(input.crests.slice(i, i + perRow));
 
   return h(
     "div",
@@ -383,35 +416,12 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
       ]),
       h(
         "div",
-        { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 30 } },
-        rows.map((row, rowIndex) =>
+        { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: CREST_GAP } },
+        rows.map((row) =>
           h(
             "div",
-            { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 30 } },
-            [
-              ...row.map((art) => crest(art, crestSize)),
-              // The chip rides at the end of the last row rather than on a
-              // line of its own, so it reads as "and more of these".
-              ...(remaining > 0 && rowIndex === rows.length - 1
-                ? [
-                    h(
-                      "div",
-                      {
-                        style: {
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          height: crestSize,
-                          color: "#e9d5ff",
-                          fontSize: 44,
-                          fontWeight: 700,
-                        },
-                      },
-                      `+${remaining}`,
-                    ),
-                  ]
-                : []),
-            ],
+            { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: CREST_GAP } },
+            row.map((art) => crest(art, crestSize)),
           ),
         ),
       ),
@@ -419,7 +429,7 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
         h(
           "div",
           { style: { display: "flex", color: "#ffffff", fontSize: 50, fontWeight: 700 } },
-          `${input.matchCount} ${input.matchCount === 1 ? "JOGO" : "JOGOS"} • ARRASTE`,
+          `${input.matchCount} ${input.matchCount === 1 ? "JOGO" : "JOGOS"}`,
         ),
         h("img", { src: input.wordmarkDataUri, style: { height: 78 } }),
       ]),
