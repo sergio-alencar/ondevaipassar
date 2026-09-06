@@ -1,4 +1,11 @@
-import { findCompetitionById, formatDateLabel, formatTimeLabel, type MatchView } from "@ondevaipassar/shared";
+import {
+  findCompetitionById,
+  formatDateLabel,
+  formatTimeLabel,
+  REGIONAL_CAVEAT_TEXT,
+  REGIONAL_PRACA_CAVEAT,
+  type MatchView,
+} from "@ondevaipassar/shared";
 import { Resvg } from "@resvg/resvg-js";
 import satori from "satori";
 import type { ReactNode } from "react";
@@ -34,11 +41,32 @@ async function toSlideMatch(match: MatchView, showCompetition: boolean): Promise
     channels: match.broadcasts.map((broadcast) => ({
       displayName: broadcast.displayName,
       logoDataUri: channelLogoDataUri(broadcast.channelId),
+      hasRegionalNote: Boolean(broadcast.regionalDetail) || broadcast.regionalCaveat === true,
     })),
     competitionLabel: showCompetition
       ? (findCompetitionById(match.competitionId)?.shortName ?? match.competitionName)
       : null,
   };
+}
+
+/**
+ * The footnote lines for one slide, deduped: the real per-state list when
+ * a source gave us one, and the generic disclaimer otherwise. Same wording
+ * as the site and the digest (packages/shared), so a reader who checks both
+ * doesn't get two different answers.
+ */
+function buildRegionalNotes(matches: MatchView[]): string[] {
+  const notes = new Set<string>();
+  for (const match of matches) {
+    for (const broadcast of match.broadcasts) {
+      if (broadcast.regionalDetail) {
+        notes.add(`${broadcast.displayName} em: ${broadcast.regionalDetail} (${REGIONAL_PRACA_CAVEAT})`);
+      } else if (broadcast.regionalCaveat) {
+        notes.add(REGIONAL_CAVEAT_TEXT);
+      }
+    }
+  }
+  return [...notes];
 }
 
 /** Splits a competition's matches into slides of at most MATCHES_PER_SLIDE. */
@@ -85,6 +113,7 @@ export async function renderCarouselImages(competitionId: string, competitionNam
           matches: slideMatchInputs,
           wordmarkDataUri: WORDMARK,
           slideLabel: slides.length > 1 ? `${index + 1}/${slides.length}` : null,
+          regionalNotes: buildRegionalNotes(slideMatches),
         }),
       ),
     );

@@ -21,8 +21,14 @@ function h(type: string, props: SatoriProps = {}, children?: unknown): SatoriEle
 export const PORTRAIT_WIDTH = 1080;
 export const PORTRAIT_HEIGHT = 1350;
 
-/** Kept here rather than in renderCarousel so the layout maths and the chunking can never disagree about how many matches a slide holds. */
-export const MATCHES_PER_SLIDE = 3;
+/**
+ * Kept here rather than in renderCarousel so the layout maths and the
+ * chunking can never disagree about how many matches a slide holds. Two,
+ * not three: once the crests, names, kick-off and channel logos all grew
+ * (and got stacked on separate lines), three blocks no longer fit a 1350px
+ * canvas — they overflowed their own boxes and printed on top of each other.
+ */
+export const MATCHES_PER_SLIDE = 2;
 
 const PURPLE = "#59168b";
 const GRAY_900 = "#111827";
@@ -32,13 +38,18 @@ const GRAY_200 = "#e5e7eb";
 const SIDE_PADDING = 64;
 const CONTENT_WIDTH = PORTRAIT_WIDTH - 2 * SIDE_PADDING;
 
+/** A channel on a slide, plus whether its coverage carries a regional note (the asterisk and the footnote at the foot of the slide). */
+export interface SlideChannel extends TemplateChannel {
+  hasRegionalNote: boolean;
+}
+
 export interface SlideMatch {
   homeTeamName: string;
   awayTeamName: string;
   homeCrest: TemplateCrest;
   awayCrest: TemplateCrest;
   timeLabel: string;
-  channels: TemplateChannel[];
+  channels: SlideChannel[];
   /** Which competition this match belongs to — set only on a slide whose matches come from more than one (the combined "Jogos da Europa" post), where the header can't say it for them. */
   competitionLabel: string | null;
 }
@@ -51,36 +62,47 @@ function crest(art: TemplateCrest, size: number): SatoriElement {
   });
 }
 
-function channelStrip(channels: TemplateChannel[], tileSize: number): SatoriElement {
+/** One channel: its logo (or its name, when we don't ship art), carrying an asterisk when its coverage varies by region. */
+function channelTile(channel: SlideChannel, tileSize: number): SatoriElement {
+  const art = channel.logoDataUri
+    ? h("img", {
+        src: channel.logoDataUri,
+        style: { width: tileSize, height: tileSize, objectFit: "contain", borderRadius: 12 },
+      })
+    : // No local art for this channel yet — its name still has to show,
+      // otherwise the slide would silently drop a broadcaster.
+      h(
+        "div",
+        {
+          style: {
+            display: "flex",
+            alignItems: "center",
+            height: tileSize,
+            padding: "0 18px",
+            borderRadius: 12,
+            backgroundColor: GRAY_200,
+            color: GRAY_900,
+            fontSize: 30,
+            fontWeight: 700,
+          },
+        },
+        channel.displayName,
+      );
+
+  if (!channel.hasRegionalNote) return art;
+  // The asterisk rides alongside the logo rather than on top of it, so it
+  // never covers the art it's marking.
+  return h("div", { style: { display: "flex", alignItems: "flex-start", gap: 2 } }, [
+    art,
+    h("div", { style: { display: "flex", color: GRAY_900, fontSize: 40, fontWeight: 700 } }, "*"),
+  ]);
+}
+
+function channelStrip(channels: SlideChannel[], tileSize: number): SatoriElement {
   return h(
     "div",
-    { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 14, flexWrap: "wrap" } },
-    channels.map((channel) =>
-      channel.logoDataUri
-        ? h("img", {
-            src: channel.logoDataUri,
-            style: { width: tileSize, height: tileSize, objectFit: "contain", borderRadius: 10 },
-          })
-        : // No local art for this channel yet — its name still has to show,
-          // otherwise the slide would silently drop a broadcaster.
-          h(
-            "div",
-            {
-              style: {
-                display: "flex",
-                alignItems: "center",
-                height: tileSize,
-                padding: "0 16px",
-                borderRadius: 10,
-                backgroundColor: GRAY_200,
-                color: GRAY_900,
-                fontSize: 26,
-                fontWeight: 700,
-              },
-            },
-            channel.displayName,
-          ),
-    ),
+    { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 18, flexWrap: "wrap" } },
+    channels.map((channel) => channelTile(channel, tileSize)),
   );
 }
 
@@ -95,10 +117,20 @@ const MIN_CREST = 150;
 // otherwise just grow into whatever vertical space it was given.
 const MAX_CREST = 245;
 
-function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
-  const crestSize = Math.min(MAX_CREST, Math.max(MIN_CREST, Math.round(blockHeight * 0.42)));
-  const nameFontSize = 46;
+// Everything in a block except the crests: the name, the kick-off, the
+// channel strip, the optional competition label and the gaps between them.
+// The crest gets whatever is left, which is what keeps a block inside its
+// box no matter how the surrounding sizes are tuned.
+const BLOCK_FIXED_HEIGHT = 58 + 56 + 104 + 40;
 
+function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
+  const labelHeight = match.competitionLabel ? 44 : 0;
+  const crestBudget = blockHeight - BLOCK_FIXED_HEIGHT - labelHeight;
+  const crestSize = Math.min(MAX_CREST, Math.max(MIN_CREST, crestBudget));
+
+  // Stacked, per Sérgio: crests, then names, then kick-off, then channels —
+  // each on its own line. Time and channels used to share a row, which
+  // pushed the channel logos small to fit beside the text.
   return h(
     "div",
     {
@@ -109,7 +141,7 @@ function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
         justifyContent: "center",
         width: CONTENT_WIDTH,
         height: blockHeight,
-        gap: 12,
+        gap: 10,
       },
     },
     [
@@ -117,25 +149,28 @@ function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
         ? [
             h(
               "div",
-              { style: { display: "flex", color: GRAY_600, fontSize: 26, fontWeight: 700, letterSpacing: 2 } },
+              { style: { display: "flex", color: GRAY_600, fontSize: 28, fontWeight: 700, letterSpacing: 2 } },
               match.competitionLabel.toUpperCase(),
             ),
           ]
         : []),
-      h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 28 } }, [
+      h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 30 } }, [
         crest(match.homeCrest, crestSize),
-        h("div", { style: { display: "flex", color: GRAY_600, fontSize: 40, fontWeight: 700 } }, "x"),
+        h("div", { style: { display: "flex", color: GRAY_600, fontSize: 42, fontWeight: 700 } }, "x"),
         crest(match.awayCrest, crestSize),
       ]),
       h(
         "div",
-        { style: { display: "flex", color: GRAY_900, fontSize: nameFontSize, fontWeight: 700, textAlign: "center" } },
+        { style: { display: "flex", color: GRAY_900, fontSize: 48, fontWeight: 700, textAlign: "center" } },
         `${abbreviateTeamName(match.homeTeamName)} x ${abbreviateTeamName(match.awayTeamName)}`,
       ),
-      h("div", { style: { display: "flex", alignItems: "center", gap: 16 } }, [
-        h("div", { style: { display: "flex", color: PURPLE, fontSize: 42, fontWeight: 700 } }, match.timeLabel),
-        channelStrip(match.channels, 88),
-      ]),
+      h(
+        "div",
+        { style: { display: "flex", color: PURPLE, fontSize: 46, fontWeight: 700 } },
+        // "18H30", not "18h30" — Sérgio asked for the H uppercase here.
+        match.timeLabel.toUpperCase(),
+      ),
+      channelStrip(match.channels, 104),
     ],
   );
 }
@@ -147,17 +182,22 @@ export interface SlideInput {
   wordmarkDataUri: string;
   /** Rendered as "2/3" in the corner when a competition needed more than one slide of matches. */
   slideLabel: string | null;
+  /** One line per regional caveat on this slide, already worded — printed under the matches, keyed by the asterisk on the channel it belongs to. */
+  regionalNotes: string[];
 }
 
 /** A slide carrying 2-3 matches. */
 export function buildSlideTree(input: SlideInput): SatoriElement {
-  const headerHeight = 170;
+  const headerHeight = 190;
   const footerHeight = 96;
-  const available = PORTRAIT_HEIGHT - headerHeight - footerHeight;
-  // Each block keeps the same height it would have on a full 3-match
-  // slide, and the group is centred in what's left — otherwise a slide
-  // carrying one match stretched that single block over the whole canvas,
-  // leaving it marooned in the middle of a lot of white.
+  // Sized from the notes' own WRAPPED line count, not just how many notes
+  // there are: a full-state list ("AC, AL, AM, ...") runs to two lines at
+  // this width, and budgeting one would push the block into the footer.
+  // ~62 characters per line at fontSize 26 across CONTENT_WIDTH, measured
+  // against the real Globo notes rather than assumed.
+  const noteLines = input.regionalNotes.reduce((total, note) => total + Math.ceil((note.length + 2) / 62), 0);
+  const notesHeight = noteLines > 0 ? 30 + noteLines * 38 : 0;
+  const available = PORTRAIT_HEIGHT - headerHeight - footerHeight - notesHeight;
   const dividers = Math.max(0, input.matches.length - 1) * 2;
   const blockHeight = Math.min(
     Math.floor(available / MATCHES_PER_SLIDE),
@@ -183,14 +223,23 @@ export function buildSlideTree(input: SlideInput): SatoriElement {
           style: {
             display: "flex",
             flexDirection: "column",
+            alignItems: "center",
             justifyContent: "center",
             height: headerHeight,
             borderBottom: `4px solid ${GRAY_200}`,
           },
         },
         [
-          h("div", { style: { display: "flex", color: PURPLE, fontSize: 48, fontWeight: 700 } }, input.competitionName.toUpperCase()),
-          h("div", { style: { display: "flex", color: GRAY_600, fontSize: 34 } }, input.dateLabel),
+          h(
+            "div",
+            { style: { display: "flex", color: PURPLE, fontSize: 52, fontWeight: 700, textAlign: "center" } },
+            input.competitionName.toUpperCase(),
+          ),
+          h(
+            "div",
+            { style: { display: "flex", color: GRAY_600, fontSize: 38, fontWeight: 700 } },
+            input.dateLabel.toUpperCase(),
+          ),
         ],
       ),
       h(
@@ -218,14 +267,33 @@ export function buildSlideTree(input: SlideInput): SatoriElement {
               ],
         ),
       ),
+      ...(input.regionalNotes.length > 0
+        ? [
+            h(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  height: notesHeight,
+                  gap: 6,
+                },
+              },
+              input.regionalNotes.map((note) =>
+                h("div", { style: { display: "flex", color: GRAY_600, fontSize: 26 } }, `* ${note}`),
+              ),
+            ),
+          ]
+        : []),
       h(
         "div",
         { style: { display: "flex", alignItems: "center", justifyContent: "space-between", height: footerHeight } },
         [
-          h("img", { src: input.wordmarkDataUri, style: { height: 52 } }),
+          h("img", { src: input.wordmarkDataUri, style: { height: 56 } }),
           h(
             "div",
-            { style: { display: "flex", color: GRAY_600, fontSize: 26 } },
+            { style: { display: "flex", color: GRAY_600, fontSize: 28 } },
             input.slideLabel ?? "ondevaipassar.com",
           ),
         ],
@@ -253,7 +321,7 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
   // bigger size.
   const perRow = 5;
   const rowCount = hasLogo ? 1 : 2;
-  const crestSize = hasLogo ? 118 : 158;
+  const crestSize = hasLogo ? 150 : 190;
   const shown = input.crests.slice(0, perRow * rowCount);
   const rows: TemplateCrest[][] = [];
   for (let i = 0; i < shown.length; i += perRow) rows.push(shown.slice(i, i + perRow));
@@ -266,7 +334,7 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 52,
+        gap: 64,
         width: PORTRAIT_WIDTH,
         height: PORTRAIT_HEIGHT,
         backgroundColor: PURPLE,
@@ -274,22 +342,12 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
       },
     },
     [
-      h("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 20 } }, [
-        h(
-          "div",
-          { style: { display: "flex", color: "#e9d5ff", fontSize: 40, fontWeight: 700, letterSpacing: 4 } },
-          "ONDE ASSISTIR",
-        ),
-        // No card behind the logo: Sérgio supplied light-text variants
-        // built for a dark background (the "-2" files in
-        // frontend/public/images/campeonatos), so the marks sit directly on
-        // the brand purple. The earlier white card existed only because the
-        // first set was drawn for light backgrounds and vanished here.
-        // Logo alone when we have one: it already names the competition,
-        // and the title under it was saying the same thing twice. The name
-        // stays as the fallback for a competition with no art.
+      h("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 28 } }, [
+        // No "ONDE ASSISTIR" line and no competition name: the logo says
+        // which competition this is, and the wordmark at the foot says what
+        // the account is. Both were repeating what the art already carried.
         ...(hasLogo
-          ? [h("img", { src: input.competitionLogoDataUri as string, style: { height: 400, objectFit: "contain" } })]
+          ? [h("img", { src: input.competitionLogoDataUri as string, style: { height: 520, objectFit: "contain" } })]
           : [
               h(
                 "div",
@@ -297,7 +355,7 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
                   style: {
                     display: "flex",
                     color: "#ffffff",
-                    fontSize: input.competitionName.length > 22 ? 66 : 86,
+                    fontSize: input.competitionName.length > 22 ? 76 : 96,
                     fontWeight: 700,
                     textAlign: "center",
                     lineHeight: 1.05,
@@ -307,26 +365,30 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
                 input.competitionName.toUpperCase(),
               ),
             ]),
-        h("div", { style: { display: "flex", color: "#e9d5ff", fontSize: 44 } }, input.dateLabel.toUpperCase()),
+        h(
+          "div",
+          { style: { display: "flex", color: "#e9d5ff", fontSize: 52, fontWeight: 700, letterSpacing: 1 } },
+          input.dateLabel.toUpperCase(),
+        ),
       ]),
       h(
         "div",
-        { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 26 } },
+        { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 30 } },
         rows.map((row) =>
           h(
             "div",
-            { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 26 } },
+            { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 30 } },
             row.map((art) => crest(art, crestSize)),
           ),
         ),
       ),
-      h("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 22 } }, [
+      h("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 26 } }, [
         h(
           "div",
-          { style: { display: "flex", color: "#ffffff", fontSize: 42, fontWeight: 700 } },
+          { style: { display: "flex", color: "#ffffff", fontSize: 50, fontWeight: 700 } },
           `${input.matchCount} ${input.matchCount === 1 ? "JOGO" : "JOGOS"} • ARRASTE`,
         ),
-        h("img", { src: input.wordmarkDataUri, style: { height: 66 } }),
+        h("img", { src: input.wordmarkDataUri, style: { height: 78 } }),
       ]),
     ],
   );
