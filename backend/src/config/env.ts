@@ -21,10 +21,11 @@ const envSchema = z.object({
   // ingest and instagram-post endpoints can't be triggered by anyone who
   // finds the URL.
   CRON_SECRET: z.string().optional(),
-  // Guards the operator-only surfaces: the error detail on /api/status and
-  // the broadcast removal on /api/admin-broadcast. Separate from
-  // CRON_SECRET so the schedulers' token isn't also the one that can
-  // delete data.
+  // Read-only operator access: the error detail on /api/status and the
+  // broadcast listing. Deliberately an ordinary (readable) env var, unlike
+  // CRON_SECRET — its worst case is exposing a source's internal error
+  // text, and making diagnosis cost a rotation plus a deploy is what kept
+  // wrong data on the site. Anything that WRITES uses CRON_SECRET instead.
   ADMIN_TOKEN: z.string().optional(),
   // "Instagram API with Instagram Login" (graph.instagram.com) — the app
   // dashboard hands out an already-long-lived (60-day) token directly, no

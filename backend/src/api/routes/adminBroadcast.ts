@@ -22,15 +22,29 @@ const removeQuerySchema = z.object({ id: z.string().min(1) });
  * because the sources rebuild what's real on the next run, while writing a
  * broadcast by hand would invent data no source is claiming — exactly what
  * this project refuses to do.
+ *
+ * Two different tokens on purpose, split by what the call can break rather
+ * than by which file it lives in:
+ *
+ * - Reading uses ADMIN_TOKEN, kept as an ordinary readable env var. Its
+ *   worst case is exposing a source's internal error text, and making
+ *   diagnosis cost a token rotation plus a production deploy is what left
+ *   wrong data sitting on the site because fixing it was too expensive.
+ * - Deleting uses CRON_SECRET, which stays unreadable ("Sensitive"). Same
+ *   token that already guards the other write operations — the ingest, the
+ *   posting, and cron-instagram-reset, which also deletes. Writes are rare,
+ *   so paying a rotation for them is fine.
  */
 export async function adminBroadcastRoutes(app: FastifyInstance): Promise<void> {
-  const authorize = (request: { headers: { authorization?: string } }): boolean =>
+  const authorizeRead = (request: { headers: { authorization?: string } }): boolean =>
     Boolean(env.ADMIN_TOKEN) && request.headers.authorization === `Bearer ${env.ADMIN_TOKEN}`;
+  const authorizeWrite = (request: { headers: { authorization?: string } }): boolean =>
+    Boolean(env.CRON_SECRET) && request.headers.authorization === `Bearer ${env.CRON_SECRET}`;
 
   // Read first: the id is `${matchId}__${channelId}`, and this saves
   // guessing it (or deleting the wrong one) from the outside.
   app.get("/api/admin-broadcasts", async (request, reply) => {
-    if (!authorize(request)) return reply.status(401).send({ error: "unauthorized" });
+    if (!authorizeRead(request)) return reply.status(401).send({ error: "unauthorized" });
 
     const parsedQuery = listQuerySchema.safeParse(request.query);
     if (!parsedQuery.success) {
@@ -42,7 +56,7 @@ export async function adminBroadcastRoutes(app: FastifyInstance): Promise<void> 
   });
 
   app.get("/api/admin-broadcast-remove", async (request, reply) => {
-    if (!authorize(request)) return reply.status(401).send({ error: "unauthorized" });
+    if (!authorizeWrite(request)) return reply.status(401).send({ error: "unauthorized" });
 
     const parsedQuery = removeQuerySchema.safeParse(request.query);
     if (!parsedQuery.success) {
