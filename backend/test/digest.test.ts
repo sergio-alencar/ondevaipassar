@@ -31,7 +31,7 @@ describe("buildDigest", () => {
         "⚽ *Onde assistir aos jogos de hoje — sábado, 5/set*",
         "",
         "*Campeonato Brasileiro Série A*",
-        "18h30 — *São Paulo x Atlético-MG* — Premiere",
+        "18h30 *São Paulo x Atlético-MG* — Premiere",
         "",
         "Mais detalhes: https://ondevaipassar.com",
       ].join("\n"),
@@ -55,12 +55,12 @@ describe("buildDigest", () => {
 
     expect(digest.indexOf("Série A")).toBeLessThan(digest.indexOf("Série B"));
     // The Série A group keeps both of its matches, in kickoff order.
-    expect(digest.indexOf("16h —")).toBeLessThan(digest.indexOf("19h —"));
+    expect(digest.indexOf("16h *")).toBeLessThan(digest.indexOf("19h *"));
   });
 
   it("says 'Transmissão a confirmar' for a match with no broadcast, matching the site's own wording", () => {
     expect(buildDigest([buildMatch({ broadcasts: [] })], NOW)).toContain(
-      "18h30 — *São Paulo x Atlético-MG* — Transmissão a confirmar",
+      "18h30 *São Paulo x Atlético-MG* — Transmissão a confirmar",
     );
   });
 
@@ -106,7 +106,7 @@ describe("buildDigest", () => {
 
   it("says 'horário a confirmar' in place of the time when the kickoff time isn't set", () => {
     expect(buildDigest([buildMatch({ kickoffTimeConfirmed: false })], NOW)).toContain(
-      "horário a confirmar — *São Paulo x Atlético-MG*",
+      "horário a confirmar *São Paulo x Atlético-MG*",
     );
   });
 

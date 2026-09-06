@@ -90,7 +90,7 @@ function buildMatchLine(match: MatchView, bold: boolean): MatchLine {
   const pairing = bold ? `*${match.homeTeamName} x ${match.awayTeamName}*` : `${match.homeTeamName} x ${match.awayTeamName}`;
 
   if (match.broadcasts.length === 0) {
-    return { text: `${time} — ${pairing} — ${NO_BROADCAST_TEXT}`, regionalDetail: null, usedRegionalMark: false };
+    return { text: `${time} ${pairing} — ${NO_BROADCAST_TEXT}`, regionalDetail: null, usedRegionalMark: false };
   }
 
   // Handled per broadcast, not per match (unlike the Instagram caption):
@@ -116,7 +116,11 @@ function buildMatchLine(match: MatchView, bold: boolean): MatchLine {
   // header already says what the list is. The label survives only in
   // NO_BROADCAST_TEXT, where "Transmissão a confirmar" is the information
   // itself rather than a heading, and matches the site's own wording.
-  return { text: `${time} — ${pairing} — ${channels.join(", ")}`, regionalDetail, usedRegionalMark };
+  //
+  // No dash after the time either (Sérgio's call): one dash separating the
+  // match from its channels reads cleanly, two made the line look like
+  // three equal parts.
+  return { text: `${time} ${pairing} — ${channels.join(", ")}`, regionalDetail, usedRegionalMark };
 }
 
 /**
