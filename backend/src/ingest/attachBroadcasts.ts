@@ -39,21 +39,46 @@ export interface AttachBroadcastsParams<T extends TeamPairStream> {
  */
 const STALE_SAFETY_BUFFER_MS = 3 * 60 * 60 * 1000;
 
-async function removeStaleBroadcasts(sourceId: string, claimedMatchIds: string[], allMatches: MatchCandidate[]): Promise<number> {
+async function removeStaleBroadcasts(
+  sourceId: string,
+  channelId: string,
+  claimedMatchIds: string[],
+  allMatches: MatchCandidate[],
+): Promise<number> {
   const cutoff = new Date(Date.now() + STALE_SAFETY_BUFFER_MS).toISOString();
   const upcomingIds = new Set(allMatches.filter((match) => match.kickoffUtc > cutoff).map((match) => match.id));
   const claimed = new Set(claimedMatchIds);
+  const isStale = (row: { matchId: string }): boolean => upcomingIds.has(row.matchId) && !claimed.has(row.matchId);
 
-  const stale = (await db.select().from(broadcasts).where(eq(broadcasts.sourceId, sourceId))).filter(
-    (row) => upcomingIds.has(row.matchId) && !claimed.has(row.matchId),
-  );
-  if (stale.length === 0) return 0;
+  // Rows this source created: withdraw them entirely.
+  const owned = (await db.select().from(broadcasts).where(eq(broadcasts.sourceId, sourceId))).filter(isStale);
 
-  const deletes = stale.map((row) => db.delete(broadcasts).where(eq(broadcasts.id, row.id)));
-  const [first, ...rest] = deletes;
+  // Rows another source created but that carry a per-match link THIS source
+  // wrote (attachBroadcastsFromStreams sets watchUrl on an existing row —
+  // sourceId stays with whoever got there first). Deleting those would
+  // throw away the other source's own claim, so only the link goes.
+  //
+  // Real bug: futnatv listed TNT Sports for a Champions League match and
+  // created the row; the YouTube enrichment then wrote a link to that
+  // channel's Youth League stream onto it. Scoped by sourceId alone, the
+  // cleanup couldn't see it, and the site kept sending people to an
+  // under-19 match long after the title filter stopped claiming it.
+  const borrowed = (await db.select().from(broadcasts).where(eq(broadcasts.channelId, channelId)))
+    .filter((row) => row.sourceId !== sourceId && row.watchUrl !== null)
+    .filter(isStale);
+
+  if (owned.length === 0 && borrowed.length === 0) return 0;
+
+  const writes = [
+    ...owned.map((row) => db.delete(broadcasts).where(eq(broadcasts.id, row.id))),
+    ...borrowed.map((row) => db.update(broadcasts).set({ watchUrl: null }).where(eq(broadcasts.id, row.id))),
+  ];
+  const [first, ...rest] = writes;
   await db.batch([first, ...rest]);
-  for (const row of stale) console.log(`[${sourceId}] removed stale broadcast ${row.id}`);
-  return stale.length;
+
+  for (const row of owned) console.log(`[${sourceId}] removed stale broadcast ${row.id}`);
+  for (const row of borrowed) console.log(`[${sourceId}] cleared stale link on ${row.id}`);
+  return writes.length;
 }
 
 /**
@@ -110,7 +135,7 @@ export async function attachBroadcastsFromStreams<T extends TeamPairStream>(
     await db.batch([first, ...rest]);
   }
 
-  const removedCount = await removeStaleBroadcasts(sourceId, matchIds, allMatches);
+  const removedCount = await removeStaleBroadcasts(sourceId, channelId, matchIds, allMatches);
 
   await db.insert(scrapeRuns).values({
     sourceId,
