@@ -1,3 +1,5 @@
+import { normalizeText } from "./text.js";
+
 export type CompetitionType = "national-league" | "national-cup" | "state" | "continental" | "friendly";
 
 export interface Competition {
@@ -94,4 +96,28 @@ export const COMPETITIONS: Competition[] = [
 
 export function findCompetitionById(id: string): Competition | undefined {
   return COMPETITIONS.find((competition) => competition.id === id);
+}
+
+// Age-group and women's football carry the SAME club names as the senior
+// men's game, so a source that mixes categories in one list will hand us a
+// pairing that looks identical to a fixture we track. The competition name
+// is the only thing separating them.
+//
+// Real bug this comes from: futnatv listed Bayern de Munique x Bodo/Glimt
+// twice on 2026-09-10 — once as "UEFA Youth League" at 11h with a YouTube
+// link, once as "Champions League" at 16h — and the youth entry attached
+// its under-19 stream to the senior fixture.
+const YOUTH_COMPETITION_PATTERNS = [/\byouth\b/, /\bsub[\s-]?\d{2}\b/, /\bu\d{2}\b/, /\bjuniores\b/, /\bjuvenil\b/];
+const WOMENS_COMPETITION_PATTERNS = [/\bwsl\b/, /\bnwsl\b/, /\bwomen/, /\bfeminin[ao]\b/];
+
+/** True when this names an age-group competition. Nothing here tracks youth football, so such a name can only ever produce a wrong attach. */
+export function isYouthCompetitionName(name: string): boolean {
+  const normalized = normalizeText(name);
+  return YOUTH_COMPETITION_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
+/** True when this names a women's competition. Unlike youth, this IS tracked — but only through the dedicated Feminino resolver, never the shared men's one. */
+export function isWomensCompetitionName(name: string): boolean {
+  const normalized = normalizeText(name);
+  return WOMENS_COMPETITION_PATTERNS.some((pattern) => pattern.test(normalized));
 }

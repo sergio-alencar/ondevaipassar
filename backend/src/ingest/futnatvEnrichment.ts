@@ -1,4 +1,4 @@
-import { resolveChannelId } from "@ondevaipassar/shared";
+import { isWomensCompetitionName, isYouthCompetitionName, resolveChannelId } from "@ondevaipassar/shared";
 import { db } from "../db/client.js";
 import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
 import { parseBroadcastChannels } from "../sources/futnatv/broadcastText.js";
@@ -52,7 +52,15 @@ export async function runFutnatvEnrichment(): Promise<void> {
       // resolves against the men's-only teamResolver, so a Feminino game
       // must never reach it (see femininoTeamResolver.ts for the dedicated,
       // separate resolution path those games actually use).
-      if (game.competition.toLowerCase().includes("feminin")) continue;
+      if (isWomensCompetitionName(game.competition)) continue;
+      // Youth, same hazard one category further: futnatv listed Bayern de
+      // Munique x Bodo/Glimt twice on the same day — "UEFA Youth League" at
+      // 11h carrying a YouTube link, and "Champions League" at 16h. The
+      // pairing is identical, so the youth entry matched the senior fixture
+      // and wrote its under-19 stream onto it (which the TNT->HBO Max
+      // mirror then copied). Nothing here tracks youth football, so these
+      // can only ever attach to the wrong match.
+      if (isYouthCompetitionName(game.competition)) continue;
 
       const streamDateUtc = toKickoffUtc(dateKey, game.time);
       if (!streamDateUtc) {

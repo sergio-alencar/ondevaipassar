@@ -1,4 +1,4 @@
-import { normalizeText } from "@ondevaipassar/shared";
+import { isWomensCompetitionName, isYouthCompetitionName, normalizeText } from "@ondevaipassar/shared";
 import { z } from "zod";
 
 // YouTube Data API v3's actual documented response shapes — much smaller
@@ -73,36 +73,15 @@ const TITLE_PATTERNS = [
 // positive means telling someone to watch something they can't see.
 const NON_BROADCAST_PATTERNS = [/\bpre[\s-]?jogo\b/, /\bpos[\s-]?jogo\b/, /\bnarracao\b/];
 
-// Markers that a title is a WOMEN'S match. Real bug this comes from: Canal
-// GOAT's "AO VIVO: BRIGHTON X ARSENAL | WSL - WOMEN'S SUPER LEAGUE"
-// resolved "ARSENAL" through the men's registry (Brighton isn't tracked,
-// so it became a wildcard) and got attached to that day's men's Arsenal x
-// Chelsea. Club names are shared across the men's and women's sides of the
-// same institution, so the competition named in the title is the only
-// thing separating them.
-const WOMENS_TITLE_PATTERNS = [/\bwsl\b/, /\bnwsl\b/, /\bwomen/, /\bfeminin[ao]\b/];
-
-/** True when the title names a women's competition — see WOMENS_TITLE_PATTERNS for why that has to be checked separately from the team names. */
+// Both checks live in packages/shared: the same category hazard shows up
+// in a YouTube title and in a source's own competition field, and the
+// patterns must not drift apart between the two.
 export function isWomensCompetitionTitle(title: string): boolean {
-  const normalized = normalizeText(title);
-  return WOMENS_TITLE_PATTERNS.some((pattern) => pattern.test(normalized));
+  return isWomensCompetitionName(title);
 }
 
-// Youth football, same hazard as the women's game and one category further:
-// the clubs are the same institutions, so "BAYERN X BODO/GLIMT" reads
-// identically whether it's the Champions League or the Youth League. Real
-// bug: TNT Sports' "AO VIVO: BAYERN X BODO/GLIMT - YOUTH LEAGUE 2026/2027"
-// was attached to that day's senior Champions League fixture, and the site
-// sent viewers to an under-19 match.
-//
-// Always excluded, unlike the women's game: no youth competition is tracked
-// here, so a youth title can only ever be a wrong attach.
-const YOUTH_TITLE_PATTERNS = [/\byouth\b/, /\bsub[\s-]?\d{2}\b/, /\bu\d{2}\b/, /\bjuniores\b/, /\bjuvenil\b/];
-
-/** True when the title names a youth competition. */
 export function isYouthCompetitionTitle(title: string): boolean {
-  const normalized = normalizeText(title);
-  return YOUTH_TITLE_PATTERNS.some((pattern) => pattern.test(normalized));
+  return isYouthCompetitionName(title);
 }
 
 export interface ParsedStreamTitle {
