@@ -15,6 +15,8 @@ function buildMatch(overrides: Partial<MatchCandidate> = {}): MatchCandidate {
     id: "ge-globo:1",
     homeTeamId: "botafogo",
     awayTeamId: "palmeiras",
+    homeTeamNameRaw: "Botafogo",
+    awayTeamNameRaw: "Palmeiras",
     kickoffUtc: "2026-09-06T21:30:00.000Z",
     ...overrides,
   };
@@ -143,6 +145,41 @@ describe("matchStreamsToBroadcasts", () => {
   });
 
   it("counts as unresolved (never wildcard-matches everything) when neither side of the stream is tracked", () => {
+    const result = matchStreamsToBroadcasts([buildStream({ homeTeamId: null, awayTeamId: null })], [buildMatch()]);
+    expect(result.matchIds).toEqual([]);
+    expect(result.unresolvedCount).toBe(1);
+  });
+
+  // Both sides untracked is a real case since the European cups started
+  // being ingested whole: the ids are both null, so the names are the only
+  // thing that can tell two fixtures apart. Every pair below is a real
+  // futnatv-vs-OneFootball spelling difference from one day of Champions
+  // League fixtures.
+  it("matches two untracked clubs across differing source spellings", () => {
+    const cases: [string, string, string, string][] = [
+      ["Shakhtar", "PSV", "FC Shakhtar Donetsk", "PSV"],
+      ["Como", "RB Leipzig", "Como 1907", "RB Leipzig"],
+      ["Slavia Praga", "Lens", "SK Slavia Praga", "Lens"],
+      ["Fenerbahçe", "Roma", "Fenerbahce", "Roma"],
+    ];
+    for (const [streamHome, streamAway, matchHome, matchAway] of cases) {
+      const result = matchStreamsToBroadcasts(
+        [buildStream({ homeTeamId: null, awayTeamId: null, homeTeamNameRaw: streamHome, awayTeamNameRaw: streamAway })],
+        [buildMatch({ homeTeamId: null, awayTeamId: null, homeTeamNameRaw: matchHome, awayTeamNameRaw: matchAway })],
+      );
+      expect(result.matchIds, `${streamHome} x ${streamAway}`).toEqual(["ge-globo:1"]);
+    }
+  });
+
+  it("compares whole words, so a shorter name never swallows a longer unrelated one", () => {
+    const result = matchStreamsToBroadcasts(
+      [buildStream({ homeTeamId: null, awayTeamId: null, homeTeamNameRaw: "Inter", awayTeamNameRaw: "Roma" })],
+      [buildMatch({ homeTeamId: null, awayTeamId: null, homeTeamNameRaw: "Internacional", awayTeamNameRaw: "Roma" })],
+    );
+    expect(result.matchIds).toEqual([]);
+  });
+
+  it("still refuses two untracked clubs when the source gave no names to compare", () => {
     const result = matchStreamsToBroadcasts([buildStream({ homeTeamId: null, awayTeamId: null })], [buildMatch()]);
     expect(result.matchIds).toEqual([]);
     expect(result.unresolvedCount).toBe(1);

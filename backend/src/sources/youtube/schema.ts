@@ -63,7 +63,15 @@ const TITLE_PATTERNS = [
 // are covered too. Deliberately anchored on the PRÉ/PÓS prefix rather than
 // the word "JOGO" alone: "JOGO COMPLETO: SANTOS X PALMEIRAS ... | ge tv" is
 // a real ge TV broadcast and must keep matching.
-const NON_BROADCAST_PATTERNS = [/\bpre[\s-]?jogo\b/, /\bpos[\s-]?jogo\b/];
+//
+// "(NARRAÇÃO)" belongs here for a different reason: it IS the match, but
+// audio only. Real bug: "AO VIVO: MANCHESTER UNITED X SABAH (NARRAÇÃO) |
+// CHAMPIONS LEAGUE" was listed as a TNT Sports broadcast, so the site sent
+// someone expecting to watch a game to a radio-style stream. Sérgio flagged
+// this hazard early on for Jovem Pan, which does the same with Brazilian
+// matches. A false negative here just means a missing broadcast; a false
+// positive means telling someone to watch something they can't see.
+const NON_BROADCAST_PATTERNS = [/\bpre[\s-]?jogo\b/, /\bpos[\s-]?jogo\b/, /\bnarracao\b/];
 
 // Markers that a title is a WOMEN'S match. Real bug this comes from: Canal
 // GOAT's "AO VIVO: BRIGHTON X ARSENAL | WSL - WOMEN'S SUPER LEAGUE"
@@ -78,6 +86,23 @@ const WOMENS_TITLE_PATTERNS = [/\bwsl\b/, /\bnwsl\b/, /\bwomen/, /\bfeminin[ao]\
 export function isWomensCompetitionTitle(title: string): boolean {
   const normalized = normalizeText(title);
   return WOMENS_TITLE_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
+// Youth football, same hazard as the women's game and one category further:
+// the clubs are the same institutions, so "BAYERN X BODO/GLIMT" reads
+// identically whether it's the Champions League or the Youth League. Real
+// bug: TNT Sports' "AO VIVO: BAYERN X BODO/GLIMT - YOUTH LEAGUE 2026/2027"
+// was attached to that day's senior Champions League fixture, and the site
+// sent viewers to an under-19 match.
+//
+// Always excluded, unlike the women's game: no youth competition is tracked
+// here, so a youth title can only ever be a wrong attach.
+const YOUTH_TITLE_PATTERNS = [/\byouth\b/, /\bsub[\s-]?\d{2}\b/, /\bu\d{2}\b/, /\bjuniores\b/, /\bjuvenil\b/];
+
+/** True when the title names a youth competition. */
+export function isYouthCompetitionTitle(title: string): boolean {
+  const normalized = normalizeText(title);
+  return YOUTH_TITLE_PATTERNS.some((pattern) => pattern.test(normalized));
 }
 
 export interface ParsedStreamTitle {

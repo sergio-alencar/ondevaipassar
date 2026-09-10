@@ -1,9 +1,12 @@
 import { resolveTeamId } from "../../ingest/teamResolver.js";
 import { fetchChannelAvatarUrl, fetchScheduledStartTimes, searchUpcomingVideos } from "./client.js";
-import { isWomensCompetitionTitle, parseMatchTitle } from "./schema.js";
+import { isWomensCompetitionTitle, isYouthCompetitionTitle, parseMatchTitle } from "./schema.js";
 
 export interface YoutubeStream {
   videoId: string;
+  /** The title's own spelling of each side — how a match between two untracked clubs is found (see broadcastMatching's nameMatches). */
+  homeTeamNameRaw: string;
+  awayTeamNameRaw: string;
   // Nullable: a "Europa" club plays almost every match against an opponent
   // we don't individually track (we track 20 clubs, not entire leagues) —
   // see broadcastMatching.ts's TeamPairStream for how a null side is
@@ -61,6 +64,9 @@ export async function fetchUpcomingStreams(
     // isWomensCompetitionTitle). Channels that DO broadcast women's
     // football pass the Feminino resolver and keep these.
     if (division !== "feminino" && isWomensCompetitionTitle(video.title)) continue;
+    // Youth is excluded for every channel: no youth competition is tracked,
+    // so such a title can only attach to the wrong (senior) fixture.
+    if (isYouthCompetitionTitle(video.title)) continue;
     candidates.push({ videoId: video.videoId, ...titleMatch });
   }
 
@@ -81,7 +87,14 @@ export async function fetchUpcomingStreams(
     // has one resolvable side to match on, see broadcastMatching.ts.
     if (!homeTeamId && !awayTeamId) continue;
 
-    streams.push({ videoId: candidate.videoId, homeTeamId, awayTeamId, streamDateUtc });
+    streams.push({
+      videoId: candidate.videoId,
+      homeTeamId,
+      awayTeamId,
+      homeTeamNameRaw: candidate.homeTeamNameRaw,
+      awayTeamNameRaw: candidate.awayTeamNameRaw,
+      streamDateUtc,
+    });
   }
 
   return { streams, channelLogoUrl };

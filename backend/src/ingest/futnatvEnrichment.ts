@@ -62,9 +62,14 @@ export async function runFutnatvEnrichment(): Promise<void> {
 
       const homeTeamId = resolveTeamId(game.home);
       const awayTeamId = resolveTeamId(game.away);
-      if (!homeTeamId && !awayTeamId) continue; // not a team we track at all — not our concern, doesn't count against run health
-
-      const { matchIds } = matchStreamsToBroadcasts([{ homeTeamId, awayTeamId, streamDateUtc }], allMatches);
+      // No longer skipped when neither side is tracked: the European cups
+      // are ingested whole now, so those fixtures are real and on the site,
+      // and the raw names let the matcher find them (see nameMatches). If
+      // no fixture matches, it just resolves to nothing, as before.
+      const { matchIds } = matchStreamsToBroadcasts(
+        [{ homeTeamId, awayTeamId, homeTeamNameRaw: game.home, awayTeamNameRaw: game.away, streamDateUtc }],
+        allMatches,
+      );
       if (matchIds.length !== 1) {
         unresolvedCount++;
         continue;

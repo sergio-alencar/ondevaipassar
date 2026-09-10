@@ -156,6 +156,14 @@ const CHANNELS: Channel[] = [
     officialUrl: "https://www.youtube.com/@SBTSports/streams",
     instagramHandle: "sbt",
   },
+  // Sérgio: transmite Champions League ao lado do HBO Max (confirmado no
+  // futnatv, "Space e HBO MAX" para PSV x Shakhtar).
+  {
+    id: "space",
+    displayName: "Space",
+    officialUrl: "https://www.hbomax.com/br/pt/sports",
+    instagramHandle: "canalspacebr",
+  },
   {
     id: "sportv",
     displayName: "SporTV",
@@ -263,6 +271,7 @@ const CHANNEL_ALIASES: Record<string, string> = {
   hbomax: "hbomax",
   onefootball: "onefootball",
   sbt: "sbt",
+  space: "space",
   sportv: "sportv",
   "sportv 2": "sportv",
   "sportv 3": "sportv",

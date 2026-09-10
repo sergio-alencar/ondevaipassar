@@ -1,3 +1,5 @@
+import { normalizeText } from "@ondevaipassar/shared";
+
 // Shared by every "no fixtures API, just a team pair + a rough date/time
 // straight from a broadcaster's own channel" enrichment source (YouTube
 // channels, Premiere) — matches a stream against matches ge.globo already
@@ -44,6 +46,9 @@ export interface TeamPairStream {
   // wildcard below — see teamMatches.
   homeTeamId: string | null;
   awayTeamId: string | null;
+  /** The source's own spelling of each side. Only used when BOTH ids are null — see nameMatches. */
+  homeTeamNameRaw?: string;
+  awayTeamNameRaw?: string;
   /** Whatever rough date/time the broadcaster's own source gives for this stream — never trusted as *the* kickoff time, only used to pick which candidate match this is. */
   streamDateUtc: string;
 }
@@ -58,7 +63,28 @@ export interface MatchCandidate {
   id: string;
   homeTeamId: string | null;
   awayTeamId: string | null;
+  homeTeamNameRaw: string;
+  awayTeamNameRaw: string;
   kickoffUtc: string;
+}
+
+/**
+ * Same club, as spelled by two different sources: one side's words must be
+ * a subset of the other's. Real pairs this reconciles, all from one day of
+ * Champions League fixtures — "Shakhtar" vs "FC Shakhtar Donetsk", "Como"
+ * vs "Como 1907", "Slavia Praga" vs "SK Slavia Praga".
+ *
+ * Compared as whole WORDS, never substrings: "Inter" is a subset of "Inter
+ * de Milão" (right) but not of "Internacional" (which substring matching
+ * would have wrongly joined).
+ */
+function nameMatches(a: string, b: string): boolean {
+  const words = (value: string): Set<string> => new Set(normalizeText(value).split(/\s+/).filter(Boolean));
+  const wordsA = words(a);
+  const wordsB = words(b);
+  if (wordsA.size === 0 || wordsB.size === 0) return false;
+  const [smaller, larger] = wordsA.size <= wordsB.size ? [wordsA, wordsB] : [wordsB, wordsA];
+  return [...smaller].every((word) => larger.has(word));
 }
 
 export interface MatchedBroadcasts<T> {
@@ -79,17 +105,32 @@ export function matchStreamsToBroadcasts<T extends TeamPairStream>(
   const matchedStreams: T[] = [];
 
   for (const stream of streams) {
-    // Nothing to anchor on at all (both sides untracked) — would otherwise
-    // wildcard-match literally any fixture on the right date.
-    if (stream.homeTeamId === null && stream.awayTeamId === null) {
+    // Both sides untracked: ids can't tell two fixtures apart (they're both
+    // null, which would wildcard-match every fixture on the date), so the
+    // names are all there is. Only reachable for a source that supplies
+    // them — without names this still bails, as it always did.
+    //
+    // This case only exists because the European cups are now ingested
+    // whole (see onefootballEnrichment's FULL_COVERAGE_COMPETITIONS): those
+    // fixtures are real and on the site, but every broadcast source used to
+    // drop them here, so four Champions League matches sat on "transmissão
+    // a confirmar" while futnatv had the answer all along.
+    const bothUntracked = stream.homeTeamId === null && stream.awayTeamId === null;
+    if (bothUntracked && !(stream.homeTeamNameRaw && stream.awayTeamNameRaw)) {
       unresolvedCount++;
       continue;
     }
 
     const streamDate = toBrtCalendarDate(stream.streamDateUtc);
     const candidates = candidateMatches.filter((match) => {
-      const sameOrder = teamMatches(stream.homeTeamId, match.homeTeamId) && teamMatches(stream.awayTeamId, match.awayTeamId);
-      const swappedOrder = teamMatches(stream.homeTeamId, match.awayTeamId) && teamMatches(stream.awayTeamId, match.homeTeamId);
+      const sameOrder = bothUntracked
+        ? nameMatches(stream.homeTeamNameRaw as string, match.homeTeamNameRaw) &&
+          nameMatches(stream.awayTeamNameRaw as string, match.awayTeamNameRaw)
+        : teamMatches(stream.homeTeamId, match.homeTeamId) && teamMatches(stream.awayTeamId, match.awayTeamId);
+      const swappedOrder = bothUntracked
+        ? nameMatches(stream.homeTeamNameRaw as string, match.awayTeamNameRaw) &&
+          nameMatches(stream.awayTeamNameRaw as string, match.homeTeamNameRaw)
+        : teamMatches(stream.homeTeamId, match.awayTeamId) && teamMatches(stream.awayTeamId, match.homeTeamId);
       if (!sameOrder && !swappedOrder) return false;
       return daysBetween(toBrtCalendarDate(match.kickoffUtc), streamDate) <= DATE_TOLERANCE_DAYS;
     });

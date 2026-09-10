@@ -72,6 +72,7 @@ const RASTER_EXTENSION: Record<string, string> = {
   record: "png",
   romariotv: "png",
   sbt: "png",
+  space: "png",
   sportv: "png",
   tntsports: "png",
   tvbrasil: "png",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isWomensCompetitionTitle, parseMatchTitle } from "../src/sources/youtube/schema.js";
+import { isWomensCompetitionTitle, isYouthCompetitionTitle, parseMatchTitle } from "../src/sources/youtube/schema.js";
 
 describe("parseMatchTitle", () => {
   it("parses ge tv / CazéTV's 'AO VIVO: A X B |' format", () => {
@@ -88,6 +88,13 @@ describe("parseMatchTitle", () => {
     });
   });
 
+  // Real bug (2026-09-10): listed as a TNT Sports broadcast of the
+  // Champions League match, but the stream is audio only — someone
+  // expecting to watch got a radio call.
+  it("returns null for an audio-only narration, which is the match but not something you can watch", () => {
+    expect(parseMatchTitle("AO VIVO: MANCHESTER UNITED X SABAH (NARRAÇÃO) | 1ª RODADA | CHAMPIONS LEAGUE 2026/27")).toBeNull();
+  });
+
   // ge tv renames a stream to "JOGO COMPLETO:" once the match is over, and
   // that renamed VOD matches no pattern (none of them accept that prefix) —
   // correct, since only upcoming/live streams should ever attach. Pinned
@@ -118,5 +125,25 @@ describe("isWomensCompetitionTitle", () => {
   it("does not flag a men's title", () => {
     expect(isWomensCompetitionTitle("AO VIVO: ARSENAL X CHELSEA | PREMIER LEAGUE")).toBe(false);
     expect(isWomensCompetitionTitle("CRB X CRICIÚMA | AO VIVO E COM IMAGENS | SÉRIE B")).toBe(false);
+  });
+});
+
+// Real bug (2026-09-10): the site sent viewers to an under-19 match. The
+// clubs are the same institutions, so the pairing alone can't tell a Youth
+// League fixture from the senior Champions League one on the same day.
+describe("isYouthCompetitionTitle", () => {
+  it("recognizes the real title behind the incident", () => {
+    expect(isYouthCompetitionTitle("AO VIVO: BAYERN X BODO/GLIMT - YOUTH LEAGUE 2026/2027 COM IMAGENS")).toBe(true);
+  });
+
+  it("recognizes the other ways youth football gets labelled", () => {
+    expect(isYouthCompetitionTitle("AO VIVO: FLAMENGO X VASCO | COPA DO BRASIL SUB-20")).toBe(true);
+    expect(isYouthCompetitionTitle("PALMEIRAS X SANTOS U17 | AO VIVO")).toBe(true);
+    expect(isYouthCompetitionTitle("AO VIVO: SÃO PAULO X CORINTHIANS | JUNIORES")).toBe(true);
+  });
+
+  it("does not flag a senior title", () => {
+    expect(isYouthCompetitionTitle("AO VIVO: BAYERN X BODO/GLIMT | UEFA CHAMPIONS LEAGUE")).toBe(false);
+    expect(isYouthCompetitionTitle("CRB X CRICIÚMA | AO VIVO E COM IMAGENS | SÉRIE B")).toBe(false);
   });
 });
