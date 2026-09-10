@@ -83,6 +83,34 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
                     }
                   }}
                 />
+                {/* Canto oposto ao aviso regional, para os dois poderem
+                    conviver no mesmo logo. Só TV e YouTube ganham marca:
+                    "streaming" é o que a arte do canal já comunica (um app),
+                    e marcar tudo tiraria o contraste de marcar alguma coisa. */}
+                {broadcast.kind !== "streaming" && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -bottom-1 -right-1 flex items-center justify-center size-5 rounded-full bg-gray-900 text-white shadow"
+                    title={broadcast.kind === "tv" ? "Na TV" : "No YouTube"}
+                  >
+                    {broadcast.kind === "tv" ? (
+                      <svg viewBox="0 0 24 24" className="size-3" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round">
+                        <rect x="2" y="6" width="20" height="13" rx="2" />
+                        <path d="M8 2l4 4 4-4" strokeLinecap="round" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" className="size-3" fill="currentColor">
+                        <path d="M10 15.5v-7l6 3.5-6 3.5z" />
+                        <path
+                          d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8z"
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                          opacity="0.35"
+                        />
+                      </svg>
+                    )}
+                  </span>
+                )}
                 {broadcast.regionalCaveat && (
                   <span
                     aria-hidden="true"

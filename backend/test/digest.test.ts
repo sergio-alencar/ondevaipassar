@@ -19,7 +19,7 @@ function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
     kickoffTimeConfirmed: true,
     round: 26,
     status: "scheduled",
-    broadcasts: [{ channelId: "premiere", displayName: "Premiere", url: "", logoUrl: "", regionalCaveat: false }],
+    broadcasts: [{ channelId: "premiere", displayName: "Premiere", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: false }],
     ...overrides,
   } as MatchView;
 }
@@ -69,7 +69,7 @@ describe("buildDigest", () => {
       [
         buildMatch({
           broadcasts: [
-            { channelId: "globo", displayName: "Globo", url: "", logoUrl: "", regionalCaveat: true, regionalDetail: "RJ, ES, MG e BA" },
+            { channelId: "globo", displayName: "Globo", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: true, regionalDetail: "RJ, ES, MG e BA" },
           ],
         } as Partial<MatchView>),
       ],
@@ -83,8 +83,8 @@ describe("buildDigest", () => {
   it("marks a channel that only has the generic caveat, with the footnote appearing exactly once", () => {
     const withCaveat = buildMatch({
       broadcasts: [
-        { channelId: "globo", displayName: "Globo", url: "", logoUrl: "", regionalCaveat: true },
-        { channelId: "premiere", displayName: "Premiere", url: "", logoUrl: "", regionalCaveat: false },
+        { channelId: "globo", displayName: "Globo", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: true },
+        { channelId: "premiere", displayName: "Premiere", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: false },
       ],
     } as Partial<MatchView>);
     const digest = buildDigest([withCaveat, { ...withCaveat, id: "b", kickoffUtc: "2026-09-05T23:00:00.000Z" }], NOW);
@@ -95,7 +95,7 @@ describe("buildDigest", () => {
 
   it("uses '(regional)', never a bare asterisk, so WhatsApp's own bold markup isn't broken", () => {
     const digest = buildDigest(
-      [buildMatch({ broadcasts: [{ channelId: "globo", displayName: "Globo", url: "", logoUrl: "", regionalCaveat: true }] } as Partial<MatchView>)],
+      [buildMatch({ broadcasts: [{ channelId: "globo", displayName: "Globo", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: true }] } as Partial<MatchView>)],
       NOW,
     );
     // Every "*" must be part of a matched bold pair, i.e. an even count per line.

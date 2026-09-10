@@ -17,7 +17,7 @@ function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
     kickoffTimeConfirmed: true,
     round: 20,
     status: "scheduled",
-    broadcasts: [{ channelId: "globo", displayName: "Globo", url: "https://globo.com", logoUrl: "", regionalCaveat: true }],
+    broadcasts: [{ channelId: "globo", displayName: "Globo", kind: "tv" as const, url: "https://globo.com", logoUrl: "", regionalCaveat: true }],
     ...overrides,
   };
 }
@@ -143,11 +143,11 @@ describe("renderMatchImage", () => {
     const png = await renderMatchImage(
       buildMatch({
         broadcasts: [
-          { channelId: "globo", displayName: "Globo", url: "", logoUrl: "", regionalCaveat: true },
-          { channelId: "premiere", displayName: "Premiere", url: "", logoUrl: "", regionalCaveat: false },
-          { channelId: "getv", displayName: "ge TV", url: "", logoUrl: "", regionalCaveat: false },
-          { channelId: "sportv", displayName: "SporTV", url: "", logoUrl: "", regionalCaveat: false },
-          { channelId: "tntsports", displayName: "TNT Sports", url: "", logoUrl: "", regionalCaveat: false },
+          { channelId: "globo", displayName: "Globo", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: true },
+          { channelId: "premiere", displayName: "Premiere", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: false },
+          { channelId: "getv", displayName: "ge TV", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: false },
+          { channelId: "sportv", displayName: "SporTV", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: false },
+          { channelId: "tntsports", displayName: "TNT Sports", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: false },
         ],
       }),
     );

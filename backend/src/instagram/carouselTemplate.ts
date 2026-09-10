@@ -41,6 +41,8 @@ const CONTENT_WIDTH = PORTRAIT_WIDTH - 2 * SIDE_PADDING;
 /** A channel on a slide, plus its footnote marker ("*", "**") — empty when its coverage carries no regional note. */
 export interface SlideChannel extends TemplateChannel {
   regionalMarker: string;
+  /** "TV" / "YT" badge, or "" for a streaming app (whose own art already says what it is). */
+  kindLabel: string;
 }
 
 export interface SlideMatch {
@@ -96,11 +98,44 @@ function channelTile(channel: SlideChannel, tileSize: number): SatoriElement {
         channel.displayName,
       );
 
-  if (!channel.regionalMarker) return art;
+  if (!channel.regionalMarker && !channel.kindLabel) return art;
 
   const badge = Math.round(tileSize * 0.34);
+  // Written as text, not an icon: the only fonts loaded here are Roboto
+  // regular/bold, and a play or television glyph outside that set renders
+  // as tofu. "TV"/"YT" are unambiguous at this size and always draw.
+  const kindBadge = channel.kindLabel
+    ? [
+        h(
+          "div",
+          {
+            style: {
+              position: "absolute",
+              bottom: -6,
+              right: -6,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minWidth: badge,
+              height: badge,
+              padding: "0 8px",
+              borderRadius: badge,
+              backgroundColor: GRAY_900,
+              color: "#ffffff",
+              fontSize: Math.round(badge * 0.56),
+              fontWeight: 700,
+            },
+          },
+          channel.kindLabel,
+        ),
+      ]
+    : [];
+
+  if (!channel.regionalMarker) return h("div", { style: { display: "flex", position: "relative" } }, [art, ...kindBadge]);
+
   return h("div", { style: { display: "flex", position: "relative" } }, [
     art,
+    ...kindBadge,
     h(
       "div",
       {

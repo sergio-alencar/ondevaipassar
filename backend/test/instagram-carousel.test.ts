@@ -19,7 +19,7 @@ function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
     kickoffTimeConfirmed: true,
     round: 26,
     status: "scheduled",
-    broadcasts: [{ channelId: "premiere", displayName: "Premiere", url: "", logoUrl: "", regionalCaveat: false, instagramHandle: "premiere" }],
+    broadcasts: [{ channelId: "premiere", displayName: "Premiere", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: false, instagramHandle: "premiere" }],
     ...overrides,
   } as MatchView;
 }
@@ -96,7 +96,7 @@ describe("buildCarouselCaption", () => {
   it("carries the per-state detail and the praça caveat through to the caption", () => {
     const caption = buildCarouselCaption("Brasileirão Feminino", [
       buildMatch({
-        broadcasts: [{ channelId: "globo", displayName: "Globo", url: "", logoUrl: "", regionalCaveat: true, regionalDetail: "MG e PR" }],
+        broadcasts: [{ channelId: "globo", displayName: "Globo", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: true, regionalDetail: "MG e PR" }],
       } as Partial<MatchView>),
     ]);
     expect(caption).toContain("Globo em: MG e PR (pode variar por praça dentro do estado)");

@@ -13,7 +13,14 @@ const SOURCE_ID = "channel-mirror";
  * both listed, regardless of which one whatever source (ge.globo's own
  * liveWatchSources, a supplementary scraper, ...) happened to confirm.
  */
-const MIRRORS: { from: string; to: string }[] = [{ from: "tntsports", to: "hbomax" }];
+// Duas origens desde que TNT (TV) e TNT Sports (YouTube) viraram entradas
+// separadas: o pedido original do Sérgio era sobre a marca TNT como um
+// todo — os jogos dela passam no app do HBO Max — e o que mudou foi só a
+// nossa modelagem, não a realidade.
+const MIRRORS: { from: string; to: string }[] = [
+  { from: "tnt", to: "hbomax" },
+  { from: "tntsports", to: "hbomax" },
+];
 
 /**
  * Runs last in the cron pass (after every other source), so it mirrors the

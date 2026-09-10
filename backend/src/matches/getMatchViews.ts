@@ -81,6 +81,7 @@ async function buildMatchViews(conditions: (SQL | undefined)[]): Promise<MatchVi
             {
               channelId: channel.id,
               displayName: channel.displayName,
+              kind: channel.kind,
               // A per-match link (e.g. this exact YouTube stream) beats the
               // channel's own generic page when a source gave us one.
               url: broadcast.watchUrl ?? channel.officialUrl,

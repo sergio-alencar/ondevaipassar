@@ -1,8 +1,18 @@
 import { normalizeText } from "./text.js";
 
+/**
+ * How a viewer actually reaches this channel. Shown as a badge on the logo,
+ * because "onde vai passar" is only half an answer: a cable channel and a
+ * free YouTube stream are different asks, and the brand name alone doesn't
+ * say which — TNT (cable) and TNT Sports (YouTube) are the case that forced
+ * this, but SBT and Band carry the same ambiguity.
+ */
+export type ChannelKind = "tv" | "streaming" | "youtube";
+
 export interface Channel {
   id: string;
   displayName: string;
+  kind: ChannelKind;
   officialUrl: string;
   /** True when the source can't tell us whether this actually airs in the viewer's specific region (true today only for "globo" — ge.globo's data has no region/UF field, every entry just says "check local listings"). */
   regionalCaveat?: boolean;
@@ -18,58 +28,68 @@ const CHANNELS: Channel[] = [
   {
     id: "band",
     displayName: "Band",
+    kind: "tv",
     officialUrl: "https://www.band.com.br/ao-vivo",
     instagramHandle: "esportenaband",
   },
   {
     id: "canaldobenja",
     displayName: "Canal do Benja",
+    kind: "youtube",
     officialUrl: "https://www.youtube.com/@canaldobenjaoficial/streams",
   },
   {
     id: "goat",
     displayName: "Canal GOAT",
+    kind: "youtube",
     officialUrl: "https://www.youtube.com/@canalgoatbr/streams",
     instagramHandle: "canalgoatbr",
   },
   {
     id: "cazetv",
     displayName: "CazéTV",
+    kind: "youtube",
     officialUrl: "https://www.youtube.com/cazetv/streams",
     instagramHandle: "cazetv",
   },
   {
     id: "dazn",
     displayName: "DAZN",
+    kind: "streaming",
     officialUrl: "https://www.dazn.com/pt-BR",
   },
   {
     id: "disneyplus",
     displayName: "Disney+",
+    kind: "streaming",
     officialUrl: "https://www.disneyplus.com/pt-br",
     instagramHandle: "disneyplusbr",
   },
   {
     id: "espn",
     displayName: "ESPN",
+    kind: "tv",
     officialUrl: "https://www.espn.com.br",
     instagramHandle: "espnbrasil",
   },
   {
     id: "fpftv",
     displayName: "FPF TV",
+    kind: "youtube",
     officialUrl: "https://www.youtube.com/@federacaopr/streams",
     instagramHandle: "federacaopr",
   },
   {
     id: "getv",
     displayName: "ge TV",
+    kind: "youtube",
     officialUrl: "https://www.youtube.com/@getv/streams",
     instagramHandle: "getv",
   },
   {
     id: "globo",
     displayName: "Globo",
+    kind: "tv",
     officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/6120663",
     regionalCaveat: true,
     instagramHandle: "tvglobo",
@@ -77,6 +97,7 @@ const CHANNELS: Channel[] = [
   {
     id: "globoplay",
     displayName: "Globoplay",
+    kind: "streaming",
     officialUrl: "https://globoplay.globo.com",
     instagramHandle: "globoplay",
   },
@@ -88,12 +109,14 @@ const CHANNELS: Channel[] = [
   {
     id: "hbomax",
     displayName: "HBO Max",
+    kind: "streaming",
     officialUrl: "https://www.hbomax.com/br/pt/sports",
     instagramHandle: "hbomaxbrasil",
   },
   {
     id: "nsports",
     displayName: "N Sports",
+    kind: "youtube",
     officialUrl: "https://www.youtube.com/@NSports/streams",
     instagramHandle: "nsports",
   },
@@ -101,12 +124,14 @@ const CHANNELS: Channel[] = [
   {
     id: "jovempanesportes",
     displayName: "Jovem Pan Esportes",
+    kind: "youtube",
     officialUrl: "https://www.youtube.com/@jovempanesportes/streams",
     instagramHandle: "jovempanesportes",
   },
   {
     id: "romariotv",
     displayName: "Romário TV",
+    kind: "youtube",
     officialUrl: "https://www.youtube.com/@RomarioTVoficial/streams",
     instagramHandle: "romariotv_oficial",
   },
@@ -119,36 +144,42 @@ const CHANNELS: Channel[] = [
   {
     id: "onefootball",
     displayName: "OneFootball",
+    kind: "streaming",
     officialUrl: "https://onefootball.com",
     instagramHandle: "onefootball",
   },
   {
     id: "paramountplus",
     displayName: "Paramount Plus",
+    kind: "streaming",
     officialUrl: "https://www.paramountplus.com/br/collections/sports-hub-br",
     instagramHandle: "paramountplusesportes",
   },
   {
     id: "premiere",
     displayName: "Premiere",
+    kind: "tv",
     officialUrl: "https://globoplay.globo.com/canais/premiere",
     instagramHandle: "premiere",
   },
   {
     id: "primevideo",
     displayName: "Prime Video",
+    kind: "streaming",
     officialUrl: "https://www.primevideo.com/sports",
     instagramHandle: "primevideosportbr",
   },
   {
     id: "record",
     displayName: "Record",
+    kind: "tv",
     officialUrl: "https://www.recordplus.com/Live/LiveEvent",
     instagramHandle: "sigarecord",
   },
   {
     id: "sbt",
     displayName: "SBT",
+    kind: "tv",
     // SBT also streams from its main channel (youtube.com/@sbt/streams), and
     // that used to render as an "outro link" under the logo. Sérgio asked
     // for it gone: a second link there reads as a second broadcast rather
@@ -161,12 +192,14 @@ const CHANNELS: Channel[] = [
   {
     id: "space",
     displayName: "Space",
+    kind: "tv",
     officialUrl: "https://www.hbomax.com/br/pt/sports",
     instagramHandle: "canalspacebr",
   },
   {
     id: "sportv",
     displayName: "SporTV",
+    kind: "tv",
     officialUrl: "https://globoplay.globo.com/sportv/ao-vivo/7339108",
     instagramHandle: "sportv",
   },
@@ -176,35 +209,54 @@ const CHANNELS: Channel[] = [
     // DB foreign key and local-asset filename already) to avoid orphaning
     // already-ingested broadcast rows; only the display name/URL changed.
     displayName: "SportyNet",
+    kind: "youtube",
     officialUrl: "https://www.youtube.com/@SportyNetBrasil/streams",
     instagramHandle: "sportynetbrasil",
+  },
+  // Duas entradas de propósito, e as fontes já as tratam assim ("TNT" vs
+  // "YouTube (TNT Sports)"): na TV paga o canal chama-se TNT, enquanto TNT
+  // Sports é a marca esportiva que transmite de graça no YouTube. Enquanto
+  // eram uma coisa só, um jogo que passava na TNT aparecia como "TNT
+  // Sports" com link para o HBO Max, e quem tinha TV a cabo procurava na
+  // grade um canal com esse nome, que não existe.
+  {
+    id: "tnt",
+    displayName: "TNT",
+    kind: "tv",
+    officialUrl: "https://www.hbomax.com/br/pt/sports",
+    instagramHandle: "tntbr",
   },
   {
     id: "tntsports",
     displayName: "TNT Sports",
-    officialUrl: "https://play.hbomax.com/tnt-sports",
+    kind: "youtube",
+    officialUrl: "https://www.youtube.com/@TNTSportsBR/streams",
     instagramHandle: "tntsportsbr",
   },
   {
     id: "tvbrasil",
     displayName: "TV Brasil",
+    kind: "tv",
     officialUrl: "https://play.ebc.com.br/tvs",
     instagramHandle: "tvbrasil",
   },
   {
     id: "uolesporte",
     displayName: "UOL Esporte",
+    kind: "youtube",
     officialUrl: "https://www.youtube.com/@UOLEsporte/streams",
   },
   {
     id: "xsports",
     displayName: "XSports",
+    kind: "streaming",
     officialUrl: "https://www.xsports.com.br",
     instagramHandle: "xsports.brasil",
   },
   {
     id: "youtube",
     displayName: "YouTube",
+    kind: "youtube",
     officialUrl: "https://youtube.com",
     instagramHandle: "youtubebrasil",
   },
@@ -275,7 +327,7 @@ const CHANNEL_ALIASES: Record<string, string> = {
   sportv: "sportv",
   "sportv 2": "sportv",
   "sportv 3": "sportv",
-  tnt: "tntsports",
+  tnt: "tnt",
   "tnt sports": "tntsports",
   "tv brasil": "tvbrasil",
   "uol esporte": "uolesporte",

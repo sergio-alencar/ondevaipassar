@@ -52,6 +52,7 @@ async function toSlideMatch(match: MatchView, showCompetition: boolean, notes: S
     channels: match.broadcasts.map((broadcast) => ({
       displayName: broadcast.displayName,
       logoDataUri: channelLogoDataUri(broadcast.channelId),
+      kindLabel: broadcast.kind === "tv" ? "TV" : broadcast.kind === "youtube" ? "YT" : "",
       regionalMarker: broadcast.regionalDetail
         ? notes.markerFor(broadcast.regionalDetail)
         : broadcast.regionalCaveat
