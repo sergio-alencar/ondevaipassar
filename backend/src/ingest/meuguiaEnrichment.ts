@@ -29,7 +29,10 @@ const TRACKED_CHANNELS: { code: string; channelId: string; sourceId: string }[] 
   { code: "ES3", channelId: "espn", sourceId: "meuguia-es3" },
   { code: "ES4", channelId: "espn", sourceId: "meuguia-es4" },
   { code: "ES5", channelId: "espn", sourceId: "meuguia-es5" },
-  { code: "TNT", channelId: "tntsports", sourceId: "meuguia-tnt" },
+  // A grade do meuguia.tv e de TV paga, entao este e o canal TNT, nao a
+  // marca TNT Sports do YouTube. Enquanto apontava para "tntsports", um
+  // jogo que passa na TNT aparecia como se fosse o canal do YouTube.
+  { code: "TNT", channelId: "tnt", sourceId: "meuguia-tnt" },
   { code: "SPO", channelId: "sportv", sourceId: "meuguia-spo" },
   { code: "SP2", channelId: "sportv", sourceId: "meuguia-sp2" },
   { code: "SP3", channelId: "sportv", sourceId: "meuguia-sp3" },
