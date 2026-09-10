@@ -4,8 +4,10 @@ import type { MatchStatus } from "./match.js";
 export interface BroadcastView {
   channelId: string;
   displayName: string;
-  /** How the viewer reaches it — drives the TV/YouTube badge on the logo (see Channel.kind). */
+  /** How the viewer reaches it (see Channel.kind) — data, not a badge. */
   kind: ChannelKind;
+  /** Watchable without paying (see Channel.free) — this is what the logo badge marks. */
+  free: boolean;
   url: string;
   /** Prefer a local asset for this channel when we have one; this is the fallback (source-provided) logo, e.g. for channels like ge TV we don't have local art for. */
   logoUrl: string;

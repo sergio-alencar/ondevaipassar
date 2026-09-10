@@ -1,11 +1,11 @@
 import { normalizeText } from "./text.js";
 
 /**
- * How a viewer actually reaches this channel. Shown as a badge on the logo,
- * because "onde vai passar" is only half an answer: a cable channel and a
- * free YouTube stream are different asks, and the brand name alone doesn't
- * say which — TNT (cable) and TNT Sports (YouTube) are the case that forced
- * this, but SBT and Band carry the same ambiguity.
+ * How a viewer actually reaches this channel. Kept as data (it's what tells
+ * TNT-the-cable-channel from TNT Sports-the-YouTube-brand, the case that
+ * forced it into existence) but deliberately NOT what the logo badge shows:
+ * badging every "tv" and "youtube" channel marked 22 of 30 entries, which is
+ * a taxonomy, not a signal. `free` is the marker instead — see below.
  */
 export type ChannelKind = "tv" | "streaming" | "youtube";
 
@@ -16,6 +16,18 @@ export interface Channel {
   officialUrl: string;
   /** True when the source can't tell us whether this actually airs in the viewer's specific region (true today only for "globo" — ge.globo's data has no region/UF field, every entry just says "check local listings"). */
   regionalCaveat?: boolean;
+  /**
+   * Watchable at no cost: TV aberta and free YouTube channels, plus
+   * OneFootball's own free streams. A free account can be required (Globo's
+   * signal on Globoplay, OneFootball) — "grátis" here means no payment, not
+   * no signup.
+   *
+   * Curated per channel rather than derived from `kind`, because the two
+   * axes genuinely disagree: OneFootball is `streaming` and free, ESPN is
+   * `tv` and paid. It's the badge the logos carry, and it earns that spot by
+   * being the exception — 53 of 246 live broadcast rows, about one in five.
+   */
+  free?: true;
   /** Handle (no "@"), for tagging the broadcaster in the Instagram poster's caption — manually verified against each channel's real profile, not guessed. */
   instagramHandle?: string;
 }
@@ -29,19 +41,35 @@ const CHANNELS: Channel[] = [
     id: "band",
     displayName: "Band",
     kind: "tv",
+    free: true,
     officialUrl: "https://www.band.com.br/ao-vivo",
     instagramHandle: "esportenaband",
+  },
+  // Separada da Band pelo mesmo motivo que TNT foi separada de TNT Sports:
+  // a Band e aberta e de graca, a BandSports so existe na TV por assinatura.
+  // Enquanto eram uma coisa so, um jogo da BandSports aparecia como "Band" —
+  // e, com o selo de grátis, passaria a dizer a quem nao tem TV paga que da
+  // pra assistir sem pagar. Quem emitia isso era o meuguia.tv, cuja grade e
+  // toda de TV paga (codigo "BSP", confirmado ao vivo: o <title> da pagina e
+  // "Programação Band Sports").
+  {
+    id: "bandsports",
+    displayName: "BandSports",
+    kind: "tv",
+    officialUrl: "https://bandsports.uol.com.br",
   },
   {
     id: "canaldobenja",
     displayName: "Canal do Benja",
     kind: "youtube",
+    free: true,
     officialUrl: "https://www.youtube.com/@canaldobenjaoficial/streams",
   },
   {
     id: "goat",
     displayName: "Canal GOAT",
     kind: "youtube",
+    free: true,
     officialUrl: "https://www.youtube.com/@canalgoatbr/streams",
     instagramHandle: "canalgoatbr",
   },
@@ -49,6 +77,7 @@ const CHANNELS: Channel[] = [
     id: "cazetv",
     displayName: "CazéTV",
     kind: "youtube",
+    free: true,
     officialUrl: "https://www.youtube.com/cazetv/streams",
     instagramHandle: "cazetv",
   },
@@ -76,6 +105,7 @@ const CHANNELS: Channel[] = [
     id: "fpftv",
     displayName: "FPF TV",
     kind: "youtube",
+    free: true,
     officialUrl: "https://www.youtube.com/@federacaopr/streams",
     instagramHandle: "federacaopr",
   },
@@ -83,6 +113,7 @@ const CHANNELS: Channel[] = [
     id: "getv",
     displayName: "ge TV",
     kind: "youtube",
+    free: true,
     officialUrl: "https://www.youtube.com/@getv/streams",
     instagramHandle: "getv",
   },
@@ -90,10 +121,18 @@ const CHANNELS: Channel[] = [
     id: "globo",
     displayName: "Globo",
     kind: "tv",
+    free: true,
     officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/6120663",
     regionalCaveat: true,
     instagramHandle: "tvglobo",
   },
+  // Deliberately NOT `free`. TV Globo's live signal does stream here for
+  // nothing (a Conta Globo, no payment) — but that's the same broadcast as
+  // the "globo" entry, which already links straight to it, so a second free
+  // door to one broadcast would be double-counting. Everything else
+  // Globoplay carries (SporTV, Premiere) is a paid entitlement, which is why
+  // resolveBroadcasts drops this entry whenever a real channel is listed
+  // beside it (see sources/ge-globo/adapter.ts).
   {
     id: "globoplay",
     displayName: "Globoplay",
@@ -117,6 +156,7 @@ const CHANNELS: Channel[] = [
     id: "nsports",
     displayName: "N Sports",
     kind: "youtube",
+    free: true,
     officialUrl: "https://www.youtube.com/@NSports/streams",
     instagramHandle: "nsports",
   },
@@ -125,6 +165,7 @@ const CHANNELS: Channel[] = [
     id: "jovempanesportes",
     displayName: "Jovem Pan Esportes",
     kind: "youtube",
+    free: true,
     officialUrl: "https://www.youtube.com/@jovempanesportes/streams",
     instagramHandle: "jovempanesportes",
   },
@@ -132,6 +173,7 @@ const CHANNELS: Channel[] = [
     id: "romariotv",
     displayName: "Romário TV",
     kind: "youtube",
+    free: true,
     officialUrl: "https://www.youtube.com/@RomarioTVoficial/streams",
     instagramHandle: "romariotv_oficial",
   },
@@ -145,6 +187,7 @@ const CHANNELS: Channel[] = [
     id: "onefootball",
     displayName: "OneFootball",
     kind: "streaming",
+    free: true,
     officialUrl: "https://onefootball.com",
     instagramHandle: "onefootball",
   },
@@ -173,6 +216,7 @@ const CHANNELS: Channel[] = [
     id: "record",
     displayName: "Record",
     kind: "tv",
+    free: true,
     officialUrl: "https://www.recordplus.com/Live/LiveEvent",
     instagramHandle: "sigarecord",
   },
@@ -180,6 +224,7 @@ const CHANNELS: Channel[] = [
     id: "sbt",
     displayName: "SBT",
     kind: "tv",
+    free: true,
     // SBT also streams from its main channel (youtube.com/@sbt/streams), and
     // that used to render as an "outro link" under the logo. Sérgio asked
     // for it gone: a second link there reads as a second broadcast rather
@@ -210,6 +255,7 @@ const CHANNELS: Channel[] = [
     // already-ingested broadcast rows; only the display name/URL changed.
     displayName: "SportyNet",
     kind: "youtube",
+    free: true,
     officialUrl: "https://www.youtube.com/@SportyNetBrasil/streams",
     instagramHandle: "sportynetbrasil",
   },
@@ -230,6 +276,7 @@ const CHANNELS: Channel[] = [
     id: "tntsports",
     displayName: "TNT Sports",
     kind: "youtube",
+    free: true,
     officialUrl: "https://www.youtube.com/@TNTSportsBR/streams",
     instagramHandle: "tntsportsbr",
   },
@@ -237,6 +284,7 @@ const CHANNELS: Channel[] = [
     id: "tvbrasil",
     displayName: "TV Brasil",
     kind: "tv",
+    free: true,
     officialUrl: "https://play.ebc.com.br/tvs",
     instagramHandle: "tvbrasil",
   },
@@ -244,12 +292,18 @@ const CHANNELS: Channel[] = [
     id: "uolesporte",
     displayName: "UOL Esporte",
     kind: "youtube",
+    free: true,
     officialUrl: "https://www.youtube.com/@UOLEsporte/streams",
   },
   {
     id: "xsports",
     displayName: "XSports",
-    kind: "streaming",
+    // TV aberta, not a subscription app: it launched in Aug/2025 as a free
+    // over-the-air sports channel (digital terrestrial + parabólica) and
+    // mirrors matches on its own YouTube. Being carried by Claro/Sky/Vivo
+    // as well doesn't make it paid, same as Globo.
+    kind: "tv",
+    free: true,
     officialUrl: "https://www.xsports.com.br",
     instagramHandle: "xsports.brasil",
   },
@@ -257,6 +311,7 @@ const CHANNELS: Channel[] = [
     id: "youtube",
     displayName: "YouTube",
     kind: "youtube",
+    free: true,
     officialUrl: "https://youtube.com",
     instagramHandle: "youtubebrasil",
   },
@@ -271,8 +326,8 @@ const CHANNELS: Channel[] = [
 const CHANNEL_ALIASES: Record<string, string> = {
   band: "band",
   bandeirantes: "band",
-  "band sports": "band",
-  bandsports: "band",
+  "band sports": "bandsports",
+  bandsports: "bandsports",
   "canal do benja": "canaldobenja",
   benja: "canaldobenja",
   cazetv: "cazetv",

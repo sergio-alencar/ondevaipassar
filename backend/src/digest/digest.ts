@@ -19,6 +19,13 @@ const NO_BROADCAST_TEXT = "Transmissão a confirmar";
 // its own bold-toggle, so a stray one silently mangles the formatting of
 // everything after it.
 const REGIONAL_MARK = "(regional)";
+
+// Marks a channel you can watch without paying. An emoji rather than a
+// "(grátis)" suffix because a line can carry three of them, and three
+// parenthesised words next to each other stop being scannable — which is the
+// only reason the digest exists. Safe alongside REGIONAL_MARK's reasoning
+// too: it isn't an asterisk, so WhatsApp's bold markup stays intact.
+const FREE_MARK = "🆓";
 /**
  * Which day the digest is about. Needed because `date` alone can't say it:
  * a Saturday-evening pull of tomorrow's listing was rendering "jogos de
@@ -28,6 +35,10 @@ const REGIONAL_MARK = "(regional)";
 export type DigestDay = "hoje" | "amanhã";
 
 const REGIONAL_FOOTNOTE = `${REGIONAL_MARK} — ${REGIONAL_CAVEAT_TEXT}`;
+// Spelled out once per digest, and only when something actually carried
+// the mark — the emoji reads as "FREE", which is close enough to guess but
+// not close enough to leave unsaid.
+const FREE_FOOTNOTE = `${FREE_MARK} — dá pra assistir de graça`;
 
 interface CompetitionGroup {
   id: string;
@@ -78,6 +89,7 @@ interface MatchLine {
   /** Indented sub-line naming the exact states a broadcast covers, when the source gave us that detail. */
   regionalDetail: string | null;
   usedRegionalMark: boolean;
+  usedFreeMark: boolean;
 }
 
 /**
@@ -90,7 +102,7 @@ function buildMatchLine(match: MatchView, bold: boolean): MatchLine {
   const pairing = bold ? `*${match.homeTeamName} x ${match.awayTeamName}*` : `${match.homeTeamName} x ${match.awayTeamName}`;
 
   if (match.broadcasts.length === 0) {
-    return { text: `${time} ${pairing} — ${NO_BROADCAST_TEXT}`, regionalDetail: null, usedRegionalMark: false };
+    return { text: `${time} ${pairing} — ${NO_BROADCAST_TEXT}`, regionalDetail: null, usedRegionalMark: false, usedFreeMark: false };
   }
 
   // Handled per broadcast, not per match (unlike the Instagram caption):
@@ -98,18 +110,27 @@ function buildMatchLine(match: MatchView, bold: boolean): MatchLine {
   // situation — one with real per-state data, another with only the
   // generic disclaimer.
   let usedRegionalMark = false;
+  let usedFreeMark = false;
   let regionalDetail: string | null = null;
 
   const channels = match.broadcasts.map((broadcast) => {
+    // The free mark goes right after the name, before any regional note:
+    // "de graça" is a property of the channel, "(regional)" a caveat about
+    // this particular coverage.
+    let name = broadcast.displayName;
+    if (broadcast.free) {
+      usedFreeMark = true;
+      name = `${name} ${FREE_MARK}`;
+    }
     if (broadcast.regionalDetail) {
       regionalDetail ??= `   📍 ${broadcast.displayName} em: ${broadcast.regionalDetail} (${REGIONAL_PRACA_CAVEAT})`;
-      return broadcast.displayName;
+      return name;
     }
     if (broadcast.regionalCaveat) {
       usedRegionalMark = true;
-      return `${broadcast.displayName} ${REGIONAL_MARK}`;
+      return `${name} ${REGIONAL_MARK}`;
     }
-    return broadcast.displayName;
+    return name;
   });
 
   // No "Transmissão:" label — it would repeat on every single line, and the
@@ -120,7 +141,7 @@ function buildMatchLine(match: MatchView, bold: boolean): MatchLine {
   // No dash after the time either (Sérgio's call): one dash separating the
   // match from its channels reads cleanly, two made the line look like
   // three equal parts.
-  return { text: `${time} ${pairing} — ${channels.join(", ")}`, regionalDetail, usedRegionalMark };
+  return { text: `${time} ${pairing} — ${channels.join(", ")}`, regionalDetail, usedRegionalMark, usedFreeMark };
 }
 
 /**
@@ -138,6 +159,7 @@ export function buildDigest(matches: MatchView[], date: Date = new Date(), day: 
 
   const sections: string[] = [];
   let anyRegionalMark = false;
+  let anyFreeMark = false;
 
   for (const group of groupByCompetition(matches)) {
     const lines = [`*${group.name}*`];
@@ -146,12 +168,17 @@ export function buildDigest(matches: MatchView[], date: Date = new Date(), day: 
       lines.push(line.text);
       if (line.regionalDetail) lines.push(line.regionalDetail);
       if (line.usedRegionalMark) anyRegionalMark = true;
+      if (line.usedFreeMark) anyFreeMark = true;
     }
     sections.push(lines.join("\n"));
   }
 
   const parts = [header, "", sections.join("\n\n")];
-  if (anyRegionalMark) parts.push("", REGIONAL_FOOTNOTE);
+  const footnotes = [
+    ...(anyFreeMark ? [FREE_FOOTNOTE] : []),
+    ...(anyRegionalMark ? [REGIONAL_FOOTNOTE] : []),
+  ];
+  if (footnotes.length > 0) parts.push("", footnotes.join("\n"));
   parts.push("", `Mais detalhes: ${SITE_URL}`);
   return parts.join("\n");
 }
@@ -180,6 +207,7 @@ export function buildThreadDigest(matches: MatchView[], date: Date = new Date(),
 
   const bodies: string[] = [`${opener}\n\n${matches.length} ${matches.length === 1 ? "jogo" : "jogos"}. Onde passa cada um 🧵`];
   let anyRegionalMark = false;
+  let anyFreeMark = false;
 
   for (const group of groupByCompetition(matches)) {
     const lines: string[] = [];
@@ -187,12 +215,14 @@ export function buildThreadDigest(matches: MatchView[], date: Date = new Date(),
       const line = buildMatchLine(match, false);
       lines.push(line.regionalDetail ? `${line.text}\n${line.regionalDetail}` : line.text);
       if (line.usedRegionalMark) anyRegionalMark = true;
+      if (line.usedFreeMark) anyFreeMark = true;
     }
     bodies.push(...packIntoPosts(group.name, lines));
   }
 
   const closing = [`Lista completa e detalhes de cada jogo:`, SITE_URL];
   if (anyRegionalMark) closing.unshift(REGIONAL_FOOTNOTE, "");
+  if (anyFreeMark) closing.unshift(FREE_FOOTNOTE, "");
   bodies.push(closing.join("\n"));
 
   // Reserve the numbering width against the widest suffix any post will get

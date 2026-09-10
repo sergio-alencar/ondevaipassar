@@ -41,8 +41,8 @@ const CONTENT_WIDTH = PORTRAIT_WIDTH - 2 * SIDE_PADDING;
 /** A channel on a slide, plus its footnote marker ("*", "**") — empty when its coverage carries no regional note. */
 export interface SlideChannel extends TemplateChannel {
   regionalMarker: string;
-  /** "TV" / "YT" badge, or "" for a streaming app (whose own art already says what it is). */
-  kindLabel: string;
+  /** Gets the green "GRÁTIS" badge — the same marker the site puts on the logo, and for the same reason: it's the exception, not a label for every channel. */
+  free: boolean;
 }
 
 export interface SlideMatch {
@@ -65,6 +65,9 @@ function crest(art: TemplateCrest, size: number): SatoriElement {
 }
 
 const YELLOW = "#facc15";
+// Same green the site's badge uses (Tailwind green-600), so the two surfaces
+// read as one marker rather than two similar-looking ones.
+const GREEN_600 = "#16a34a";
 
 /**
  * One channel: its logo (or its name, when we don't ship art). A regional
@@ -98,44 +101,60 @@ function channelTile(channel: SlideChannel, tileSize: number): SatoriElement {
         channel.displayName,
       );
 
-  if (!channel.regionalMarker && !channel.kindLabel) return art;
+  if (!channel.regionalMarker && !channel.free) return art;
 
   const badge = Math.round(tileSize * 0.34);
-  // Written as text, not an icon: the only fonts loaded here are Roboto
-  // regular/bold, and a play or television glyph outside that set renders
-  // as tofu. "TV"/"YT" are unambiguous at this size and always draw.
-  const kindBadge = channel.kindLabel
+  // Written as a word, not an icon: the only fonts loaded here are Roboto
+  // regular/bold, so any glyph outside that set renders as tofu. Centered
+  // under the logo instead of in a corner, both because the word is wide and
+  // so it never fights the regional marker sitting at the top right.
+  const freeBadge = channel.free
     ? [
         h(
           "div",
           {
             style: {
               position: "absolute",
-              bottom: -6,
-              right: -6,
+              // Hangs mostly BELOW the tile, overlapping just enough to read
+              // as attached to it. Sitting on the logo (as a corner badge
+              // does) buried the bottom of the wordmark on Globo and CazéTV,
+              // whose art has type running to the edge.
+              bottom: -Math.round(badge * 0.78),
+              left: 0,
+              width: tileSize,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              minWidth: badge,
-              height: badge,
-              padding: "0 8px",
-              borderRadius: badge,
-              backgroundColor: GRAY_900,
-              color: "#ffffff",
-              fontSize: Math.round(badge * 0.56),
-              fontWeight: 700,
             },
           },
-          channel.kindLabel,
+          [
+            h(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  alignItems: "center",
+                  height: badge,
+                  padding: "0 10px",
+                  borderRadius: badge,
+                  backgroundColor: GREEN_600,
+                  color: "#ffffff",
+                  fontSize: Math.round(badge * 0.5),
+                  fontWeight: 700,
+                },
+              },
+              "GRÁTIS",
+            ),
+          ],
         ),
       ]
     : [];
 
-  if (!channel.regionalMarker) return h("div", { style: { display: "flex", position: "relative" } }, [art, ...kindBadge]);
+  if (!channel.regionalMarker) return h("div", { style: { display: "flex", position: "relative" } }, [art, ...freeBadge]);
 
   return h("div", { style: { display: "flex", position: "relative" } }, [
     art,
-    ...kindBadge,
+    ...freeBadge,
     h(
       "div",
       {

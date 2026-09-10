@@ -36,7 +36,10 @@ const TRACKED_CHANNELS: { code: string; channelId: string; sourceId: string }[] 
   { code: "SPO", channelId: "sportv", sourceId: "meuguia-spo" },
   { code: "SP2", channelId: "sportv", sourceId: "meuguia-sp2" },
   { code: "SP3", channelId: "sportv", sourceId: "meuguia-sp3" },
-  { code: "BSP", channelId: "band", sourceId: "meuguia-bsp" },
+  // "BSP" e a BandSports (TV paga), nao a Band aberta — o <title> da propria
+  // pagina do meuguia diz "Programação Band Sports". Mesmo erro que o "TNT"
+  // acima tinha, e o mesmo conserto.
+  { code: "BSP", channelId: "bandsports", sourceId: "meuguia-bsp" },
 ];
 
 async function runChannel(

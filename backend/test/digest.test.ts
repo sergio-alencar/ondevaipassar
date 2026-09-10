@@ -19,7 +19,7 @@ function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
     kickoffTimeConfirmed: true,
     round: 26,
     status: "scheduled",
-    broadcasts: [{ channelId: "premiere", displayName: "Premiere", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: false }],
+    broadcasts: [{ channelId: "premiere", displayName: "Premiere", kind: "tv" as const, free: false, url: "", logoUrl: "", regionalCaveat: false }],
     ...overrides,
   } as MatchView;
 }
@@ -69,13 +69,13 @@ describe("buildDigest", () => {
       [
         buildMatch({
           broadcasts: [
-            { channelId: "globo", displayName: "Globo", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: true, regionalDetail: "RJ, ES, MG e BA" },
+            { channelId: "globo", displayName: "Globo", kind: "tv" as const, free: true, url: "", logoUrl: "", regionalCaveat: true, regionalDetail: "RJ, ES, MG e BA" },
           ],
         } as Partial<MatchView>),
       ],
       NOW,
     );
-    expect(digest).toContain("— Globo");
+    expect(digest).toContain("— Globo 🆓");
     expect(digest).toContain("   📍 Globo em: RJ, ES, MG e BA");
     expect(digest).not.toContain("(regional)");
   });
@@ -83,25 +83,56 @@ describe("buildDigest", () => {
   it("marks a channel that only has the generic caveat, with the footnote appearing exactly once", () => {
     const withCaveat = buildMatch({
       broadcasts: [
-        { channelId: "globo", displayName: "Globo", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: true },
-        { channelId: "premiere", displayName: "Premiere", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: false },
+        { channelId: "globo", displayName: "Globo", kind: "tv" as const, free: true, url: "", logoUrl: "", regionalCaveat: true },
+        { channelId: "premiere", displayName: "Premiere", kind: "tv" as const, free: false, url: "", logoUrl: "", regionalCaveat: false },
       ],
     } as Partial<MatchView>);
     const digest = buildDigest([withCaveat, { ...withCaveat, id: "b", kickoffUtc: "2026-09-05T23:00:00.000Z" }], NOW);
 
-    expect(digest).toContain("— Globo (regional), Premiere");
+    expect(digest).toContain("— Globo 🆓 (regional), Premiere");
     expect(digest.match(/A transmissão pela Globo pode variar/g)).toHaveLength(1);
   });
 
   it("uses '(regional)', never a bare asterisk, so WhatsApp's own bold markup isn't broken", () => {
     const digest = buildDigest(
-      [buildMatch({ broadcasts: [{ channelId: "globo", displayName: "Globo", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: true }] } as Partial<MatchView>)],
+      [buildMatch({ broadcasts: [{ channelId: "globo", displayName: "Globo", kind: "tv" as const, free: true, url: "", logoUrl: "", regionalCaveat: true }] } as Partial<MatchView>)],
       NOW,
     );
     // Every "*" must be part of a matched bold pair, i.e. an even count per line.
     for (const line of digest.split("\n")) {
       expect((line.match(/\*/g) ?? []).length % 2).toBe(0);
     }
+  });
+
+  // The one question a reader can act on without leaving the message: can I
+  // watch this without paying? About 1 in 5 broadcasts can, which is what
+  // makes it worth a mark rather than a column.
+  it("marks a free channel and spells the mark out once, at the foot of the digest", () => {
+    const digest = buildDigest(
+      [
+        buildMatch({
+          broadcasts: [
+            { channelId: "getv", displayName: "ge TV", kind: "youtube" as const, free: true, url: "", logoUrl: "", regionalCaveat: false },
+            { channelId: "premiere", displayName: "Premiere", kind: "tv" as const, free: false, url: "", logoUrl: "", regionalCaveat: false },
+          ],
+        } as Partial<MatchView>),
+      ],
+      NOW,
+    );
+    expect(digest).toContain("— ge TV 🆓, Premiere");
+    expect(digest.match(/dá pra assistir de graça/g)).toHaveLength(1);
+  });
+
+  it("puts the free mark before the regional note — the channel is free either way, the caveat is about this coverage", () => {
+    const digest = buildDigest(
+      [buildMatch({ broadcasts: [{ channelId: "globo", displayName: "Globo", kind: "tv" as const, free: true, url: "", logoUrl: "", regionalCaveat: true }] } as Partial<MatchView>)],
+      NOW,
+    );
+    expect(digest).toContain("— Globo 🆓 (regional)");
+  });
+
+  it("leaves the free footnote out entirely when nothing on the day is free", () => {
+    expect(buildDigest([buildMatch()], NOW)).not.toContain("de graça");
   });
 
   it("says 'horário a confirmar' in place of the time when the kickoff time isn't set", () => {
@@ -173,6 +204,24 @@ describe("buildThreadDigest", () => {
         if (line.includes(" x ") && line.includes("—")) expect(line).toMatch(/—\s+\S.*$/);
       }
     }
+  });
+
+  it("carries both footnotes in the closing post without blowing the character limit", () => {
+    const posts = buildThreadDigest(
+      [
+        buildMatch({
+          broadcasts: [
+            { channelId: "globo", displayName: "Globo", kind: "tv" as const, free: true, url: "", logoUrl: "", regionalCaveat: true },
+            { channelId: "premiere", displayName: "Premiere", kind: "tv" as const, free: false, url: "", logoUrl: "", regionalCaveat: false },
+          ],
+        } as Partial<MatchView>),
+      ],
+      NOW,
+    );
+    const closing = posts.at(-1) as string;
+    expect(closing).toContain("dá pra assistir de graça");
+    expect(closing).toContain("A transmissão pela Globo pode variar");
+    for (const post of posts) expect(countCharacters(post)).toBeLessThanOrEqual(X_CHARACTER_LIMIT);
   });
 
   it("puts Brazilian competitions before foreign ones, and Série A before B before C", () => {

@@ -48,7 +48,7 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
 
   return (
     <div>
-      <div className="flex flex-wrap justify-start items-center gap-x-6 gap-y-3 max-lg:gap-x-3 max-sm:justify-center">
+      <div className="flex flex-wrap justify-start items-center gap-x-6 gap-y-5 pb-1.5 max-lg:gap-x-3 max-sm:justify-center">
         {broadcasts.map((broadcast) => {
           const tooltipSuffix = broadcast.regionalDetail
             ? `: ${broadcast.regionalDetail}`
@@ -83,32 +83,19 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
                     }
                   }}
                 />
-                {/* Canto oposto ao aviso regional, para os dois poderem
-                    conviver no mesmo logo. Só TV e YouTube ganham marca:
-                    "streaming" é o que a arte do canal já comunica (um app),
-                    e marcar tudo tiraria o contraste de marcar alguma coisa. */}
-                {broadcast.kind !== "streaming" && (
+                {/* Só o que é grátis ganha marca. Marcar TV e YouTube
+                    marcava 22 dos 30 canais — isso é taxonomia, não sinal.
+                    "Dá pra ver sem pagar?" é a pergunta que o torcedor faz
+                    de verdade, e a resposta é sim em cerca de 1 a cada 5
+                    transmissões, que é a frequência certa pra uma marca.
+                    Fica embaixo, centralizado, pra conviver com o asterisco
+                    regional no canto de cima. */}
+                {broadcast.free && (
                   <span
-                    aria-hidden="true"
-                    className="absolute -bottom-1 -right-1 flex items-center justify-center size-5 rounded-full bg-gray-900 text-white shadow"
-                    title={broadcast.kind === "tv" ? "Na TV" : "No YouTube"}
+                    className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 rounded-full bg-green-600 px-1.5 py-px text-[10px] font-bold uppercase leading-tight tracking-wide text-white shadow"
+                    title="Dá pra assistir sem pagar"
                   >
-                    {broadcast.kind === "tv" ? (
-                      <svg viewBox="0 0 24 24" className="size-3" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round">
-                        <rect x="2" y="6" width="20" height="13" rx="2" />
-                        <path d="M8 2l4 4 4-4" strokeLinecap="round" />
-                      </svg>
-                    ) : (
-                      <svg viewBox="0 0 24 24" className="size-3" fill="currentColor">
-                        <path d="M10 15.5v-7l6 3.5-6 3.5z" />
-                        <path
-                          d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8z"
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          opacity="0.35"
-                        />
-                      </svg>
-                    )}
+                    Grátis
                   </span>
                 )}
                 {broadcast.regionalCaveat && (
@@ -134,7 +121,7 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
         })}
       </div>
       {hasRegionalCaveat && (
-        <p className="text-xs text-gray-500 mt-2 max-sm:text-center">
+        <p className="text-xs text-gray-500 mt-3 max-sm:text-center">
           <span className="font-bold">*</span> {regionalCaveatCaption}
         </p>
       )}

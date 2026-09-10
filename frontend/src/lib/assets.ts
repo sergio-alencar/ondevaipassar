@@ -51,6 +51,7 @@ export function crestProxyUrl(sourceUrl: string): string {
 // channel not in this map yet.
 const RASTER_EXTENSION: Record<string, string> = {
   band: "png",
+  bandsports: "jpg",
   canaldobenja: "png",
   cazetv: "png",
   dazn: "png",

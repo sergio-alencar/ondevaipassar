@@ -18,10 +18,10 @@ function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
     round: 20,
     status: "scheduled",
     broadcasts: [
-      { channelId: "globo", displayName: "Globo", kind: "tv" as const, url: "https://globo.com", logoUrl: "", regionalCaveat: true, instagramHandle: "tvglobo" },
+      { channelId: "globo", displayName: "Globo", kind: "tv" as const, free: true, url: "https://globo.com", logoUrl: "", regionalCaveat: true, instagramHandle: "tvglobo" },
       {
         channelId: "premiere",
-        displayName: "Premiere", kind: "tv" as const,
+        displayName: "Premiere", kind: "tv" as const, free: false,
         url: "https://premiere.globo.com",
         logoUrl: "",
         regionalCaveat: false,
@@ -53,7 +53,7 @@ describe("buildCaption", () => {
         broadcasts: [
           {
             channelId: "globo",
-            displayName: "Globo", kind: "tv" as const,
+            displayName: "Globo", kind: "tv" as const, free: true,
             url: "https://globo.com",
             logoUrl: "",
             regionalCaveat: true,
@@ -70,7 +70,7 @@ describe("buildCaption", () => {
   it("omits the regional caveat line entirely when no broadcast has one", () => {
     const caption = buildCaption(
       buildMatch({
-        broadcasts: [{ channelId: "cazetv", displayName: "CazéTV", kind: "tv" as const, url: "https://youtube.com", logoUrl: "", regionalCaveat: false }],
+        broadcasts: [{ channelId: "cazetv", displayName: "CazéTV", kind: "youtube" as const, free: true, url: "https://youtube.com", logoUrl: "", regionalCaveat: false }],
       }),
     );
     expect(caption).not.toContain("*");
@@ -79,7 +79,7 @@ describe("buildCaption", () => {
   it("joins a single broadcast with no separator noise", () => {
     const caption = buildCaption(
       buildMatch({
-        broadcasts: [{ channelId: "cazetv", displayName: "CazéTV", kind: "tv" as const, url: "https://youtube.com", logoUrl: "", regionalCaveat: false }],
+        broadcasts: [{ channelId: "cazetv", displayName: "CazéTV", kind: "youtube" as const, free: true, url: "https://youtube.com", logoUrl: "", regionalCaveat: false }],
       }),
     );
     expect(caption).toContain("Transmissão: CazéTV");
@@ -99,7 +99,7 @@ describe("buildCaption", () => {
   it("omits the handles line entirely when no broadcast has a verified handle yet", () => {
     const caption = buildCaption(
       buildMatch({
-        broadcasts: [{ channelId: "getv", displayName: "ge TV", kind: "tv" as const, url: "https://youtube.com", logoUrl: "", regionalCaveat: false }],
+        broadcasts: [{ channelId: "getv", displayName: "ge TV", kind: "youtube" as const, free: true, url: "https://youtube.com", logoUrl: "", regionalCaveat: false }],
       }),
     );
     expect(caption.endsWith("Transmissão: ge TV")).toBe(true);
@@ -109,8 +109,8 @@ describe("buildCaption", () => {
     const caption = buildCaption(
       buildMatch({
         broadcasts: [
-          { channelId: "globo", displayName: "Globo", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: false, instagramHandle: "tvglobo" },
-          { channelId: "getv", displayName: "ge TV", kind: "tv" as const, url: "", logoUrl: "", regionalCaveat: false },
+          { channelId: "globo", displayName: "Globo", kind: "tv" as const, free: true, url: "", logoUrl: "", regionalCaveat: false, instagramHandle: "tvglobo" },
+          { channelId: "getv", displayName: "ge TV", kind: "youtube" as const, free: true, url: "", logoUrl: "", regionalCaveat: false },
         ],
       }),
     );
