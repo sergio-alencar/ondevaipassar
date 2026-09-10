@@ -1,7 +1,7 @@
 import { db } from "../db/client.js";
-import { matches } from "../db/schema.js";
+import { broadcasts, matches } from "../db/schema.js";
 import { fetchChannelSchedule } from "../sources/meuguia/client.js";
-import { attachBroadcastsFromStreams, runBroadcastSource } from "./attachBroadcasts.js";
+import { attachBroadcastsFromStreams, runBroadcastSource, type BroadcastRow } from "./attachBroadcasts.js";
 import type { MatchCandidate } from "./broadcastMatching.js";
 import { resolveTeamId } from "./teamResolver.js";
 
@@ -36,7 +36,11 @@ const TRACKED_CHANNELS: { code: string; channelId: string; sourceId: string }[] 
   { code: "BSP", channelId: "band", sourceId: "meuguia-bsp" },
 ];
 
-async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], allMatches: MatchCandidate[]): Promise<void> {
+async function runChannel(
+  channel: (typeof TRACKED_CHANNELS)[number],
+  allMatches: MatchCandidate[],
+  allBroadcasts: BroadcastRow[],
+): Promise<void> {
   const entries = await fetchChannelSchedule(channel.code);
   const streams = entries
     .map((entry) => ({
@@ -56,13 +60,15 @@ async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], allMatches
     streams,
     channelLogoUrl: null,
     allMatches,
+    allBroadcasts,
   });
 }
 
 /** Enriches already-ingested matches with broadcasts from every tracked meuguia.tv channel grid. */
 export async function runMeuguiaEnrichment(): Promise<void> {
   const allMatches = await db.select().from(matches);
+  const allBroadcasts = await db.select().from(broadcasts);
   for (const channel of TRACKED_CHANNELS) {
-    await runBroadcastSource(channel.sourceId, () => runChannel(channel, allMatches));
+    await runBroadcastSource(channel.sourceId, () => runChannel(channel, allMatches, allBroadcasts));
   }
 }

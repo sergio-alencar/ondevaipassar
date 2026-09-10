@@ -1,8 +1,8 @@
 import { env } from "../config/env.js";
 import { db } from "../db/client.js";
-import { matches } from "../db/schema.js";
+import { broadcasts, matches } from "../db/schema.js";
 import { fetchUpcomingStreams } from "../sources/youtube/adapter.js";
-import { attachBroadcastsFromStreams, runBroadcastSource } from "./attachBroadcasts.js";
+import { attachBroadcastsFromStreams, runBroadcastSource, type BroadcastRow } from "./attachBroadcasts.js";
 import type { MatchCandidate } from "./broadcastMatching.js";
 import { resolveFemininoTeamId } from "./femininoTeamResolver.js";
 
@@ -82,7 +82,12 @@ const TRACKED_CHANNELS: { channelId: string; youtubeChannelId: string; sourceId:
   { channelId: "tntsports", youtubeChannelId: "UCs-6sCz2LJm1PrWQN4ErsPw", sourceId: "youtube-tntsports" },
 ];
 
-async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], apiKey: string, allMatches: MatchCandidate[]): Promise<void> {
+async function runChannel(
+  channel: (typeof TRACKED_CHANNELS)[number],
+  apiKey: string,
+  allMatches: MatchCandidate[],
+  allBroadcasts: BroadcastRow[],
+): Promise<void> {
   const resolveTeamIdFn = channel.division === "feminino" ? resolveFemininoTeamId : undefined;
   const { streams, channelLogoUrl } = await fetchUpcomingStreams(channel.youtubeChannelId, apiKey, resolveTeamIdFn, channel.division);
   await attachBroadcastsFromStreams({
@@ -91,6 +96,7 @@ async function runChannel(channel: (typeof TRACKED_CHANNELS)[number], apiKey: st
     streams,
     channelLogoUrl,
     allMatches,
+    allBroadcasts,
     // Links straight to this match's own stream instead of the channel's
     // generic /streams page — Sérgio asked for this specifically (a viewer
     // shouldn't have to hunt through a channel's whole upcoming list to
@@ -108,7 +114,8 @@ export async function runYoutubeEnrichment(): Promise<void> {
   }
 
   const allMatches = await db.select().from(matches);
+  const allBroadcasts = await db.select().from(broadcasts);
   for (const channel of TRACKED_CHANNELS) {
-    await runBroadcastSource(channel.sourceId, () => runChannel(channel, apiKey, allMatches));
+    await runBroadcastSource(channel.sourceId, () => runChannel(channel, apiKey, allMatches, allBroadcasts));
   }
 }

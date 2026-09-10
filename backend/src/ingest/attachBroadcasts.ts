@@ -11,6 +11,8 @@ export interface AttachBroadcastsParams<T extends TeamPairStream> {
   /** Source-provided logo, or null to leave an existing broadcast row's logoUrl untouched (e.g. no channel avatar found this run). */
   channelLogoUrl: string | null;
   allMatches: MatchCandidate[];
+  /** Snapshot of the broadcasts table, loaded ONCE per enrichment run and shared across its channels — see removeStaleBroadcasts for why reading it per channel got expensive. */
+  allBroadcasts: BroadcastRow[];
   /** Extracts a per-broadcast direct link from the matched stream (e.g. a YouTube video URL for that exact match) — omitted for a source with no such per-stream link (e.g. Premiere's channel-grid schedule), in which case the broadcast falls back to the channel's own officialUrl at render time (see getMatchViews.ts). */
   getWatchUrl?: (stream: T) => string | undefined;
 }
@@ -39,19 +41,31 @@ export interface AttachBroadcastsParams<T extends TeamPairStream> {
  */
 const STALE_SAFETY_BUFFER_MS = 3 * 60 * 60 * 1000;
 
+export interface BroadcastRow {
+  id: string;
+  matchId: string;
+  channelId: string;
+  watchUrl: string | null;
+  sourceId: string;
+}
+
 async function removeStaleBroadcasts(
   sourceId: string,
   channelId: string,
   claimedMatchIds: string[],
   allMatches: MatchCandidate[],
+  allBroadcasts: BroadcastRow[],
 ): Promise<number> {
   const cutoff = new Date(Date.now() + STALE_SAFETY_BUFFER_MS).toISOString();
   const upcomingIds = new Set(allMatches.filter((match) => match.kickoffUtc > cutoff).map((match) => match.id));
   const claimed = new Set(claimedMatchIds);
   const isStale = (row: { matchId: string }): boolean => upcomingIds.has(row.matchId) && !claimed.has(row.matchId);
 
-  // Rows this source created: withdraw them entirely.
-  const owned = (await db.select().from(broadcasts).where(eq(broadcasts.sourceId, sourceId))).filter(isStale);
+  // Filtered in memory from a snapshot the caller loaded once. Querying
+  // per channel meant two full reads of the broadcasts table for each of
+  // ~20 sources, and against a remote database that alone pushed the whole
+  // cron past its 60s ceiling.
+  const owned = allBroadcasts.filter((row) => row.sourceId === sourceId).filter(isStale);
 
   // Rows another source created but that carry a per-match link THIS source
   // wrote (attachBroadcastsFromStreams sets watchUrl on an existing row —
@@ -63,8 +77,8 @@ async function removeStaleBroadcasts(
   // channel's Youth League stream onto it. Scoped by sourceId alone, the
   // cleanup couldn't see it, and the site kept sending people to an
   // under-19 match long after the title filter stopped claiming it.
-  const borrowed = (await db.select().from(broadcasts).where(eq(broadcasts.channelId, channelId)))
-    .filter((row) => row.sourceId !== sourceId && row.watchUrl !== null)
+  const borrowed = allBroadcasts
+    .filter((row) => row.channelId === channelId && row.sourceId !== sourceId && row.watchUrl !== null)
     .filter(isStale);
 
   if (owned.length === 0 && borrowed.length === 0) return 0;
@@ -95,7 +109,7 @@ async function removeStaleBroadcasts(
 export async function attachBroadcastsFromStreams<T extends TeamPairStream>(
   params: AttachBroadcastsParams<T>,
 ): Promise<void> {
-  const { sourceId, channelId, streams, channelLogoUrl, allMatches, getWatchUrl } = params;
+  const { sourceId, channelId, streams, channelLogoUrl, allMatches, allBroadcasts, getWatchUrl } = params;
   const startedAt = new Date().toISOString();
 
   const { matchIds, matchedStreams, unresolvedCount } = matchStreamsToBroadcasts(streams, allMatches);
@@ -135,7 +149,7 @@ export async function attachBroadcastsFromStreams<T extends TeamPairStream>(
     await db.batch([first, ...rest]);
   }
 
-  const removedCount = await removeStaleBroadcasts(sourceId, channelId, matchIds, allMatches);
+  const removedCount = await removeStaleBroadcasts(sourceId, channelId, matchIds, allMatches, allBroadcasts);
 
   await db.insert(scrapeRuns).values({
     sourceId,

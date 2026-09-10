@@ -1,7 +1,7 @@
 import { db } from "../db/client.js";
-import { matches } from "../db/schema.js";
+import { broadcasts, matches } from "../db/schema.js";
 import { fetchPremiereStreams } from "../sources/premiere/adapter.js";
-import { attachBroadcastsFromStreams, runBroadcastSource } from "./attachBroadcasts.js";
+import { attachBroadcastsFromStreams, runBroadcastSource, type BroadcastRow } from "./attachBroadcasts.js";
 
 const SOURCE_ID = "premiere";
 const CHANNEL_ID = "premiere";
@@ -22,12 +22,14 @@ export async function runPremiereEnrichment(): Promise<void> {
   const allMatches = await db.select().from(matches);
   await runBroadcastSource(SOURCE_ID, async () => {
     const streams = await fetchPremiereStreams();
+    const allBroadcasts = await db.select().from(broadcasts);
     await attachBroadcastsFromStreams({
       sourceId: SOURCE_ID,
       channelId: CHANNEL_ID,
       streams: streams.map((stream) => ({ ...stream, streamDateUtc: stream.startTimeUtc })),
       channelLogoUrl: null,
       allMatches,
+    allBroadcasts,
     });
   });
 }
