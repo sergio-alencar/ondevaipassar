@@ -65,7 +65,16 @@ async function removeStaleBroadcasts(
   // per channel meant two full reads of the broadcasts table for each of
   // ~20 sources, and against a remote database that alone pushed the whole
   // cron past its 60s ceiling.
-  const owned = allBroadcasts.filter((row) => row.sourceId === sourceId).filter(isStale);
+  //
+  // A row of ours on a DIFFERENT channel is a leftover from remapping this
+  // source, and goes too: each source writes exactly one channel, so it
+  // can't be a current claim. Without this, splitting TNT out of TNT Sports
+  // left meuguia's old "tntsports" rows behind, still asserting a YouTube
+  // broadcast — invisible to the staleness check, because the MATCH was
+  // still claimed, just under the new channel.
+  const owned = allBroadcasts.filter(
+    (row) => row.sourceId === sourceId && (row.channelId !== channelId || isStale(row)),
+  );
 
   // Rows another source created but that carry a per-match link THIS source
   // wrote (attachBroadcastsFromStreams sets watchUrl on an existing row —
