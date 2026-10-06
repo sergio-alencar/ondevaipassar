@@ -64,9 +64,13 @@ function brasiliaToUtc(date: string, time: string): string {
  * match page it isn't airing sends a viewer to the wrong place. They arrive
  * the usual way — futnatv listing them per game — and need no change here.
  *
- * The 21/out Corinthians game is left out: its opponent is a Colombian club
- * still to be decided, and UOL's own text names it "Colombia 1" in the group
- * list and "Colombia 2" in the schedule. Add it when the club is known.
+ * Corinthians' last group game (21/out) is against Santa Fé: Colombia sends
+ * two clubs, the champion to Group D and the runner-up to Group A. Deportivo
+ * Cali beat Santa Fe 7-4 on aggregate in the league final (26/09/2026), so
+ * Santa Fe is Corinthians' opponent — which fits Pluto TV's "vice-campeão
+ * colombiano x Corinthians" and UOL's "Colombia 2 x Corinthians". (UOL's own
+ * group list labels the Colombian slots the other way round, "Colombia 1" in
+ * Group A; its schedule and Pluto's list agree with each other instead.)
  */
 const LIBERTADORES_FEMININA_FIRST_PHASE: ManualFixture[] = [
   { date: "2026-10-15", time: "17:00", home: ["corinthians_feminino", "Corinthians"], away: ["colo_colo_feminino", "Colo-Colo"], palmeiras: false },
@@ -76,6 +80,7 @@ const LIBERTADORES_FEMININA_FIRST_PHASE: ManualFixture[] = [
   { date: "2026-10-18", time: "21:00", home: ["corinthians_feminino", "Corinthians"], away: ["caracas_feminino", "Caracas"], palmeiras: false },
   { date: "2026-10-19", time: "17:00", home: ["cruzeiro_feminino", "Cruzeiro"], away: ["bolivar_feminino", "Bolívar"], palmeiras: false },
   { date: "2026-10-21", time: "21:00", home: ["palmeiras_feminino", "Palmeiras"], away: ["independiente_del_valle_feminino", "Independiente del Valle"], palmeiras: true },
+  { date: "2026-10-21", time: "17:00", home: ["santa_fe_feminino", "Santa Fé"], away: ["corinthians_feminino", "Corinthians"], palmeiras: false },
   { date: "2026-10-22", time: "21:00", home: ["olimpia_feminino", "Olimpia"], away: ["cruzeiro_feminino", "Cruzeiro"], palmeiras: false },
 ].map(({ date, time, home, away, palmeiras }) => ({
   competitionId: "libertadores-feminina",

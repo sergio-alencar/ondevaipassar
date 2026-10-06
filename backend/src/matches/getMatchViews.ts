@@ -1,4 +1,4 @@
-import { findChannelById, findCompetitionById, findTeamById, type MatchView } from "@ondevaipassar/shared";
+import { findChannelById, findCompetitionById, findTeamById, teamNameInCompetition, type MatchView } from "@ondevaipassar/shared";
 import { and, eq, gte, inArray, lte, or, type SQL } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { broadcasts, matches } from "../db/schema.js";
@@ -100,10 +100,10 @@ async function buildMatchViews(conditions: (SQL | undefined)[]): Promise<MatchVi
         competitionId: row.competitionId,
         competitionName: competition?.displayName ?? row.competitionId,
         homeTeamId: row.homeTeamId,
-        homeTeamName: homeTeam?.displayName ?? row.homeTeamNameRaw,
+        homeTeamName: teamNameInCompetition(homeTeam?.displayName ?? row.homeTeamNameRaw, competition?.displayName ?? row.competitionId),
         homeTeamCrestUrl: row.homeTeamCrestUrl,
         awayTeamId: row.awayTeamId,
-        awayTeamName: awayTeam?.displayName ?? row.awayTeamNameRaw,
+        awayTeamName: teamNameInCompetition(awayTeam?.displayName ?? row.awayTeamNameRaw, competition?.displayName ?? row.competitionId),
         awayTeamCrestUrl: row.awayTeamCrestUrl,
         kickoffUtc: row.kickoffUtc,
         kickoffTimeConfirmed: row.kickoffTimeConfirmed,

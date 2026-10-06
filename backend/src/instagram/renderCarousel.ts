@@ -4,6 +4,7 @@ import {
   formatTimeLabel,
   REGIONAL_CAVEAT_TEXT,
   REGIONAL_PRACA_CAVEAT,
+  teamNameInCompetition,
   type MatchView,
 } from "@ondevaipassar/shared";
 import { Resvg } from "@resvg/resvg-js";
@@ -29,13 +30,12 @@ async function render(tree: SatoriElement): Promise<Buffer> {
 }
 
 /**
- * Drops the "(Fem.)" that distinguishes a women's team from the men's side
- * of the same club. The registry needs it — "Grêmio" and "Grêmio (Fem.)"
- * are two rows — but inside a Brasileirão Feminino carousel every match is
- * women's football, so it's noise on every line.
+ * Team name as it reads on a slide: "(Fem.)" is dropped inside a women's
+ * competition (see teamNameInCompetition). A slide's matches share one
+ * competition, except on the combined European one, which is all men's.
  */
-function displayTeamName(name: string): string {
-  return name.replace(/\s*\(Fem\.\)\s*$/i, "");
+function displayTeamName(name: string, competitionName: string): string {
+  return teamNameInCompetition(name, competitionName);
 }
 
 async function toSlideMatch(match: MatchView, showCompetition: boolean, notes: SlideNotes): Promise<SlideMatch> {
@@ -44,8 +44,8 @@ async function toSlideMatch(match: MatchView, showCompetition: boolean, notes: S
     crestArt(match.awayTeamId, match.awayTeamCrestUrl),
   ]);
   return {
-    homeTeamName: displayTeamName(match.homeTeamName),
-    awayTeamName: displayTeamName(match.awayTeamName),
+    homeTeamName: displayTeamName(match.homeTeamName, match.competitionName),
+    awayTeamName: displayTeamName(match.awayTeamName, match.competitionName),
     homeCrest,
     awayCrest,
     timeLabel: formatTimeLabel(match.kickoffUtc, match.kickoffTimeConfirmed),

@@ -8,7 +8,14 @@ const { matchRows, broadcastRows } = expandManualFixtures(MANUAL_FIXTURES, NOW);
 
 describe("the hand-seeded fixtures", () => {
   it("has the nine games with a club this site follows, not the whole 24-game group stage", () => {
-    expect(matchRows).toHaveLength(9 - 1); // the 21/out Corinthians game waits on a Colombian club still undecided
+    expect(matchRows).toHaveLength(9);
+  });
+
+  // Colombia's champion (Deportivo Cali) goes to Group D, the runner-up (Santa
+  // Fe) to Corinthians' Group A — so Corinthians' 21/out opponent is Santa Fe.
+  it("has Corinthians playing Santa Fé, the runner-up, on 21/out", () => {
+    const game = matchRows.find((row) => row.awayTeamId === "corinthians_feminino" && row.homeTeamId === "santa_fe_feminino");
+    expect(game?.kickoffUtc).toBe("2026-10-21T20:00:00.000Z");
   });
 
   it("gives every game a unique id, so a re-run can never insert a game twice", () => {

@@ -112,8 +112,22 @@ describe("foreign clubs in the women's resolver", () => {
     expect(isTrackedBrazilianFemininoTeam(null)).toBe(false);
   });
 
+  it("resolves the two Colombian clubs, with and without the accent", () => {
+    expect(resolveFemininoTeamId("Santa Fé")).toBe("santa_fe_feminino");
+    expect(resolveFemininoTeamId("Santa Fe")).toBe("santa_fe_feminino");
+    expect(resolveFemininoTeamId("Independiente Santa Fe")).toBe("santa_fe_feminino");
+    expect(resolveFemininoTeamId("Deportivo Cali")).toBe("deportivo_cali_feminino");
+  });
+
+  // América de Cali is a different club (and has men's art in this repo):
+  // a bare "Cali" must not pick a side.
+  it("does not guess between the two Cali clubs from a bare name", () => {
+    expect(resolveFemininoTeamId("Cali")).toBeNull();
+    expect(resolveFemininoTeamId("América de Cali")).toBeNull();
+  });
+
   it("does not resolve a club it doesn't know", () => {
-    expect(resolveFemininoTeamId("Santa Fé")).toBeNull();
+    expect(resolveFemininoTeamId("Millonarios")).toBeNull();
   });
 });
 

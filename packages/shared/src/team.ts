@@ -1,3 +1,5 @@
+import { isWomensCompetitionName } from "./competition.js";
+
 export interface TeamAliases {
   /** football-data.org's team name, e.g. "CA Mineiro". Not verified for every team yet. */
   footballDataOrg?: string;
@@ -95,6 +97,7 @@ export const TEAMS: Team[] = [
   { id: "cruzeiro", displayName: "Cruzeiro", color: "blue-800", crestFile: "cruzeiro.svg", division: "A", aliases: { geGlobo: "cruzeiro" } },
   { id: "cruzeiro_feminino", displayName: "Cruzeiro (Fem.)", color: "blue-800", crestFile: "cruzeiro.svg", division: "FEMININO", aliases: { geGlobo: null } },
   { id: "cuiaba", displayName: "Cuiabá", color: "green-900", crestFile: "cuiaba.svg", division: "B", aliases: { geGlobo: "cuiaba" } },
+  { id: "deportivo_cali_feminino", displayName: "Deportivo Cali (Fem.)", color: "green-900", crestFile: "deportivo_cali.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "ferroviaria", displayName: "Ferroviária", color: "red-800", crestFile: "ferroviaria.svg", division: "C", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2019/01/08/Ferroviaria_Araraquara.svg", aliases: { geGlobo: null } },
   { id: "ferroviaria_feminino", displayName: "Ferroviária (Fem.)", color: "red-800", crestFile: "ferroviaria.svg", division: "FEMININO", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2019/01/08/Ferroviaria_Araraquara.svg", aliases: { geGlobo: null } },
   { id: "figueirense", displayName: "Figueirense", color: "black", crestFile: "figueirense.svg", division: "C", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2018/03/11/figueirense.svg", aliases: { geGlobo: null } },
@@ -118,7 +121,7 @@ export const TEAMS: Team[] = [
   { id: "juventude", displayName: "Juventude", color: "green-900", crestFile: "juventude.svg", division: "B", aliases: { geGlobo: "juventude" } },
   { id: "juventude_feminino", displayName: "Juventude (Fem.)", color: "green-900", crestFile: "juventude.svg", division: "FEMININO", aliases: { geGlobo: null } },
   { id: "juventus", displayName: "Juventus", color: "black", crestFile: "juventus.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2025/06/27/Juventus.svg", aliases: { geGlobo: null } },
-  { id: "ldu_feminino", displayName: "LDU de Quito (Fem.)", color: "blue-800", crestFile: "ldu.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
+  { id: "ldu_feminino", displayName: "LDU (Fem.)", color: "blue-800", crestFile: "ldu.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "libertad_feminino", displayName: "Libertad (Fem.)", color: "black", crestFile: "libertad.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "liverpool", displayName: "Liverpool", color: "red-800", crestFile: "liverpool.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2026/07/30/Liverpool.svg", aliases: { geGlobo: null } },
   { id: "londrina", displayName: "Londrina", color: "blue-800", crestFile: "londrina.svg", division: "B", aliases: { geGlobo: "londrina" } },
@@ -147,6 +150,7 @@ export const TEAMS: Team[] = [
   { id: "real_madrid", displayName: "Real Madrid", color: "blue-800", crestFile: "real_madrid.svg", division: "EUROPA", aliases: { geGlobo: "real-madrid" } },
   { id: "remo", displayName: "Remo", color: "blue-800", crestFile: "remo.svg", division: "A", aliases: { geGlobo: "remo" } },
   { id: "santa_cruz", displayName: "Santa Cruz", color: "red-800", crestFile: "santa_cruz.svg", division: "C", aliases: { geGlobo: "santa-cruz" } },
+  { id: "santa_fe_feminino", displayName: "Santa Fé (Fem.)", color: "red-800", crestFile: "santa_fe.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "santos", displayName: "Santos", color: "black", crestFile: "santos.svg", division: "A", aliases: { geGlobo: "santos" } },
   { id: "santos_feminino", displayName: "Santos (Fem.)", color: "black", crestFile: "santos.svg", division: "FEMININO", aliases: { geGlobo: null } },
   { id: "sao_bernardo", displayName: "São Bernardo", color: "black", crestFile: "sao_bernardo.svg", division: "B", aliases: { geGlobo: null } },
@@ -166,4 +170,22 @@ export const TEAMS: Team[] = [
 
 export function findTeamById(id: string): Team | undefined {
   return TEAMS.find((team) => team.id === id);
+}
+
+const FEM_SUFFIX = /\s*\(Fem\.\)\s*$/i;
+
+/**
+ * A team's name as it should read INSIDE a given competition. The "(Fem.)"
+ * suffix exists to tell a club's women's side from its men's one — it's what
+ * keeps "Cruzeiro" and "Cruzeiro (Fem.)" apart in the registry and on the
+ * team page. Inside a women's competition it only repeats what the
+ * competition's own name already says ("Copa Libertadores Feminina"), seven
+ * times on one team's page, so it's dropped there.
+ *
+ * Keyed on the competition rather than dropped always: a women's side
+ * showing up in a competition whose name doesn't say so would then have
+ * nothing left telling it apart from the men's.
+ */
+export function teamNameInCompetition(teamName: string, competitionName: string): string {
+  return isWomensCompetitionName(competitionName) ? teamName.replace(FEM_SUFFIX, "") : teamName;
 }
