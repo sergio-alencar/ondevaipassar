@@ -1,5 +1,6 @@
 import { env } from "../config/env.js";
 import { db } from "../db/client.js";
+import { mapWithConcurrency } from "../lib/concurrency.js";
 import { broadcasts, matches } from "../db/schema.js";
 import { fetchUpcomingStreams } from "../sources/youtube/adapter.js";
 import { attachBroadcastsFromStreams, runBroadcastSource, type BroadcastRow } from "./attachBroadcasts.js";
@@ -106,6 +107,10 @@ const TRACKED_CHANNELS: {
   { channelId: "uolesporte", youtubeChannelId: "UC3KHYFWeB0WimMBfm3NEahQ", sourceId: "youtube-uolesporte", division: "feminino", womensTitlesOnly: true },
 ];
 
+// Enough to take the wall-clock cost down without opening a dozen simultaneous
+// connections to the API.
+const YOUTUBE_CONCURRENCY = 4;
+
 async function runChannel(
   channel: (typeof TRACKED_CHANNELS)[number],
   apiKey: string,
@@ -145,7 +150,12 @@ export async function runYoutubeEnrichment(): Promise<void> {
 
   const allMatches = await db.select().from(matches);
   const allBroadcasts = await db.select().from(broadcasts);
-  for (const channel of TRACKED_CHANNELS) {
-    await runBroadcastSource(channel.sourceId, () => runChannel(channel, apiKey, allMatches, allBroadcasts));
-  }
+  // In parallel, a few at a time: each channel is two or three YouTube API
+  // round trips, and 13 of them in a row were several seconds of an ingest
+  // that has a hard 60s ceiling (see ingest/budget.ts). Safe to overlap — each
+  // channel writes only rows of its OWN channelId, reads the shared snapshots
+  // without modifying them, and runBroadcastSource contains its own failures.
+  await mapWithConcurrency(TRACKED_CHANNELS, YOUTUBE_CONCURRENCY, (channel) =>
+    runBroadcastSource(channel.sourceId, () => runChannel(channel, apiKey, allMatches, allBroadcasts)),
+  );
 }

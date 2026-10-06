@@ -5,6 +5,7 @@ import { getErrorMessage } from "../lib/errors.js";
 import { fetchCompetitionMatchCards, fetchTeamMatchCards, type RoundMatchCard } from "../sources/onefootball/client.js";
 import type { MatchCard } from "../sources/onefootball/schema.js";
 import { resolveCompetitionId } from "./competitionResolver.js";
+import { mapWithConcurrency } from "../lib/concurrency.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
 import { resolveTeamId } from "./teamResolver.js";
 import { normalizeText } from "@ondevaipassar/shared";
@@ -97,21 +98,6 @@ const TRACKED_EUROPEAN_TEAMS: { teamId: string; onefootballId: string }[] = [
 // Enough to cut the wall-clock cost without hammering onefootball.com with
 // all 30 pages at once.
 const FETCH_CONCURRENCY = 6;
-
-/** Runs `task` over every item with at most `limit` in flight, returning results in the input's order. */
-async function mapWithConcurrency<T, R>(items: T[], limit: number, task: (item: T) => Promise<R>): Promise<R[]> {
-  const results: R[] = new Array(items.length);
-  let next = 0;
-  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
-    for (;;) {
-      const index = next++;
-      if (index >= items.length) return;
-      results[index] = await task(items[index]);
-    }
-  });
-  await Promise.all(workers);
-  return results;
-}
 
 /** One page to scrape, plus how to tell which competition each of its cards belongs to. */
 interface PageSource {
