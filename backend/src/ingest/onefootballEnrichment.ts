@@ -5,7 +5,7 @@ import { getErrorMessage } from "../lib/errors.js";
 import { fetchCompetitionMatchCards, fetchTeamMatchCards, type RoundMatchCard } from "../sources/onefootball/client.js";
 import type { MatchCard } from "../sources/onefootball/schema.js";
 import { resolveCompetitionId } from "./competitionResolver.js";
-import { mapWithConcurrency } from "../lib/concurrency.js";
+import { mapWithinBudget, TIMED_OUT } from "../lib/concurrency.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
 import { resolveTeamId } from "./teamResolver.js";
 import { normalizeText } from "@ondevaipassar/shared";
@@ -98,6 +98,16 @@ const TRACKED_EUROPEAN_TEAMS: { teamId: string; onefootballId: string }[] = [
 // Enough to cut the wall-clock cost without hammering onefootball.com with
 // all 30 pages at once.
 const FETCH_CONCURRENCY = 6;
+
+/**
+ * The whole fetch phase gets this long, however slow onefootball.com is. A
+ * page that isn't fetched in time is skipped this run (the matches already
+ * stored from earlier runs stay), instead of the slowest page deciding how
+ * much of the 60s ingest is left for everything else. Normal cost is ~6s;
+ * on a bad day it took 40s — a single page can cost up to 48s on its own
+ * (15s timeout, two retries) — and that starved every step after it.
+ */
+const FETCH_BUDGET_MS = 20_000;
 
 /** One page to scrape, plus how to tell which competition each of its cards belongs to. */
 interface PageSource {
@@ -337,7 +347,8 @@ export async function runOnefootballEnrichment(): Promise<void> {
     // ceiling and cut off everything after it — futnatv, which owns the
     // regional detail, never ran. Only the network moves: the DB reads and
     // writes below stay in the same order, which is what the dedup relies on.
-    const fetched = await mapWithConcurrency(buildPageSources(), FETCH_CONCURRENCY, async (page) => {
+    const pages = buildPageSources();
+    const fetchedOrTimedOut = await mapWithinBudget(pages, FETCH_CONCURRENCY, FETCH_BUDGET_MS, async (page) => {
       try {
         return { page, cards: await page.fetch() };
       } catch (error) {
@@ -345,6 +356,9 @@ export async function runOnefootballEnrichment(): Promise<void> {
         return { page, cards: null };
       }
     });
+    const timedOut = fetchedOrTimedOut.filter((result) => result === TIMED_OUT).length;
+    if (timedOut > 0) console.warn(`[${SOURCE_ID}] ${timedOut} of ${pages.length} pages not fetched within ${FETCH_BUDGET_MS}ms — left for the next run`);
+    const fetched = fetchedOrTimedOut.map((result, index) => (result === TIMED_OUT ? { page: pages[index], cards: null } : result));
 
     for (const { page, cards } of fetched) {
       if (cards === null) {
