@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { REGIONAL_CAVEAT_TEXT, REGIONAL_PRACA_CAVEAT, type MatchView } from "@ondevaipassar/shared";
 import { channelLogoUrl } from "../lib/assets";
 import { textColorClass } from "../lib/colors";
@@ -21,6 +22,49 @@ const REGIONAL_TOOLTIP_SUFFIX = " — pode variar por região, confira a program
 // Channel logos are the most important info on the card, so it's sized
 // generously.
 const LOGO_BOX = "w-28 h-28 max-lg:w-22 max-lg:h-22 max-sm:w-20 max-sm:h-20";
+
+/**
+ * The channel's logo, falling back in order: our own curated art, then the
+ * source's logo, then the channel's NAME. The last step used to be "hide the
+ * image", which made a channel without art vanish from the card entirely —
+ * the viewer saw one broadcaster fewer than we had, and nothing said so. A
+ * new channel is now visible the moment it's added, ugly until its art
+ * arrives, rather than invisible until then.
+ */
+const ChannelLogo = ({ broadcast, title }: { broadcast: MatchView["broadcasts"][number]; title: string }) => {
+  const [src, setSrc] = useState(channelLogoUrl(broadcast.channelId));
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return (
+      <span
+        title={title}
+        className="flex h-full w-full items-center justify-center rounded-2xl bg-gray-200 p-2 text-center text-sm font-bold leading-tight text-gray-900"
+      >
+        {broadcast.displayName}
+      </span>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={broadcast.displayName}
+      title={title}
+      // Applied unconditionally: curated art that already has its
+      // own transparent rounded corners (e.g. ESPN, Premiere) has
+      // nothing left to clip here, so this is a no-op for those —
+      // but it's what rounds the flat-cornered ones (e.g. Globo,
+      // CazéTV) instead of them reading as a stray square tile.
+      className="max-w-full max-h-full object-contain rounded-2xl"
+      loading="lazy"
+      onError={() => {
+        if (broadcast.logoUrl && src !== broadcast.logoUrl) setSrc(broadcast.logoUrl);
+        else setFailed(true);
+      }}
+    />
+  );
+};
 
 const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) => {
   if (broadcasts.length === 0) {
@@ -64,25 +108,7 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
                 rel="noopener noreferrer"
                 className={`relative flex items-center justify-center hover:scale-105 transition ${LOGO_BOX}`}
               >
-                <img
-                  src={channelLogoUrl(broadcast.channelId)}
-                  alt={broadcast.displayName}
-                  title={`${broadcast.displayName}${tooltipSuffix}`}
-                  // Applied unconditionally: curated art that already has its
-                  // own transparent rounded corners (e.g. ESPN, Premiere) has
-                  // nothing left to clip here, so this is a no-op for those —
-                  // but it's what rounds the flat-cornered ones (e.g. Globo,
-                  // CazéTV) instead of them reading as a stray square tile.
-                  className="max-w-full max-h-full object-contain rounded-2xl"
-                  loading="lazy"
-                  onError={(event) => {
-                    if (event.currentTarget.src !== broadcast.logoUrl) {
-                      event.currentTarget.src = broadcast.logoUrl;
-                    } else {
-                      event.currentTarget.style.display = "none";
-                    }
-                  }}
-                />
+                <ChannelLogo broadcast={broadcast} title={`${broadcast.displayName}${tooltipSuffix}`} />
                 {/* Só o que é grátis ganha marca. Marcar TV e YouTube
                     marcava 22 dos 30 canais — isso é taxonomia, não sinal.
                     "Dá pra ver sem pagar?" é a pergunta que o torcedor faz

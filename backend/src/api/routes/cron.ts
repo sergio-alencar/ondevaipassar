@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { env } from "../../config/env.js";
 import { runChannelMirroring } from "../../ingest/channelMirroring.js";
 import { runFemininoEnrichment } from "../../ingest/femininoEnrichment.js";
+import { runManualFixtures } from "../../ingest/manualFixtures.js";
 import { runFutebolInteriorEnrichment } from "../../ingest/futebolInteriorEnrichment.js";
 import { runFutnatvEnrichment } from "../../ingest/futnatvEnrichment.js";
 import { runItatiaiaEnrichment } from "../../ingest/itatiaiaEnrichment.js";
@@ -40,6 +41,10 @@ export async function cronRoutes(app: FastifyInstance): Promise<void> {
     // to get a broadcast attached in the same pass, e.g. itatiaia/meuguia
     // confirming a channel for a fixture only OneFootball knew about).
     await runOnefootballEnrichment();
+    // Hand-seeded fixtures go in BEFORE the futnatv-fed women's step, which
+    // needs to see them to fold its own listing of the same game into the
+    // seeded row instead of creating a second one.
+    await runManualFixtures();
     // Same "creates its own matches" reasoning as onefootball above — runs
     // once, self-contained (fixtures + broadcasts from the same futnatv
     // fetch), not part of the "enrichment only" block below.

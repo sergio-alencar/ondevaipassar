@@ -73,6 +73,17 @@ const CHANNELS: Channel[] = [
     officialUrl: "https://www.youtube.com/@canalgoatbr/streams",
     instagramHandle: "canalgoatbr",
   },
+  // Canal UOL é o canal do UOL no YouTube (@uol), grátis — não o "UOL Esporte"
+  // (entrada `uolesporte` mais abaixo), que é outro canal. A matéria do UOL
+  // sobre a Libertadores Feminina diz que a competição "terá transmissão do
+  // Canal UOL". O id é `uol` para casar com a arte que já existia (uol.png).
+  {
+    id: "uol",
+    displayName: "Canal UOL",
+    kind: "youtube",
+    free: true,
+    officialUrl: "https://www.youtube.com/@uol/streams",
+  },
   {
     id: "cazetv",
     displayName: "CazéTV",
@@ -152,6 +163,16 @@ const CHANNELS: Channel[] = [
     officialUrl: "https://www.hbomax.com/br/pt/sports",
     instagramHandle: "hbomaxbrasil",
   },
+  // Canal de notícias e comentário sobre o Corinthians, no YouTube. Entra
+  // porque Sérgio quer acompanhar os jogos que ele transmite (ver
+  // youtubeEnrichment.ts); o que a página dele prova hoje é só comentário.
+  {
+    id: "meutimao",
+    displayName: "Meu Timão",
+    kind: "youtube",
+    free: true,
+    officialUrl: "https://www.youtube.com/@meutimao/streams",
+  },
   {
     id: "nsports",
     displayName: "N Sports",
@@ -197,6 +218,15 @@ const CHANNELS: Channel[] = [
     kind: "streaming",
     officialUrl: "https://www.paramountplus.com/br/collections/sports-hub-br",
     instagramHandle: "paramountplusesportes",
+  },
+  // Grátis: a Pluto TV exibe de graça os jogos da fase de grupos da
+  // Libertadores Feminina que anunciou (15 a 22/out/2026).
+  {
+    id: "pluto",
+    displayName: "Pluto TV",
+    kind: "streaming",
+    free: true,
+    officialUrl: "https://pluto.tv/br/watch/live-tv/category/esportes-br/",
   },
   {
     id: "premiere",
@@ -287,6 +317,16 @@ const CHANNELS: Channel[] = [
     free: true,
     officialUrl: "https://play.ebc.com.br/tvs",
     instagramHandle: "tvbrasil",
+  },
+  // Canal oficial do clube no YouTube ("TV Palmeiras Sportingbet"). O handle
+  // é @Palmeiras — o id UCBKc-rPDivvwFiWdG-81wxw e o /user/palmeirascombr
+  // abrem o mesmo canal, conferido ao vivo.
+  {
+    id: "tvpalmeiras",
+    displayName: "TV Palmeiras",
+    kind: "youtube",
+    free: true,
+    officialUrl: "https://www.youtube.com/@Palmeiras/streams",
   },
   {
     id: "uolesporte",
@@ -385,6 +425,13 @@ const CHANNEL_ALIASES: Record<string, string> = {
   tnt: "tnt",
   "tnt sports": "tntsports",
   "tv brasil": "tvbrasil",
+  "tv palmeiras": "tvpalmeiras",
+  "tv palmeiras sportingbet": "tvpalmeiras",
+  "canal uol": "uol",
+  uol: "uol",
+  "meu timao": "meutimao",
+  pluto: "pluto",
+  "pluto tv": "pluto",
   "uol esporte": "uolesporte",
   xsports: "xsports",
   youtube: "youtube",

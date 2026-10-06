@@ -43,12 +43,17 @@ export interface YoutubeChannelFetchResult {
  * mixing them for one channel risks either a silent non-match or, worse,
  * attaching this channel's stream to the wrong (men's) fixture — see
  * femininoTeamResolver.ts's own doc comment.
+ *
+ * `womensTitlesOnly` additionally drops any title that doesn't itself say
+ * it's women's football — for a club's own channel, where most of what it
+ * streams is the men's side.
  */
 export async function fetchUpcomingStreams(
   youtubeChannelId: string,
   apiKey: string,
   resolveTeamIdFn: (rawName: string) => string | null = resolveTeamId,
   division?: "feminino",
+  womensTitlesOnly = false,
 ): Promise<YoutubeChannelFetchResult> {
   const [videos, channelLogoUrl] = await Promise.all([
     searchUpcomingVideos(youtubeChannelId, apiKey),
@@ -64,6 +69,14 @@ export async function fetchUpcomingStreams(
     // isWomensCompetitionTitle). Channels that DO broadcast women's
     // football pass the Feminino resolver and keep these.
     if (division !== "feminino" && isWomensCompetitionTitle(video.title)) continue;
+    // A club's own channel (TV Palmeiras, Meu Timão) is mostly men's
+    // football, and through the Feminino resolver "PALMEIRAS X FLAMENGO"
+    // becomes the women's pair — so a men's title could attach to a women's
+    // fixture of the same two clubs within a day. Requiring the women's
+    // marker in the title closes that. Not applied to N Sports, whose
+    // content is women's football to begin with and whose titles are tested
+    // against the Feminino resolver already.
+    if (womensTitlesOnly && !isWomensCompetitionTitle(video.title)) continue;
     // Youth is excluded for every channel: no youth competition is tracked,
     // so such a title can only attach to the wrong (senior) fixture.
     if (isYouthCompetitionTitle(video.title)) continue;

@@ -15,7 +15,15 @@ export interface TeamAliases {
   geGlobo: string | null;
 }
 
-export type Division = "A" | "B" | "C" | "EUROPA" | "FEMININO";
+/**
+ * "FEMININO_EXTERIOR" is deliberately absent from the site's division tabs
+ * (frontend DivisionTabs' own list): these are the foreign clubs Brazilian
+ * women's sides meet in the Libertadores Feminina. They're registered so
+ * they get a stable id and a local crest — an untracked opponent otherwise
+ * arrives as a bare name with no crest at all — but nobody browses a grid of
+ * them, and they must never crowd the Brasileirão Feminino one.
+ */
+export type Division = "A" | "B" | "C" | "EUROPA" | "FEMININO" | "FEMININO_EXTERIOR";
 
 export interface Team {
   id: string;
@@ -62,6 +70,8 @@ export const TEAMS: Team[] = [
   { id: "barra_sc", displayName: "Barra-SC", color: "blue-800", crestFile: "barra_sc.svg", division: "C", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2024/01/19/svg.svg", aliases: { geGlobo: null } },
   { id: "bayer_leverkusen", displayName: "Bayer Leverkusen", color: "red-800", crestFile: "bayer_leverkusen.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2023/08/18/bayersvg.svg", aliases: { geGlobo: null } },
   { id: "bayern_munique", displayName: "Bayern de Munique", color: "red-800", crestFile: "bayern_munique.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2018/03/11/bayern-de-munique.svg", aliases: { geGlobo: null } },
+  { id: "belgrano_feminino", displayName: "Belgrano (Fem.)", color: "blue-800", crestFile: "belgrano.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
+  { id: "bolivar_feminino", displayName: "Bolívar (Fem.)", color: "blue-800", crestFile: "bolivar.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "borussia_dortmund", displayName: "Borussia Dortmund", color: "black", crestFile: "borussia_dortmund.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/teams/2018/03/11/borussia-dortmund.svg", aliases: { geGlobo: null } },
   { id: "botafogo", displayName: "Botafogo", color: "black", crestFile: "botafogo.svg", division: "A", aliases: { geGlobo: "botafogo" } },
   { id: "botafogo_feminino", displayName: "Botafogo (Fem.)", color: "black", crestFile: "botafogo.svg", division: "FEMININO", aliases: { geGlobo: null } },
@@ -70,10 +80,12 @@ export const TEAMS: Team[] = [
   { id: "bragantino", displayName: "Bragantino", color: "red-800", crestFile: "bragantino.svg", division: "A", aliases: { geGlobo: "bragantino" } },
   { id: "bragantino_feminino", displayName: "Bragantino (Fem.)", color: "red-800", crestFile: "bragantino.svg", division: "FEMININO", aliases: { geGlobo: null } },
   { id: "brusque", displayName: "Brusque", color: "red-800", crestFile: "brusque.svg", division: "C", aliases: { geGlobo: "brusque" } },
+  { id: "caracas_feminino", displayName: "Caracas (Fem.)", color: "red-800", crestFile: "caracas.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "caxias", displayName: "Caxias", color: "red-800", crestFile: "caxias.svg", division: "C", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2019/01/05/svg-caxias.svg", aliases: { geGlobo: null } },
   { id: "ceara", displayName: "Ceará", color: "black", crestFile: "ceara.svg", division: "B", aliases: { geGlobo: "ceara" } },
   { id: "chapecoense", displayName: "Chapecoense", color: "green-900", crestFile: "chapecoense.svg", division: "A", aliases: { geGlobo: null } },
   { id: "chelsea", displayName: "Chelsea", color: "blue-800", crestFile: "chelsea.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/teams/2018/03/11/chelsea.svg", aliases: { geGlobo: null } },
+  { id: "colo_colo_feminino", displayName: "Colo-Colo (Fem.)", color: "black", crestFile: "colo_colo.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "confianca", displayName: "Confiança", color: "blue-800", crestFile: "confianca.svg", division: "C", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2019/09/10/Confianca.svg", aliases: { geGlobo: null } },
   { id: "corinthians", displayName: "Corinthians", color: "black", crestFile: "corinthians.svg", division: "A", aliases: { geGlobo: "corinthians" } },
   { id: "corinthians_feminino", displayName: "Corinthians (Fem.)", color: "black", crestFile: "corinthians.svg", division: "FEMININO", aliases: { geGlobo: null } },
@@ -96,6 +108,7 @@ export const TEAMS: Team[] = [
   { id: "gremio", displayName: "Grêmio", color: "blue-800", crestFile: "gremio.svg", division: "A", aliases: { geGlobo: "gremio" } },
   { id: "gremio_feminino", displayName: "Grêmio (Fem.)", color: "blue-800", crestFile: "gremio.svg", division: "FEMININO", aliases: { geGlobo: null } },
   { id: "guarani", displayName: "Guarani", color: "green-900", crestFile: "guarani.svg", division: "C", aliases: { geGlobo: "guarani" } },
+  { id: "independiente_del_valle_feminino", displayName: "Independiente del Valle (Fem.)", color: "black", crestFile: "independiente_del_valle.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "inter_de_limeira", displayName: "Inter de Limeira", color: "black", crestFile: "inter_de_limeira.svg", division: "C", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2019/05/11/InterLimeiraSVG.svg", aliases: { geGlobo: null } },
   { id: "inter_de_milao", displayName: "Inter de Milão", color: "blue-900", crestFile: "inter_de_milao.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2021/03/31/Inter_de_Milão_2021.svg", aliases: { geGlobo: null } },
   { id: "internacional", displayName: "Internacional", color: "red-800", crestFile: "internacional.svg", division: "A", aliases: { geGlobo: "internacional" } },
@@ -105,6 +118,8 @@ export const TEAMS: Team[] = [
   { id: "juventude", displayName: "Juventude", color: "green-900", crestFile: "juventude.svg", division: "B", aliases: { geGlobo: "juventude" } },
   { id: "juventude_feminino", displayName: "Juventude (Fem.)", color: "green-900", crestFile: "juventude.svg", division: "FEMININO", aliases: { geGlobo: null } },
   { id: "juventus", displayName: "Juventus", color: "black", crestFile: "juventus.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2025/06/27/Juventus.svg", aliases: { geGlobo: null } },
+  { id: "ldu_feminino", displayName: "LDU (Fem.)", color: "blue-800", crestFile: "ldu.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
+  { id: "libertad_feminino", displayName: "Libertad (Fem.)", color: "black", crestFile: "libertad.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "liverpool", displayName: "Liverpool", color: "red-800", crestFile: "liverpool.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2026/07/30/Liverpool.svg", aliases: { geGlobo: null } },
   { id: "londrina", displayName: "Londrina", color: "blue-800", crestFile: "londrina.svg", division: "B", aliases: { geGlobo: "londrina" } },
   { id: "manchester_city", displayName: "Manchester City", color: "blue-800", crestFile: "manchester_city.svg", division: "EUROPA", aliases: { geGlobo: "manchester-city" } },
@@ -116,11 +131,13 @@ export const TEAMS: Team[] = [
   // No ge.globo team page found ("mixto", "mixto-ec", "mixto-mt" all 404, confirmed live). Crest sourced from Wikimedia Commons (File:Mixto_EC.svg, provided by Sérgio) — colors (black/white, nickname "Tigre da Vargas") confirmed via web search, not guessed.
   // id has the "_feminino" suffix even though the men's club isn't tracked yet (unlike every other Feminino entry, which mirrors an already-tracked men's team) — Sérgio's own call: the men's Mixto currently plays Série D, but could be promoted to Série C in a future season, at which point it WOULD get tracked under the bare "mixto" id. Suffixing now avoids a collision later instead of a rename under real data.
   { id: "mixto_feminino", displayName: "Mixto", color: "black", crestFile: "mixto.svg", division: "FEMININO", aliases: { geGlobo: null } },
+  { id: "nacional_feminino", displayName: "Nacional (Fem.)", color: "blue-800", crestFile: "nacional.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "napoli", displayName: "Napoli", color: "blue-800", crestFile: "napoli.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2024/07/05/napoli-svg-70751_zoSpRjw.svg", aliases: { geGlobo: null } },
   { id: "nautico", displayName: "Náutico", color: "red-800", crestFile: "nautico.svg", division: "B", aliases: { geGlobo: "nautico" } },
   { id: "newcastle", displayName: "Newcastle", color: "black", crestFile: "newcastle.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2023/09/04/Newcastle_United.svg", aliases: { geGlobo: null } },
   { id: "nottingham_forest", displayName: "Nottingham Forest", color: "red-800", crestFile: "nottingham_forest.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2024/02/27/nottingham_forest.svg", aliases: { geGlobo: null } },
   { id: "novorizontino", displayName: "Novorizontino", color: "black", crestFile: "novorizontino.svg", division: "B", aliases: { geGlobo: "novorizontino" } },
+  { id: "olimpia_feminino", displayName: "Olimpia (Fem.)", color: "black", crestFile: "olimpia.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "operario_pr", displayName: "Operário-PR", color: "black", crestFile: "operario_pr.svg", division: "B", aliases: { geGlobo: "operario-pr" } },
   { id: "palmeiras", displayName: "Palmeiras", color: "green-900", crestFile: "palmeiras.svg", division: "A", aliases: { geGlobo: "palmeiras" } },
   { id: "palmeiras_feminino", displayName: "Palmeiras (Fem.)", color: "green-900", crestFile: "palmeiras.svg", division: "FEMININO", aliases: { geGlobo: null } },
@@ -137,6 +154,8 @@ export const TEAMS: Team[] = [
   { id: "sao_paulo_feminino", displayName: "São Paulo (Fem.)", color: "red-800", crestFile: "sao_paulo.svg", division: "FEMININO", aliases: { geGlobo: null } },
   { id: "sport_recife", displayName: "Sport", color: "red-800", crestFile: "sport_recife.svg", division: "B", aliases: { geGlobo: "sport" } },
   { id: "tottenham", displayName: "Tottenham", color: "blue-900", crestFile: "tottenham.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2018/03/11/tottenham.svg", aliases: { geGlobo: null } },
+  { id: "universidad_de_chile_feminino", displayName: "Universidad de Chile (Fem.)", color: "blue-800", crestFile: "universidad_de_chile.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
+  { id: "universitario_feminino", displayName: "Universitario (Fem.)", color: "red-800", crestFile: "universitario.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "vasco_da_gama", displayName: "Vasco", color: "black", crestFile: "vasco_da_gama.svg", division: "A", aliases: { geGlobo: "vasco" } },
   { id: "vila_nova", displayName: "Vila Nova", color: "red-800", crestFile: "vila_nova.svg", division: "B", aliases: { geGlobo: "vila-nova" } },
   { id: "vitoria", displayName: "Vitória", color: "red-800", crestFile: "vitoria.svg", division: "A", aliases: { geGlobo: "vitoria" } },

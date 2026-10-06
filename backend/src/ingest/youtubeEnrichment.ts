@@ -16,7 +16,14 @@ import { resolveFemininoTeamId } from "./femininoTeamResolver.js";
 // for a channel confirmed live to broadcast Brasileirão Feminino under a
 // team name that would otherwise collide with the men's roster (e.g.
 // "Bahia"). Never guess this: check the channel's own /streams tab first.
-const TRACKED_CHANNELS: { channelId: string; youtubeChannelId: string; sourceId: string; division?: "feminino" }[] = [
+const TRACKED_CHANNELS: {
+  channelId: string;
+  youtubeChannelId: string;
+  sourceId: string;
+  division?: "feminino";
+  /** Drop any title that doesn't say it's women's football — see fetchUpcomingStreams. */
+  womensTitlesOnly?: true;
+}[] = [
   { channelId: "cazetv", youtubeChannelId: "UCZiYbVptd3PVPf4f6eR6UaQ", sourceId: "youtube-cazetv" },
   { channelId: "goat", youtubeChannelId: "UC_oToDrJ6uca7d1dFVBmLtg", sourceId: "youtube-goat" },
   { channelId: "getv", youtubeChannelId: "UCgCKagVhzGnZcuP9bSMgMCg", sourceId: "youtube-getv" },
@@ -80,6 +87,16 @@ const TRACKED_CHANNELS: { channelId: string; youtubeChannelId: string; sourceId:
   // externalId, not guessed). Note this also produces an HBO Max broadcast
   // for free: see ingest/channelMirroring.ts.
   { channelId: "tntsports", youtubeChannelId: "UCs-6sCz2LJm1PrWQN4ErsPw", sourceId: "youtube-tntsports" },
+  // Sérgio asked to follow both for the Libertadores Feminina, where each club
+  // streams its own games on its YouTube channel (TV Palmeiras: Lance, "todos
+  // os jogos do Verdão"; Meu Timão: Sérgio's call, nothing here confirms it
+  // yet). Channel ids read from each channel's own page. Both are club
+  // channels — mostly men's football — hence womensTitlesOnly. Meu Timão is
+  // also a fan-commentary channel: its recent titles are all shows ("CLIMA
+  // DE DECISÃO"), so a watch-along titled "AO VIVO: A X B" would be read as
+  // the match itself. Worth watching what it actually attaches.
+  { channelId: "tvpalmeiras", youtubeChannelId: "UCBKc-rPDivvwFiWdG-81wxw", sourceId: "youtube-tvpalmeiras", division: "feminino", womensTitlesOnly: true },
+  { channelId: "meutimao", youtubeChannelId: "UCwpyuvmJ_mOrebYbUPXtaBQ", sourceId: "youtube-meutimao", division: "feminino", womensTitlesOnly: true },
 ];
 
 async function runChannel(
@@ -89,7 +106,13 @@ async function runChannel(
   allBroadcasts: BroadcastRow[],
 ): Promise<void> {
   const resolveTeamIdFn = channel.division === "feminino" ? resolveFemininoTeamId : undefined;
-  const { streams, channelLogoUrl } = await fetchUpcomingStreams(channel.youtubeChannelId, apiKey, resolveTeamIdFn, channel.division);
+  const { streams, channelLogoUrl } = await fetchUpcomingStreams(
+    channel.youtubeChannelId,
+    apiKey,
+    resolveTeamIdFn,
+    channel.division,
+    channel.womensTitlesOnly,
+  );
   await attachBroadcastsFromStreams({
     sourceId: channel.sourceId,
     channelId: channel.channelId,

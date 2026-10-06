@@ -35,6 +35,13 @@ const TITLE_PATTERNS = [
   /^(.+?)\s+X\s+(.+?)\s*:\s*AO VIVO/i,
   // Canal GOAT, ge tv (some titles): "CRB X CRICIÚMA | AO VIVO E COM IMAGENS..."
   /^(.+?)\s+X\s+(.+?)\s*\|\s*AO VIVO/i,
+  // TV Palmeiras: "AO VIVO | GRÊMIO X PALMEIRAS | PRÉ-JOGO E NARRAÇÃO" — a
+  // pipe, not a colon, after "AO VIVO". Confirmed live against the channel's
+  // real titles, but every one of them was a pre-game/narration show (which
+  // NON_BROADCAST_PATTERNS below rejects); no live WOMEN'S match from this
+  // channel had been seen when this was added, so that shape is inferred from
+  // the same producer's other titles, not observed.
+  /^AO VIVO\s*\|\s*(.+?)\s+X\s+(.+?)\s*\|/i,
   // FPF TV: "COPA PARANÁ 2026 | ATHLETICO X PARANÁ CLUBE | RODADA 1, AO
   // VIVO E DE GRAÇA!" — team pair sits between the 2nd and 3rd "|"-
   // delimited segment, with "AO VIVO" only appearing later in the 4th one,

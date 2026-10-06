@@ -130,6 +130,12 @@ function groupName(competitionId: string, matches: MatchView[]): string {
   return competition?.shortName ?? competition?.displayName ?? matches[0].competitionName;
 }
 
+/** The name to print under a competition's logo, or null when the logo already spells it (see Competition.logoWithoutName). */
+function logoCaptionFor(competitionId: string): string | null {
+  const competition = findCompetitionById(competitionId);
+  return competition?.logoWithoutName ? competition.displayName : null;
+}
+
 /** The carousel's first image. `matches` is the whole group, since the cover shows every club playing. */
 export async function renderCoverImage(competitionId: string, matches: MatchView[]): Promise<Buffer> {
   const crests = await Promise.all(
@@ -144,6 +150,7 @@ export async function renderCoverImage(competitionId: string, matches: MatchView
       dateLabel: formatDateLabel(matches[0].kickoffUtc),
       matchCount: matches.length,
       competitionLogoDataUri: competitionLogoDataUri(competitionId),
+      logoCaption: logoCaptionFor(competitionId),
       crests,
       wordmarkDataUri: WORDMARK_WHITE,
     }),

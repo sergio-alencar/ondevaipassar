@@ -1,0 +1,142 @@
+import { describe, expect, it } from "vitest";
+import { findKnownMatch, resolveFemininoCompetition, type KnownMatch } from "../src/ingest/femininoEnrichment.js";
+import { isTrackedBrazilianFemininoTeam, resolveFemininoTeamId } from "../src/ingest/femininoTeamResolver.js";
+
+const idOf = (competition: string): string | null => resolveFemininoCompetition(competition)?.competitionId ?? null;
+
+describe("resolveFemininoCompetition", () => {
+  it("recognizes the Brasileirão's spellings, and keeps requiring both sides for it", () => {
+    expect(resolveFemininoCompetition("Brasileirão Feminino")).toEqual({ competitionId: "brasileirao-feminino", requireBothSides: true });
+    expect(idOf("Campeonato Brasileiro Feminino")).toBe("brasileirao-feminino");
+  });
+
+  // The 2026 edition runs 15-31/out in Ecuador, so futnatv hadn't listed it
+  // yet when this was written — the exact string it will use is unknown, and
+  // these are the variants the competition is actually published under.
+  it("recognizes the Libertadores Feminina under any of the names it goes by", () => {
+    expect(idOf("Copa Libertadores Feminina")).toBe("libertadores-feminina");
+    expect(idOf("Libertadores Feminina")).toBe("libertadores-feminina");
+    expect(idOf("CONMEBOL Libertadores Feminina")).toBe("libertadores-feminina");
+    expect(resolveFemininoCompetition("Copa Libertadores Feminina")?.requireBothSides).toBe(false);
+  });
+
+  it("ingests the Copa do Brasil Feminina under its own id, not the Brasileirão's", () => {
+    expect(idOf("Copa do Brasil Feminina")).toBe("copa-do-brasil-feminina");
+  });
+
+  // "Supercopa do Brasil Feminina" CONTAINS the text "copa do brasil". A plain
+  // substring match filed it under the Copa do Brasil's id — two different
+  // tournaments, one competition. Caught by this very test the first time.
+  it("keeps the Supercopa do Brasil Feminina apart from the Copa do Brasil Feminina", () => {
+    expect(idOf("Supercopa do Brasil Feminina")).toBe("supercopa-do-brasil-feminina");
+    expect(idOf("Copa do Brasil Feminina")).toBe("copa-do-brasil-feminina");
+  });
+
+  // "qualquer campeonato que envolva aqueles times que temos no nosso radar":
+  // a competition without a registry entry still gets in, under a stopgap id,
+  // instead of being dropped until someone adds it.
+  it("gives a competition with no registry entry a stopgap slug id instead of dropping it", () => {
+    expect(idOf("Campeonato Paulista Feminino")).toBe("campeonato-paulista-feminino");
+    expect(idOf("Copa do Nordeste Feminina")).toBe("copa-do-nordeste-feminina");
+  });
+
+  // The men's tournament carries no "feminin" marker, and the women's team
+  // resolver must never see a men's listing — that separation is the whole
+  // reason femininoTeamResolver.ts exists.
+  it("never claims men's football", () => {
+    expect(idOf("Taça Conmebol Libertadores")).toBeNull();
+    expect(idOf("Copa Libertadores")).toBeNull();
+    expect(idOf("Campeonato Brasileiro Série A")).toBeNull();
+  });
+
+  // Same shape as the Youth League bug on the men's side: the clubs are the
+  // same institutions, so only the competition name separates the two.
+  it("excludes the age-group editions that share the senior name", () => {
+    expect(idOf("Copa Libertadores Feminina Sub-20")).toBeNull();
+    expect(idOf("Brasileirão Feminino Sub-17")).toBeNull();
+    expect(idOf("Copa do Brasil Feminina Sub-20")).toBeNull();
+  });
+});
+
+describe("foreign clubs in the women's resolver", () => {
+  // None of these spellings has been seen from a real source yet — the
+  // competition starts after this was written — so the point is that dots and
+  // spacing don't decide whether a club is recognised.
+  it("resolves the opponents however the punctuation falls", () => {
+    expect(resolveFemininoTeamId("L.D.U. Quito")).toBe("ldu_feminino");
+    expect(resolveFemininoTeamId("Colo Colo")).toBe("colo_colo_feminino");
+    expect(resolveFemininoTeamId("Colo-Colo")).toBe("colo_colo_feminino");
+    expect(resolveFemininoTeamId("Caracas F.C.")).toBe("caracas_feminino");
+    expect(resolveFemininoTeamId("U. de Chile")).toBe("universidad_de_chile_feminino");
+    expect(resolveFemininoTeamId("Independiente del Valle")).toBe("independiente_del_valle_feminino");
+    expect(resolveFemininoTeamId("Bolívar")).toBe("bolivar_feminino");
+  });
+
+  it("still resolves the Brazilian clubs first, untouched by the new aliases", () => {
+    expect(resolveFemininoTeamId("Corinthians")).toBe("corinthians_feminino");
+    expect(resolveFemininoTeamId("Palmeiras")).toBe("palmeiras_feminino");
+    expect(resolveFemininoTeamId("Cruzeiro")).toBe("cruzeiro_feminino");
+  });
+
+  // What stops "Colo-Colo x Caracas" from being ingested: recognising a club
+  // is not the same as following it.
+  it("separates the clubs we follow from the opponents we merely recognise", () => {
+    expect(isTrackedBrazilianFemininoTeam("corinthians_feminino")).toBe(true);
+    expect(isTrackedBrazilianFemininoTeam("colo_colo_feminino")).toBe(false);
+    expect(isTrackedBrazilianFemininoTeam(null)).toBe(false);
+  });
+
+  it("does not resolve a club it doesn't know", () => {
+    expect(resolveFemininoTeamId("Santa Fé")).toBeNull();
+  });
+});
+
+describe("findKnownMatch", () => {
+  const seeded: KnownMatch = {
+    id: "manual-fixtures:libertadores-feminina:corinthians_feminino__caracas_feminino__2026-10-18",
+    competitionId: "libertadores-feminina",
+    homeTeamId: "corinthians_feminino",
+    awayTeamId: "caracas_feminino",
+    kickoffUtc: "2026-10-19T00:00:00.000Z", // 21h BRT on the 18th
+    sourceId: "manual-fixtures",
+  };
+  const base = { competitionId: "libertadores-feminina", kickoffUtc: "2026-10-19T00:00:00.000Z" };
+
+  it("finds the seeded game when the other source lists the sides the other way round", () => {
+    expect(findKnownMatch([seeded], { ...base, homeTeamId: "caracas_feminino", awayTeamId: "corinthians_feminino" })).toBe(seeded);
+  });
+
+  // The case it exists for: a Colombian opponent still to be decided is a
+  // placeholder one side and a real club the other, so only the Brazilian
+  // club can anchor the match.
+  it("anchors on the Brazilian club when the opponent is unknown on one side", () => {
+    const placeholder: KnownMatch = { ...seeded, awayTeamId: null };
+    expect(findKnownMatch([placeholder], { ...base, homeTeamId: "corinthians_feminino", awayTeamId: null })).toBe(placeholder);
+  });
+
+  it("tolerates a kickoff that differs by a few hours", () => {
+    expect(
+      findKnownMatch([seeded], { ...base, kickoffUtc: "2026-10-18T20:00:00.000Z", homeTeamId: "corinthians_feminino", awayTeamId: "caracas_feminino" }),
+    ).toBe(seeded);
+  });
+
+  it("does not merge two games of the same club days apart", () => {
+    expect(
+      findKnownMatch([seeded], { ...base, kickoffUtc: "2026-10-22T00:00:00.000Z", homeTeamId: "corinthians_feminino", awayTeamId: "colo_colo_feminino" }),
+    ).toBeUndefined();
+  });
+
+  it("does not merge across competitions", () => {
+    expect(
+      findKnownMatch([seeded], { ...base, competitionId: "copa-do-brasil-feminina", homeTeamId: "corinthians_feminino", awayTeamId: "caracas_feminino" }),
+    ).toBeUndefined();
+  });
+
+  it("never merges on a foreign club alone, which is no anchor", () => {
+    expect(findKnownMatch([seeded], { ...base, homeTeamId: "caracas_feminino", awayTeamId: "colo_colo_feminino" })).toBeUndefined();
+  });
+
+  it("does not merge a different Brazilian club's game on the same night", () => {
+    expect(findKnownMatch([seeded], { ...base, homeTeamId: "palmeiras_feminino", awayTeamId: "belgrano_feminino" })).toBeUndefined();
+  });
+});

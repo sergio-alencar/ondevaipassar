@@ -15,6 +15,9 @@ const DIVISION_LABELS: Record<Division, string> = {
   C: "Série C",
   EUROPA: "Europa",
   FEMININO: "Feminino",
+  // Never rendered: FEMININO_EXTERIOR is not in DIVISIONS above. The key is
+  // here only because the Record has to cover every Division.
+  FEMININO_EXTERIOR: "Feminino (exterior)",
 };
 
 // flex-wrap, not a fixed row: this also renders inside the "TIMES" dropdown

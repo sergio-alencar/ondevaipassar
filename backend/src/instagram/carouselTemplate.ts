@@ -399,6 +399,13 @@ export interface CoverInput {
   matchCount: number;
   /** The competition's own logo. Null falls back to the crest strip below — a competition we don't ship art for still gets a cover. */
   competitionLogoDataUri: string | null;
+  /**
+   * The competition's name, printed under its logo — set only when the logo
+   * is a bare symbol (Competition.logoWithoutName). Every other logo spells
+   * its own name, and repeating it there was exactly the redundancy the
+   * cover dropped. Null prints nothing.
+   */
+  logoCaption: string | null;
   /** Crests of the clubs playing that day: the cover's artwork when there's no competition logo, and a supporting strip under it when there is. */
   crests: TemplateCrest[];
   wordmarkDataUri: string;
@@ -445,7 +452,35 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
         // which competition this is, and the wordmark at the foot says what
         // the account is. Both were repeating what the art already carried.
         ...(hasLogo
-          ? [h("img", { src: input.competitionLogoDataUri as string, style: { height: 520, objectFit: "contain" } })]
+          ? [
+              // Shorter when it carries a caption, so the block keeps the
+              // height of a cover whose logo says its own name.
+              h("img", {
+                src: input.competitionLogoDataUri as string,
+                style: { height: input.logoCaption ? 420 : 520, objectFit: "contain" },
+              }),
+              ...(input.logoCaption
+                ? [
+                    h(
+                      "div",
+                      {
+                        style: {
+                          display: "flex",
+                          justifyContent: "center",
+                          width: CONTENT_WIDTH,
+                          color: "#ffffff",
+                          fontSize: input.logoCaption.length > 22 ? 56 : 68,
+                          fontWeight: 700,
+                          textAlign: "center",
+                          lineHeight: 1.05,
+                          letterSpacing: 1,
+                        },
+                      },
+                      input.logoCaption.toUpperCase(),
+                    ),
+                  ]
+                : []),
+            ]
           : [
               h(
                 "div",

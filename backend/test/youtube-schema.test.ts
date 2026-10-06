@@ -106,6 +106,37 @@ describe("parseMatchTitle", () => {
   });
 });
 
+// TV Palmeiras writes "AO VIVO | A X B | ..." — a pipe where every other
+// channel has a colon. These are its real titles, read off the channel's
+// /streams tab on 2026-10-06; none was a live women's match, they were the
+// pre-game and narration shows around the men's games.
+describe("parseMatchTitle: TV Palmeiras' format", () => {
+  it("rejects the channel's real narration and pre-game shows, which the new pattern would otherwise match", () => {
+    expect(parseMatchTitle("AO VIVO | GRÊMIO X PALMEIRAS | PRÉ-JOGO E NARRAÇÃO")).toBeNull();
+    expect(parseMatchTitle("AO VIVO | PALMEIRAS X LDU | PRÉ-JOGO E NARRAÇÃO")).toBeNull();
+    expect(parseMatchTitle("AO VIVO | PALMEIRAS X SÃO PAULO | PRÉ-JOGO E NARRAÇÃO")).toBeNull();
+  });
+
+  it("ignores the channel's press conferences and youth full-match replays", () => {
+    expect(parseMatchTitle("COLETIVA JOÃO MARTINS | GRÊMIO X PALMEIRAS | BRASILEIRÃO 2026")).toBeNull();
+    expect(parseMatchTitle("JOGO COMPLETO | PALMEIRAS 8 X 0 LG FC | PAULISTA SUB-17 2026")).toBeNull();
+  });
+
+  // INFERRED shape: no live women's match from this channel had been seen
+  // when this was written. If the real one differs, this is the test to fix.
+  it("parses a live match title in the channel's own shape", () => {
+    expect(parseMatchTitle("AO VIVO | BELGRANO X PALMEIRAS | LIBERTADORES FEMININA 2026")).toEqual({
+      homeTeamNameRaw: "BELGRANO",
+      awayTeamNameRaw: "PALMEIRAS",
+    });
+  });
+
+  it("still tells a women's title from a men's one, which is what womensTitlesOnly relies on", () => {
+    expect(isWomensCompetitionTitle("AO VIVO | BELGRANO X PALMEIRAS | LIBERTADORES FEMININA 2026")).toBe(true);
+    expect(isWomensCompetitionTitle("AO VIVO | PALMEIRAS X FLAMENGO | BRASILEIRÃO 2026")).toBe(false);
+  });
+});
+
 // Real bug (2026-09-06): Canal GOAT's women's Brighton x Arsenal was
 // attached to that day's men's Arsenal x Chelsea. Brighton isn't tracked so
 // it became a wildcard, and "ARSENAL" resolved straight into the men's
