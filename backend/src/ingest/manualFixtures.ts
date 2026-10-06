@@ -71,7 +71,7 @@ function brasiliaToUtc(date: string, time: string): string {
 const LIBERTADORES_FEMININA_FIRST_PHASE: ManualFixture[] = [
   { date: "2026-10-15", time: "17:00", home: ["corinthians_feminino", "Corinthians"], away: ["colo_colo_feminino", "Colo-Colo"], palmeiras: false },
   { date: "2026-10-15", time: "21:00", home: ["universitario_feminino", "Universitario"], away: ["palmeiras_feminino", "Palmeiras"], palmeiras: true },
-  { date: "2026-10-16", time: "21:00", home: ["cruzeiro_feminino", "Cruzeiro"], away: ["ldu_feminino", "LDU"], palmeiras: false },
+  { date: "2026-10-16", time: "21:00", home: ["cruzeiro_feminino", "Cruzeiro"], away: ["ldu_feminino", "LDU de Quito"], palmeiras: false },
   { date: "2026-10-18", time: "17:00", home: ["belgrano_feminino", "Belgrano"], away: ["palmeiras_feminino", "Palmeiras"], palmeiras: true },
   { date: "2026-10-18", time: "21:00", home: ["corinthians_feminino", "Corinthians"], away: ["caracas_feminino", "Caracas"], palmeiras: false },
   { date: "2026-10-19", time: "17:00", home: ["cruzeiro_feminino", "Cruzeiro"], away: ["bolivar_feminino", "Bolívar"], palmeiras: false },

@@ -38,12 +38,16 @@ export interface Competition {
    */
   priority?: number;
   /**
-   * The competition's logo is a bare symbol with no wordmark in it, so any
-   * surface that shows the logo alone (the Instagram carousel cover) has to
-   * print the name beside it. Most competition art spells its own name; the
-   * Libertadores Feminina emblem doesn't.
+   * Text printed under the competition's logo on any surface that shows the
+   * logo alone (the Instagram carousel cover), for a logo that doesn't say
+   * enough by itself. Two different reasons set it:
+   * - the logo is a bare symbol with no wordmark (Libertadores Feminina, Copa
+   *   do Brasil Feminina) — the caption is the whole name;
+   * - the logo is the men's one, wording and all (Supercopa do Brasil) — the
+   *   caption is just what tells the women's tournament apart ("Feminina").
+   * Most competition art spells its own name and needs neither.
    */
-  logoWithoutName?: true;
+  logoCaption?: string;
 }
 
 // Seeded from competition names actually observed coming back from ge.globo's
@@ -56,16 +60,16 @@ export const COMPETITIONS: Competition[] = [
   { id: "brasileirao-serie-c", displayName: "Campeonato Brasileiro Série C", type: "national-league", shortName: "Série C", priority: 3 },
   { id: "brasileirao-feminino", displayName: "Brasileirão Feminino", type: "national-league", shortName: "Feminino" },
   { id: "copa-do-brasil", displayName: "Copa do Brasil", type: "national-cup" },
-  { id: "supercopa-do-brasil-feminina", displayName: "Supercopa do Brasil Feminina", type: "national-cup", shortName: "Supercopa Fem." },
-  { id: "copa-do-brasil-feminina", displayName: "Copa do Brasil Feminina", type: "national-cup", shortName: "Copa do Brasil Fem." },
+  { id: "supercopa-do-brasil-feminina", displayName: "Supercopa do Brasil Feminina", type: "national-cup", shortName: "Supercopa Fem.", logoCaption: "Feminina" },
+  { id: "copa-do-brasil-feminina", displayName: "Copa do Brasil Feminina", type: "national-cup", shortName: "Copa do Brasil Fem.", logoCaption: "Copa do Brasil Feminina" },
   { id: "copa-do-nordeste", displayName: "Copa do Nordeste", type: "national-cup" },
   { id: "supercopa-do-brasil", displayName: "Supercopa do Brasil", type: "national-cup", shortName: "Supercopa" },
   { id: "libertadores", displayName: "Taça Conmebol Libertadores", type: "continental", shortName: "Libertadores" },
   // Não é `foreign`: Corinthians, Palmeiras e Cruzeiro disputam a edição de
   // 2026, então ela ordena junto com as competições brasileiras, igual à
   // Libertadores masculina. O logo é só o símbolo, sem o nome — por isso
-  // `logoWithoutName`: a capa do Instagram escreve o nome embaixo dele.
-  { id: "libertadores-feminina", displayName: "Copa Libertadores Feminina", type: "continental", shortName: "Libertadores Fem.", logoWithoutName: true },
+  // `logoCaption`: a capa do Instagram escreve o nome embaixo dele.
+  { id: "libertadores-feminina", displayName: "Copa Libertadores Feminina", type: "continental", shortName: "Libertadores Fem.", logoCaption: "Copa Libertadores Feminina" },
   { id: "sul-americana", displayName: "Copa Sul-Americana", type: "continental", shortName: "Sul-Americana" },
   { id: "recopa-sul-americana", displayName: "Recopa Sul-Americana", type: "continental", shortName: "Recopa" },
   { id: "copa-intercontinental", displayName: "Copa Intercontinental", type: "continental", shortName: "Intercontinental" },

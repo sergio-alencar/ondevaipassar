@@ -118,7 +118,7 @@ export const TEAMS: Team[] = [
   { id: "juventude", displayName: "Juventude", color: "green-900", crestFile: "juventude.svg", division: "B", aliases: { geGlobo: "juventude" } },
   { id: "juventude_feminino", displayName: "Juventude (Fem.)", color: "green-900", crestFile: "juventude.svg", division: "FEMININO", aliases: { geGlobo: null } },
   { id: "juventus", displayName: "Juventus", color: "black", crestFile: "juventus.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2025/06/27/Juventus.svg", aliases: { geGlobo: null } },
-  { id: "ldu_feminino", displayName: "LDU (Fem.)", color: "blue-800", crestFile: "ldu.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
+  { id: "ldu_feminino", displayName: "LDU de Quito (Fem.)", color: "blue-800", crestFile: "ldu.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "libertad_feminino", displayName: "Libertad (Fem.)", color: "black", crestFile: "libertad.svg", division: "FEMININO_EXTERIOR", aliases: { geGlobo: null } },
   { id: "liverpool", displayName: "Liverpool", color: "red-800", crestFile: "liverpool.svg", division: "EUROPA", knownCrestUrl: "https://s.sde.globo.com/media/organizations/2026/07/30/Liverpool.svg", aliases: { geGlobo: null } },
   { id: "londrina", displayName: "Londrina", color: "blue-800", crestFile: "londrina.svg", division: "B", aliases: { geGlobo: "londrina" } },

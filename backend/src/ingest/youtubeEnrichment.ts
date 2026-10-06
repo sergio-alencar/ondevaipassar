@@ -97,6 +97,13 @@ const TRACKED_CHANNELS: {
   // the match itself. Worth watching what it actually attaches.
   { channelId: "tvpalmeiras", youtubeChannelId: "UCBKc-rPDivvwFiWdG-81wxw", sourceId: "youtube-tvpalmeiras", division: "feminino", womensTitlesOnly: true },
   { channelId: "meutimao", youtubeChannelId: "UCwpyuvmJ_mOrebYbUPXtaBQ", sourceId: "youtube-meutimao", division: "feminino", womensTitlesOnly: true },
+  // Sérgio: the Libertadores Feminina games may air on UOL Esporte's channel
+  // instead of Canal UOL's (@uol) — UOL's own piece only says "Canal UOL".
+  // Read on 2026-10-06 its streams tab held talk shows ("BLOCO DE ESPORTE",
+  // "DE PRIMEIRA") and no match, so nothing is confirmed; tracked so a game
+  // that does show up there gets its own link. Matches are attached to the
+  // `uolesporte` channel, a separate entry from `uol`.
+  { channelId: "uolesporte", youtubeChannelId: "UC3KHYFWeB0WimMBfm3NEahQ", sourceId: "youtube-uolesporte", division: "feminino", womensTitlesOnly: true },
 ];
 
 async function runChannel(

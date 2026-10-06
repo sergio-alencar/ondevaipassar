@@ -72,6 +72,32 @@ describe("foreign clubs in the women's resolver", () => {
     expect(resolveFemininoTeamId("Bolívar")).toBe("bolivar_feminino");
   });
 
+  // UOL's own schedule tags each opponent with a country, and once got the
+  // code wrong ("Colo-Colo (COL)" — Colo-Colo is Chilean). The tag can't be
+  // trusted, so it's discarded rather than interpreted.
+  it("discards a country tag a source appends to the club name, right or wrong", () => {
+    expect(resolveFemininoTeamId("Colo-Colo (CHI)")).toBe("colo_colo_feminino");
+    expect(resolveFemininoTeamId("Colo-Colo (COL)")).toBe("colo_colo_feminino");
+    expect(resolveFemininoTeamId("Colo-Colo-CHI")).toBe("colo_colo_feminino");
+    expect(resolveFemininoTeamId("Nacional (URU)")).toBe("nacional_feminino");
+    expect(resolveFemininoTeamId("Caracas-VEN")).toBe("caracas_feminino");
+  });
+
+  // "LDU" and "IDV" end in three capitals, the shape the hyphenated tag is
+  // recognised by — they must survive it.
+  it("does not mistake a club's own acronym for a country tag", () => {
+    expect(resolveFemininoTeamId("LDU")).toBe("ldu_feminino");
+    expect(resolveFemininoTeamId("IDV")).toBe("independiente_del_valle_feminino");
+    expect(resolveFemininoTeamId("Club LDU")).toBeNull(); // not an alias; the point is it isn't half-eaten into "club"
+  });
+
+  it("resolves the common short and formal forms", () => {
+    expect(resolveFemininoTeamId("LDU de Quito")).toBe("ldu_feminino");
+    expect(resolveFemininoTeamId("C.D. Colo-Colo")).toBe("colo_colo_feminino");
+    expect(resolveFemininoTeamId("Univ. de Chile")).toBe("universidad_de_chile_feminino");
+    expect(resolveFemininoTeamId("I. del Valle")).toBe("independiente_del_valle_feminino");
+  });
+
   it("still resolves the Brazilian clubs first, untouched by the new aliases", () => {
     expect(resolveFemininoTeamId("Corinthians")).toBe("corinthians_feminino");
     expect(resolveFemininoTeamId("Palmeiras")).toBe("palmeiras_feminino");

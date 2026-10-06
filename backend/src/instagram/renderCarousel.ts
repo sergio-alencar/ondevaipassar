@@ -130,10 +130,9 @@ function groupName(competitionId: string, matches: MatchView[]): string {
   return competition?.shortName ?? competition?.displayName ?? matches[0].competitionName;
 }
 
-/** The name to print under a competition's logo, or null when the logo already spells it (see Competition.logoWithoutName). */
+/** The text to print under a competition's logo, or null when the logo says enough by itself (see Competition.logoCaption). */
 function logoCaptionFor(competitionId: string): string | null {
-  const competition = findCompetitionById(competitionId);
-  return competition?.logoWithoutName ? competition.displayName : null;
+  return findCompetitionById(competitionId)?.logoCaption ?? null;
 }
 
 /** The carousel's first image. `matches` is the whole group, since the cover shows every club playing. */

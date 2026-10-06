@@ -77,12 +77,15 @@ const CHANNELS: Channel[] = [
   // (entrada `uolesporte` mais abaixo), que é outro canal. A matéria do UOL
   // sobre a Libertadores Feminina diz que a competição "terá transmissão do
   // Canal UOL". O id é `uol` para casar com a arte que já existia (uol.png).
+  // O arroba do Instagram é o do UOL Esporte (@uolesporte), o que Sérgio
+  // indicou para a cobertura; vale também para a entrada `uolesporte`.
   {
     id: "uol",
     displayName: "Canal UOL",
     kind: "youtube",
     free: true,
     officialUrl: "https://www.youtube.com/@uol/streams",
+    instagramHandle: "uolesporte",
   },
   {
     id: "cazetv",
@@ -172,6 +175,7 @@ const CHANNELS: Channel[] = [
     kind: "youtube",
     free: true,
     officialUrl: "https://www.youtube.com/@meutimao/streams",
+    instagramHandle: "meutimao",
   },
   {
     id: "nsports",
@@ -227,6 +231,7 @@ const CHANNELS: Channel[] = [
     kind: "streaming",
     free: true,
     officialUrl: "https://pluto.tv/br/watch/live-tv/category/esportes-br/",
+    instagramHandle: "plutotvbr",
   },
   {
     id: "premiere",
@@ -327,6 +332,7 @@ const CHANNELS: Channel[] = [
     kind: "youtube",
     free: true,
     officialUrl: "https://www.youtube.com/@Palmeiras/streams",
+    instagramHandle: "palmeiras",
   },
   {
     id: "uolesporte",
@@ -334,6 +340,7 @@ const CHANNELS: Channel[] = [
     kind: "youtube",
     free: true,
     officialUrl: "https://www.youtube.com/@UOLEsporte/streams",
+    instagramHandle: "uolesporte",
   },
   {
     id: "xsports",

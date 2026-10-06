@@ -400,10 +400,11 @@ export interface CoverInput {
   /** The competition's own logo. Null falls back to the crest strip below — a competition we don't ship art for still gets a cover. */
   competitionLogoDataUri: string | null;
   /**
-   * The competition's name, printed under its logo — set only when the logo
-   * is a bare symbol (Competition.logoWithoutName). Every other logo spells
-   * its own name, and repeating it there was exactly the redundancy the
-   * cover dropped. Null prints nothing.
+   * Text printed under the logo (Competition.logoCaption) — the whole name
+   * for a bare-symbol logo, or just the word that tells a women's tournament
+   * from the men's one whose logo it shares. Every other logo says enough, and
+   * repeating the name there was exactly the redundancy the cover dropped.
+   * Null prints nothing.
    */
   logoCaption: string | null;
   /** Crests of the clubs playing that day: the cover's artwork when there's no competition logo, and a supporting strip under it when there is. */

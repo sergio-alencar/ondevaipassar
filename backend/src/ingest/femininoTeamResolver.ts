@@ -43,11 +43,14 @@ export function isTrackedBrazilianFemininoTeam(teamId: string | null): boolean {
  */
 const FOREIGN_FEMININO_ALIASES: Record<string, string> = {
   "colo colo": "colo_colo_feminino",
+  "cd colo colo": "colo_colo_feminino",
   "universidad de chile": "universidad_de_chile_feminino",
   "u de chile": "universidad_de_chile_feminino",
+  "univ de chile": "universidad_de_chile_feminino",
   caracas: "caracas_feminino",
   "caracas fc": "caracas_feminino",
   "independiente del valle": "independiente_del_valle_feminino",
+  "i del valle": "independiente_del_valle_feminino",
   idv: "independiente_del_valle_feminino",
   belgrano: "belgrano_feminino",
   "ca belgrano": "belgrano_feminino",
@@ -55,6 +58,7 @@ const FOREIGN_FEMININO_ALIASES: Record<string, string> = {
   universitario: "universitario_feminino",
   "universitario de deportes": "universitario_feminino",
   ldu: "ldu_feminino",
+  "ldu de quito": "ldu_feminino",
   "ldu quito": "ldu_feminino",
   "l d u quito": "ldu_feminino",
   "liga de quito": "ldu_feminino",
@@ -69,6 +73,19 @@ const FOREIGN_FEMININO_ALIASES: Record<string, string> = {
   "club nacional": "nacional_feminino",
   "club nacional de football": "nacional_feminino",
 };
+
+/**
+ * Drops a country tag a source appended to a club name: "Colo-Colo (CHI)",
+ * "Nacional (URU)" and "Colo-Colo-CHI". UOL's own schedule writes the first
+ * form (and once got the code wrong, "Colo-Colo (COL)"), and its group list
+ * the last — so the code can't be trusted, only discarded. Run on the raw
+ * text because the hyphenated form is recognised by its UPPERCASE code, which
+ * normalisation would erase; hyphen only, never a space, or "Club LDU" would
+ * lose its "LDU".
+ */
+function stripCountryTag(value: string): string {
+  return value.replace(/\s*\(([A-Za-z]{2,3})\)\s*$/, "").replace(/-[A-Z]{3}$/, "");
+}
 
 /**
  * Lowercase, accent-free, with dots dropped and any other run of punctuation
@@ -132,7 +149,7 @@ export function resolveFemininoTeamId(rawName: string): string | null {
   return (
     NORMALIZED_NAME_TO_FEMININO_ID.get(normalized) ??
     FEMININO_FREE_TEXT_ALIASES[normalized] ??
-    FOREIGN_FEMININO_ALIASES[squash(stripped)] ??
+    FOREIGN_FEMININO_ALIASES[squash(stripCountryTag(stripped))] ??
     null
   );
 }
