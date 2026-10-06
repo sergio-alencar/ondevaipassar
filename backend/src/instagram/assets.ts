@@ -22,15 +22,26 @@ export interface CrestArt {
   aspectRatio: number;
 }
 
-const WIDTH_HEIGHT_PATTERN = /<svg\b[^>]*\bwidth="([\d.]+)(?:px)?"[^>]*\bheight="([\d.]+)(?:px)?"/;
+// Read from the opening <svg> tag only, and each attribute on its own.
+// A single pattern demanding width before height missed every SVG that
+// writes them the other way round — real bug: Sunderland's crest from
+// ge.globo is Inkscape output, which emits `height="250" width="300"`, so
+// the viewBox was never synthesized and the post went out with the generic
+// gray shield in place of the club's badge. Scoping to the opening tag also
+// keeps a nested element's own width/height from being read as the root's.
+const SVG_OPEN_TAG_PATTERN = /<svg\b[^>]*>/;
+const WIDTH_PATTERN = /\bwidth="([\d.]+)(?:px)?"/;
+const HEIGHT_PATTERN = /\bheight="([\d.]+)(?:px)?"/;
 
 /** Injects a `viewBox="0 0 W H"` synthesized from the SVG's own width/height attributes when it's missing one entirely — a no-op (same buffer back) when a viewBox is already present, or when even width/height can't be found. */
 function ensureSvgViewBox(svg: Buffer): Buffer {
   const text = svg.toString("utf-8");
   if (text.includes("viewBox")) return svg;
-  const match = text.match(WIDTH_HEIGHT_PATTERN);
-  if (!match) return svg;
-  const [, width, height] = match;
+  const openTag = text.match(SVG_OPEN_TAG_PATTERN)?.[0];
+  if (!openTag) return svg;
+  const width = openTag.match(WIDTH_PATTERN)?.[1];
+  const height = openTag.match(HEIGHT_PATTERN)?.[1];
+  if (!width || !height) return svg;
   return Buffer.from(text.replace("<svg", `<svg viewBox="0 0 ${width} ${height}"`));
 }
 

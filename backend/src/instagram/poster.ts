@@ -21,6 +21,20 @@ export interface PostingSummary {
   unknown: number;
   /** Candidates this run didn't even get to (out of time) — 0 in the normal case. Rerun the endpoint to pick up where it left off; excludeAlreadyPublished means it's always safe to just call it again. */
   skipped: number;
+  /**
+   * Matches still unposted when this run ended, and the ONLY number a caller
+   * should loop on: `skipped` (never attempted) plus every match in a group
+   * that failed and is therefore eligible again. Deliberately excludes
+   * `unknown` groups — those may already be live on Instagram, so they wait
+   * for a human, not for a retry.
+   *
+   * Exists because the GitHub Actions loop used to exit on `skipped === 0`,
+   * which is true whenever the run got through its whole list — including
+   * when every group in it FAILED. Real bug, daily: a failing group made the
+   * workflow report "all of today's matches posted" and exit 0, and Sérgio
+   * had to trigger it by hand to get the rest out.
+   */
+  pending: number;
   /** True when Meta rate-limited/blocked the account mid-run. The run stops immediately: every further attempt would fail the same way, and each one risks another ambiguous "did that publish or not?" state. */
   blocked: boolean;
 }
@@ -90,12 +104,17 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
     failed: 0,
     unknown: 0,
     skipped: 0,
+    pending: 0,
     blocked: false,
   };
   const runStartedAt = Date.now();
 
   const remainingMatches = (postsDone: number): number =>
     groups.slice(postsDone).reduce((total, group) => total + group.matches.length, 0);
+  // Matches in groups that failed outright. They have a "failed" row in
+  // instagram_posts, which excludeAlreadyPublished lets through again, so
+  // the very next call retries them — they are pending work, not done work.
+  let failedMatches = 0;
 
   for (const group of groups) {
     // Stop BEFORE starting a post we may not be able to finish - a
@@ -217,8 +236,12 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
       await db.batch([first, ...rest]);
 
       console.error(`[instagram] ${status} while posting ${group.competitionId} (phase: ${phase}):`, error);
-      if (ambiguous) summary.unknown++;
-      else summary.failed++;
+      if (ambiguous) {
+        summary.unknown++;
+      } else {
+        summary.failed++;
+        failedMatches += group.matches.length;
+      }
 
       if (isRateLimited(error)) {
         // Every remaining post would hit the same block, and each one risks
@@ -232,6 +255,7 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
     }
   }
 
+  summary.pending = summary.skipped + failedMatches;
   console.log(`[instagram] run summary: ${JSON.stringify(summary)}`);
   return summary;
 }

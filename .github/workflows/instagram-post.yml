@@ -57,28 +57,41 @@ jobs:
             published=$(echo "$body" | jq -r '.published // 0')
             blocked=$(echo "$body" | jq -r '.blocked // false')
             unknown=$(echo "$body" | jq -r '.unknown // 0')
-
-            if [ "$skipped" = "0" ]; then
-              echo "All of today's matches posted (or none were pending)."
-              exit 0
-            fi
+            pending=$(echo "$body" | jq -r '.pending // 0')
 
             # Meta blocked the account — every further attempt fails the same
             # way, and each one risks publishing a duplicate we can't detect.
             # Real incident (2026-09-05) this guard exists for: this loop ran
             # all 15 attempts against a blocked account, each reporting
             # published:0, while duplicate posts piled up on the profile.
+            # Checked BEFORE the done check, because a blocked run can report
+            # nothing pending and still have left the day half-posted.
             if [ "$blocked" = "true" ]; then
               echo "::error::Meta rate-limited the account — stopping instead of retrying. $skipped match(es) left unposted."
               exit 1
             fi
 
+            # `pending`, not `skipped`. `skipped` counts only what the run
+            # never got to, so it is 0 whenever the run worked through its
+            # whole list — including when every group in it FAILED. That is
+            # the bug this loop shipped with: a failed group made it print
+            # "all of today's matches posted" and exit 0, leaving Sérgio to
+            # re-run it by hand every day. `pending` counts failures too.
+            if [ "$pending" = "0" ]; then
+              echo "All of today's matches posted (or none were pending)."
+              exit 0
+            fi
+
             # No progress: nothing published this attempt, but something was
             # attempted. Retrying a failure that never publishes is pointless,
             # and retrying one that silently did publish is how duplicates
-            # happen — either way, stop and let a human look.
+            # happen — either way, stop and let a human look. This is what
+            # now terminates a permanently-failing group: once everything
+            # else is out, the attempt that only retries it publishes
+            # nothing, and the loop stops here with a real error instead of
+            # a false success.
             if [ "$published" = "0" ]; then
-              echo "::error::Attempt $attempt published nothing ($unknown ambiguous). Stopping to avoid duplicate posts — check the account and the logs."
+              echo "::error::Attempt $attempt published nothing ($unknown ambiguous, $pending match(es) still pending). Stopping to avoid duplicate posts — check the account and the logs."
               exit 1
             fi
 
