@@ -109,6 +109,28 @@ const FETCH_CONCURRENCY = 6;
  */
 const FETCH_BUDGET_MS = 20_000;
 
+/**
+ * True when the stored row already holds everything the upsert below would
+ * write. That upsert only ever updates crests, kickoff and round on an
+ * existing row — so when all four already match, running it changes nothing
+ * but `updatedAt`, which nothing reads. Skipping it matters because this step
+ * wrote every card one round trip at a time: 245 sequential writes took ~37s
+ * of a 60s ingest on a day the database was slow, nearly all of them no-ops,
+ * since the same fixtures come back unchanged every run.
+ */
+export function isUpsertNoOp(
+  existing: { homeTeamCrestUrl: string; awayTeamCrestUrl: string; kickoffUtc: string; round: number | null } | undefined,
+  incoming: { homeTeamCrestUrl: string; awayTeamCrestUrl: string; kickoffUtc: string; round: number | null },
+): boolean {
+  return (
+    existing !== undefined &&
+    existing.homeTeamCrestUrl === incoming.homeTeamCrestUrl &&
+    existing.awayTeamCrestUrl === incoming.awayTeamCrestUrl &&
+    existing.kickoffUtc === incoming.kickoffUtc &&
+    existing.round === incoming.round
+  );
+}
+
 /** One page to scrape, plus how to tell which competition each of its cards belongs to. */
 interface PageSource {
   label: string;
@@ -371,7 +393,10 @@ export async function runOnefootballEnrichment(): Promise<void> {
       // needs to see what an earlier one in this same run just did. That
       // matters much more now that team pages are in the mix: two clubs
       // playing each other are two pages carrying the same fixture.
-      const allMatches: MatchRow[] = await db.select().from(matches);
+      // The full stored rows (isUpsertNoOp needs the crest columns); MatchRow is the
+      // narrower view the dedup helpers take, and a full row satisfies it.
+      const storedMatches = await db.select().from(matches);
+      const allMatches: MatchRow[] = storedMatches;
 
       for (const { card, round } of cards) {
         const candidate: Candidate = {
@@ -427,36 +452,43 @@ export async function runOnefootballEnrichment(): Promise<void> {
           continue;
         }
 
-        const now = new Date().toISOString();
-        await db
-          .insert(matches)
-          .values({
-            id,
-            competitionId,
-            homeTeamId: candidate.homeTeamId,
-            homeTeamNameRaw: card.homeTeam.name,
-            homeTeamCrestUrl: card.homeTeam.imageObject.path,
-            awayTeamId: candidate.awayTeamId,
-            awayTeamNameRaw: card.awayTeam.name,
-            awayTeamCrestUrl: card.awayTeam.imageObject.path,
-            kickoffUtc: card.kickoff,
-            kickoffTimeConfirmed: true,
-            round,
-            status: "scheduled",
-            sourceId: SOURCE_ID,
-            createdAt: now,
-            updatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: matches.id,
-            set: {
-              homeTeamCrestUrl: card.homeTeam.imageObject.path,
-              awayTeamCrestUrl: card.awayTeam.imageObject.path,
-              kickoffUtc: card.kickoff,
+        const incoming = {
+          homeTeamCrestUrl: card.homeTeam.imageObject.path,
+          awayTeamCrestUrl: card.awayTeam.imageObject.path,
+          kickoffUtc: card.kickoff,
+          round,
+        };
+        // Read from the snapshot taken at the top of this page: a row this same
+        // page inserted earlier can't be the one a later card matches (ids are
+        // unique per card), so the snapshot is exact for this check.
+        if (!isUpsertNoOp(storedMatches.find((match) => match.id === id), incoming)) {
+          const now = new Date().toISOString();
+          await db
+            .insert(matches)
+            .values({
+              id,
+              competitionId,
+              homeTeamId: candidate.homeTeamId,
+              homeTeamNameRaw: card.homeTeam.name,
+              homeTeamCrestUrl: incoming.homeTeamCrestUrl,
+              awayTeamId: candidate.awayTeamId,
+              awayTeamNameRaw: card.awayTeam.name,
+              awayTeamCrestUrl: incoming.awayTeamCrestUrl,
+              kickoffUtc: incoming.kickoffUtc,
+              kickoffTimeConfirmed: true,
               round,
+              status: "scheduled",
+              sourceId: SOURCE_ID,
+              createdAt: now,
               updatedAt: now,
-            },
-          });
+            })
+            .onConflictDoUpdate({
+              target: matches.id,
+              set: { ...incoming, updatedAt: now },
+            });
+        }
+        // Counted either way: "found" has always meant the page listed it, not
+        // that a write happened.
         insertedCount++;
 
         if (card.ottStreamType === STREAMABLE_OTT_TYPE) {
