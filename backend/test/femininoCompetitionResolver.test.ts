@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findKnownMatch, resolveFemininoCompetition, type KnownMatch } from "../src/ingest/femininoEnrichment.js";
+import { decideListing, findKnownMatch, resolveFemininoCompetition, type KnownMatch } from "../src/ingest/femininoEnrichment.js";
 import { isTrackedBrazilianFemininoTeam, resolveFemininoTeamId } from "../src/ingest/femininoTeamResolver.js";
 
 const idOf = (competition: string): string | null => resolveFemininoCompetition(competition)?.competitionId ?? null;
@@ -164,5 +164,30 @@ describe("findKnownMatch", () => {
 
   it("does not merge a different Brazilian club's game on the same night", () => {
     expect(findKnownMatch([seeded], { ...base, homeTeamId: "palmeiras_feminino", awayTeamId: "belgrano_feminino" })).toBeUndefined();
+  });
+});
+
+describe("decideListing", () => {
+  it("ingests a Brasileirão game only when both clubs resolve, and flags a naming gap otherwise", () => {
+    expect(decideListing(true, "corinthians_feminino", "palmeiras_feminino")).toBe("ingest");
+    expect(decideListing(true, "corinthians_feminino", null)).toBe("unresolved");
+    expect(decideListing(true, null, null)).toBe("unresolved");
+  });
+
+  it("ingests an open competition's game as soon as one club of ours is in it", () => {
+    expect(decideListing(false, "corinthians_feminino", null)).toBe("ingest");
+    expect(decideListing(false, null, "palmeiras_feminino")).toBe("ingest");
+    expect(decideListing(false, "colo_colo_feminino", "cruzeiro_feminino")).toBe("ingest");
+  });
+
+  // The regression this exists for: national-team games (UEFA qualifiers,
+  // Brazil x Argentina friendlies) resolve to nothing on both sides, and were
+  // being counted as unresolved — flipping a healthy source to "partial".
+  it("quietly skips a game with no club of ours, even when neither side is recognised at all", () => {
+    expect(decideListing(false, null, null)).toBe("skip");
+  });
+
+  it("skips two foreign clubs meeting, which is recognised but not followed", () => {
+    expect(decideListing(false, "colo_colo_feminino", "caracas_feminino")).toBe("skip");
   });
 });

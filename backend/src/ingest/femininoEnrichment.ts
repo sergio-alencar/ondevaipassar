@@ -68,6 +68,25 @@ export function resolveFemininoCompetition(competition: string): FemininoCompeti
   return known?.competition ?? { competitionId: slugify(competition), requireBothSides: false };
 }
 
+export type ListingDecision = "ingest" | "skip" | "unresolved";
+
+/**
+ * What to do with a futnatv listing once its two sides have been looked up.
+ *
+ * "unresolved" exists ONLY for competitions that require both sides: the
+ * Brasileirão, where every Série A1 club is tracked, so a name that doesn't
+ * resolve is a genuine gap worth surfacing in scrape_runs. Everywhere else a
+ * listing with no club of ours is simply not ours — a Belgium x Poland
+ * qualifier or a Brazil x Argentina friendly between national teams — and
+ * counting those as unresolved turned the source's status to "partial" on
+ * every run with a perfectly healthy ingest (real regression, caught the day
+ * it shipped: 4 national-team games, status ok -> partial).
+ */
+export function decideListing(requireBothSides: boolean, homeTeamId: string | null, awayTeamId: string | null): ListingDecision {
+  if (requireBothSides) return homeTeamId && awayTeamId ? "ingest" : "unresolved";
+  return isTrackedBrazilianFemininoTeam(homeTeamId) || isTrackedBrazilianFemininoTeam(awayTeamId) ? "ingest" : "skip";
+}
+
 // futnatv publishes a placeholder listing for an upcoming Feminino fixture
 // — team names suffixed " F", broadcast field always empty — under a
 // DIFFERENT (and often wrong) date, alongside the real listing (bare team
@@ -207,22 +226,9 @@ export async function runFemininoEnrichment(): Promise<void> {
       const homeTeamId = resolveFemininoTeamId(game.home);
       const awayTeamId = resolveFemininoTeamId(game.away);
 
-      if (competition.requireBothSides) {
-        // The Brasileirão: every Série A1 club is tracked, so an unresolved
-        // side is a genuine gap (a naming variant the resolver doesn't know
-        // yet), not an untracked-opponent case.
-        if (!homeTeamId || !awayTeamId) {
-          unresolvedCount++;
-          continue;
-        }
-      } else if (!isTrackedBrazilianFemininoTeam(homeTeamId) && !isTrackedBrazilianFemininoTeam(awayTeamId)) {
-        // No club we follow is in this game — Colo-Colo x Caracas, or a
-        // friendly between two national teams. Not what this site is for, so
-        // skipped silently. Counted as unresolved only when NEITHER side was
-        // even recognised, the one shape that could be a real naming gap.
-        if (!homeTeamId && !awayTeamId) unresolvedCount++;
-        continue;
-      }
+      const decision = decideListing(competition.requireBothSides, homeTeamId, awayTeamId);
+      if (decision === "unresolved") unresolvedCount++;
+      if (decision !== "ingest") continue;
 
       // The opponent we don't track rides along by its raw name — same
       // contract as the men's untracked-opponent path (teamResolver.ts).
