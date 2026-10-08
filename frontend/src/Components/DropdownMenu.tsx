@@ -11,6 +11,8 @@ interface DropdownMenuProps {
   setSelectedTeam: (team: Team) => void;
   isVisible: boolean;
   setIsDropdownVisible: (visible: boolean) => void;
+  onPointerEnter?: (event: React.PointerEvent) => void;
+  onPointerLeave?: (event: React.PointerEvent) => void;
 }
 
 // Previously: Header passed a prop named `setIsVisible`, but this component
@@ -19,7 +21,7 @@ interface DropdownMenuProps {
 // shared as one type (DropdownMenuProps) both sides import, so a future
 // mismatch would fail to typecheck instead of failing at click-time.
 const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
-  ({ setSelectedTeam, isVisible, setIsDropdownVisible }, ref) => {
+  ({ setSelectedTeam, isVisible, setIsDropdownVisible, onPointerEnter, onPointerLeave }, ref) => {
     const { matches } = useContext(MatchesContext);
     const { division, setDivision, teamsInDivision } = useTeamsByDivision();
 
@@ -32,6 +34,8 @@ const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
       <div
         ref={ref}
         id="dropdownMenu"
+        onPointerEnter={onPointerEnter}
+        onPointerLeave={onPointerLeave}
         // right-0, relative to the full header row (see Header.tsx's
         // comment on why not the icon's own tiny box). Triangle and menu
         // stack in normal flow (flex-col), not each given their own
@@ -90,7 +94,7 @@ const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
           than any sub-pixel rounding could reopen; re-verified with the
           same pixel sampling that the purple line is gone.
         */}
-        <img src={triangleIcon} alt="" className="w-8 h-auto mt-2 mr-23.5 max-sm:mr-0 -mb-1" />
+        <img src={triangleIcon} alt="" className="w-8 h-auto mt-2 mr-34.5 max-sm:mr-10.5 -mb-1" />
         <div className="bg-white shadow p-4 rounded-lg w-96 max-sm:w-[calc(100vw-3rem)]">
           <div className="mb-4">
             <DivisionTabs active={division} onChange={setDivision} />

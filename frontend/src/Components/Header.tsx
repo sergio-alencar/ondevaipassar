@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import AccountMenu from "./AccountMenu";
 import DropdownMenu from "./DropdownMenu";
 import logoHeader from "../assets/images/icones/logo-3.svg";
 import escudo from "../assets/images/icones/escudo.svg";
@@ -18,25 +19,62 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const { user, loginAvailable, devLogin } = useAuth();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [isAccountVisible, setIsAccountVisible] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const escudoRef = useRef<HTMLButtonElement>(null);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+  const accountRef = useRef<HTMLButtonElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // How the pointer last arrived on an icon, so its click can tell a mouse
+  // (already opened by hovering; clicking must not close it again) from a tap.
+  const pointerKind = useRef<string>("mouse");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        escudoRef.current &&
-        !escudoRef.current.contains(event.target as Node)
-      ) {
-        setIsDropdownVisible(false);
-      }
+      const outside = (...refs: React.RefObject<HTMLElement | null>[]) => refs.every((ref) => ref.current && !ref.current.contains(event.target as Node));
+      if (outside(dropdownRef, escudoRef)) setIsDropdownVisible(false);
+      if (outside(accountMenuRef, accountRef)) setIsAccountVisible(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const toggleDropdown = () => setIsDropdownVisible((prev) => !prev);
+  // Only one of the two menus is open at a time.
+  const toggleDropdown = () => {
+    setIsAccountVisible(false);
+    setIsDropdownVisible((prev) => (pointerKind.current === "mouse" ? true : !prev));
+  };
+  const toggleAccount = () => {
+    setIsDropdownVisible(false);
+    setIsAccountVisible((prev) => (pointerKind.current === "mouse" ? true : !prev));
+  };
+
+  // Hover opens them for a mouse; a tap (which also fires pointerenter, with
+  // pointerType "touch") is left to the click handler, otherwise the tap would
+  // open the menu and the click right after it would close it again. The
+  // short delay on leaving lets the pointer cross the gap between icon and
+  // menu without it closing underneath.
+  const hoverOpen = (open: () => void) => (event: React.PointerEvent) => {
+    pointerKind.current = event.pointerType;
+    if (event.pointerType !== "mouse") return;
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    open();
+  };
+  const hoverClose = (close: () => void) => (event: React.PointerEvent) => {
+    if (event.pointerType !== "mouse") return;
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(close, 200);
+  };
+  const openShield = () => {
+    setIsAccountVisible(false);
+    setIsDropdownVisible(true);
+  };
+  const openAccount = () => {
+    setIsDropdownVisible(false);
+    setIsAccountVisible(true);
+  };
+  const closeShield = () => setIsDropdownVisible(false);
+  const closeAccount = () => setIsAccountVisible(false);
   const headerBgClass = backgroundColorClass(selectedTeam?.color);
 
   return (
@@ -87,22 +125,34 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
           </Link>
 
           <div className="flex gap-4 py-6 items-center">
-            {/* The account, for signed-in and signed-out alike: /conta shows the Google button to the latter. */}
-            <Link to="/conta" aria-label="Minha conta" title="Minha conta" className="cursor-pointer">
-              <svg viewBox="0 0 24 24" className="size-7" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="12" cy="8" r="4" />
-                <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
-              </svg>
-            </Link>
             <button
               ref={escudoRef}
               type="button"
               onClick={toggleDropdown}
+              onPointerEnter={hoverOpen(openShield)}
+              onPointerLeave={hoverClose(closeShield)}
               className="cursor-pointer"
               aria-label="Escolha o time"
               title="Escolha o time"
             >
               <img className="size-7" src={escudo} alt="" />
+            </button>
+            {/* The account: opens on hover (mouse) or tap; signed-out visitors get the Google sign-in in it. */}
+            <button
+              ref={accountRef}
+              type="button"
+              onClick={toggleAccount}
+              onPointerEnter={hoverOpen(openAccount)}
+              onPointerLeave={hoverClose(closeAccount)}
+              className="cursor-pointer"
+              aria-label="Minha conta"
+              title="Minha conta"
+              aria-expanded={isAccountVisible}
+            >
+              <svg viewBox="0 0 24 24" className="size-7" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+              </svg>
             </button>
           </div>
 
@@ -111,6 +161,15 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
             setSelectedTeam={setSelectedTeam}
             isVisible={isDropdownVisible}
             setIsDropdownVisible={setIsDropdownVisible}
+            onPointerEnter={hoverOpen(openShield)}
+            onPointerLeave={hoverClose(closeShield)}
+          />
+          <AccountMenu
+            ref={accountMenuRef}
+            isVisible={isAccountVisible}
+            close={closeAccount}
+            onPointerEnter={hoverOpen(openAccount)}
+            onPointerLeave={hoverClose(closeAccount)}
           />
         </div>
       </header>
