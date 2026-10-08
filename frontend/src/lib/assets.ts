@@ -127,6 +127,16 @@ const COMPETITION_LOGOS: Record<string, CompetitionLogoSpec> = {
   "fa-cup": { file: "fa-cup.svg" },
   "copa-del-rey": { file: "copa-del-rey.svg" },
   "campeonato-mineiro": { file: "campeonato-mineiro.svg" },
+  "campeonato-carioca": { file: "campeonato-carioca.svg" },
+  "campeonato-paulista": { file: "campeonato-paulista.svg" },
+  "campeonato-paranaense": { file: "campeonato-paranaense.svg" },
+  // Copa Paraná has no logo of its own; it borrows the federation's.
+  "copa-parana": { file: "campeonato-paranaense.svg" },
+  "supercopa-do-brasil": { file: "supercopa-do-brasil.svg" },
+  "dfb-pokal": { file: "dfb-pokal.svg" },
+  "efl-cup": { file: "efl-cup.svg" },
+  "coppa-italia": { file: "coppa-italia.svg" },
+  "coupe-de-france": { file: "coupe-de-france.svg" },
 };
 
 /** A competition's symbol-only logo, or null when we don't have one yet. */
