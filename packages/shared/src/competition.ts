@@ -19,8 +19,7 @@ export interface Competition {
    */
   foreign?: boolean;
   /**
-   * Compact name for length-constrained surfaces (the X digest, where the
-   * full "Campeonato Brasileiro Série A" costs 29 of 280 characters). Only
+   * Compact name for length-constrained surfaces (the Instagram cover). Only
    * set where it actually buys something — a competition whose displayName
    * is already short just uses that. "Série A" unqualified means the
    * Brazilian one, which is why the Italian league's short name is
@@ -55,9 +54,9 @@ export interface Competition {
 // single fetch). Growing this list is just adding a row — see ingest/teamResolver
 // for how an unrecognized competition name gets a stopgap id instead of being dropped.
 export const COMPETITIONS: Competition[] = [
-  { id: "brasileirao-serie-a", displayName: "Campeonato Brasileiro Série A", type: "national-league", shortName: "Série A", priority: 1 },
-  { id: "brasileirao-serie-b", displayName: "Campeonato Brasileiro Série B", type: "national-league", shortName: "Série B", priority: 2 },
-  { id: "brasileirao-serie-c", displayName: "Campeonato Brasileiro Série C", type: "national-league", shortName: "Série C", priority: 3 },
+  { id: "brasileirao-serie-a", displayName: "Brasileirão Série A", type: "national-league", shortName: "Série A", priority: 1 },
+  { id: "brasileirao-serie-b", displayName: "Brasileirão Série B", type: "national-league", shortName: "Série B", priority: 2 },
+  { id: "brasileirao-serie-c", displayName: "Brasileirão Série C", type: "national-league", shortName: "Série C", priority: 3 },
   { id: "brasileirao-feminino", displayName: "Brasileirão Feminino", type: "national-league", shortName: "Feminino" },
   { id: "copa-do-brasil", displayName: "Copa do Brasil", type: "national-cup" },
   { id: "supercopa-do-brasil-feminina", displayName: "Supercopa do Brasil Feminina", type: "national-cup", shortName: "Supercopa Fem.", logoCaption: "Feminina" },
@@ -70,7 +69,7 @@ export const COMPETITIONS: Competition[] = [
   { id: "copa-verde", displayName: "Copa Verde", type: "national-cup" },
   { id: "copa-centro-oeste", displayName: "Copa Centro-Oeste", type: "national-cup" },
   { id: "supercopa-do-brasil", displayName: "Supercopa do Brasil", type: "national-cup", shortName: "Supercopa" },
-  { id: "libertadores", displayName: "Taça Conmebol Libertadores", type: "continental", shortName: "Libertadores" },
+  { id: "libertadores", displayName: "Taça Libertadores", type: "continental", shortName: "Libertadores" },
   // Não é `foreign`: Corinthians, Palmeiras e Cruzeiro disputam a edição de
   // 2026, então ela ordena junto com as competições brasileiras, igual à
   // Libertadores masculina. O logo é só o símbolo, sem o nome — por isso
