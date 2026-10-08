@@ -9,10 +9,12 @@ interface FollowButtonProps {
 
 /**
  * Follow / unfollow, as a labelled button rather than a bare star: the word
- * says what it does, and the box is at least 44px tall (the smallest touch
+ * says what it does, and the touch target is at least 44px tall (the smallest touch
  * target that is comfortable on a phone; the star it replaced was 16-20px).
- * Not following is the loud, filled state — it is the action being offered;
- * following is the quiet, outlined one with a check.
+ * Plain text with an icon, no box: "+ Seguir" in the dark body colour is the
+ * action on offer; "✓ Seguindo" is dimmer, the state already reached. The
+ * padding and min height keep the touch target even though nothing is drawn
+ * around it.
  */
 const FollowButton = ({ active, onToggle, name, size = "large" }: FollowButtonProps) => (
   <button
@@ -24,16 +26,16 @@ const FollowButton = ({ active, onToggle, name, size = "large" }: FollowButtonPr
       event.stopPropagation();
       onToggle();
     }}
-    className={`inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-gray-800 font-bold uppercase transition-colors ${
-      size === "large" ? "min-h-11 px-6 text-sm" : "min-h-11 px-4 text-xs sm:min-h-10"
-    } ${active ? "bg-white text-gray-800 hover:bg-gray-100" : "bg-gray-800 text-white hover:bg-gray-700"}`}
+    className={`inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-2 px-3 font-bold uppercase transition-colors hover:underline ${
+      size === "large" ? "text-base" : "text-sm"
+    } ${active ? "text-gray-500 hover:text-gray-700" : "text-gray-800 hover:text-gray-600"}`}
   >
     {active ? (
-      <svg viewBox="0 0 20 20" className="size-4" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <svg viewBox="0 0 20 20" className="size-5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M4 10.5l4 4 8-9" />
       </svg>
     ) : (
-      <svg viewBox="0 0 20 20" className="size-4" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true">
+      <svg viewBox="0 0 20 20" className="size-5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true">
         <path d="M10 4v12M4 10h12" />
       </svg>
     )}
