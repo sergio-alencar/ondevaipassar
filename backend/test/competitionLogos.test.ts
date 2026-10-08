@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { findCompetitionById } from "@ondevaipassar/shared";
 import { describe, expect, it } from "vitest";
@@ -42,8 +43,21 @@ describe("competition logo map", () => {
   });
 
   it("flattens the Brasileirão family, whose yellow vanishes on a white card", () => {
-    for (const id of ["brasileirao-serie-a", "brasileirao-serie-b", "brasileirao-serie-c", "brasileirao-feminino"]) {
+    for (const id of ["brasileirao-serie-a", "brasileirao-feminino"]) {
       expect(entries.find((e) => e.id === id)?.mono, id).toBe(true);
+    }
+  });
+
+  // Série B and C are pre-recoloured instead (dark body, white ball): a mask
+  // would flatten the ball into the body.
+  it("keeps Série B and C dark with a white ball, without yellow", () => {
+    for (const id of ["brasileirao-serie-b", "brasileirao-serie-c"]) {
+      const entry = entries.find((e) => e.id === id);
+      expect(entry?.mono, id).toBe(false);
+      const svg = readFileSync(join(SITE_DIR, entry!.file), "utf-8");
+      expect(svg, id).toContain("#1E2939");
+      expect(svg, id).toContain("#FFFFFF");
+      expect(svg, id).not.toMatch(/#FFF419|#FEF400/i);
     }
   });
 

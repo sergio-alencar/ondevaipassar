@@ -100,6 +100,7 @@ const RASTER_EXTENSION: Record<string, string> = {
 // white card, and for white-only artwork. It is NOT a house style applied to
 // everything: flattening the Bundesliga turns it into a solid block, and the
 // Sul-Americana and Serie A lose the detail that makes them recognisable.
+// Série B and C are not mono: their SVGs are pre-recoloured (dark body, white ball), which a mask would flatten.
 interface CompetitionLogoSpec {
   file: string;
   mono?: true;
@@ -107,8 +108,8 @@ interface CompetitionLogoSpec {
 
 const COMPETITION_LOGOS: Record<string, CompetitionLogoSpec> = {
   "brasileirao-serie-a": { file: "brasileirao-serie-a.svg", mono: true },
-  "brasileirao-serie-b": { file: "brasileirao-serie-b.svg", mono: true },
-  "brasileirao-serie-c": { file: "brasileirao-serie-c.svg", mono: true },
+  "brasileirao-serie-b": { file: "brasileirao-serie-b.svg" },
+  "brasileirao-serie-c": { file: "brasileirao-serie-c.svg" },
   "brasileirao-feminino": { file: "brasileirao-feminino.svg", mono: true },
   "copa-do-brasil": { file: "copa-do-brasil.svg" },
   "copa-do-brasil-feminina": { file: "copa-do-brasil-feminina.png" },
