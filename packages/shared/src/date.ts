@@ -17,6 +17,30 @@ export function isTomorrowInBrasilia(kickoffUtc: string, now: Date = new Date())
   return format.format(tomorrow) === format.format(new Date(kickoffUtc));
 }
 
+/** "YYYY-MM-DD" of the Brasília calendar day an instant falls on. Lexicographic order is chronological order, so keys compare with < and >. */
+export function brasiliaDayKey(instant: string | Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(
+    typeof instant === "string" ? new Date(instant) : instant,
+  );
+}
+
+/**
+ * True for a kickoff on today's Brasília calendar day or any of the following
+ * `days - 1` — `days: 7` is "today and the next six". Counted in calendar
+ * days, not 24h blocks from now: a 21h match tonight and one at 9h in six
+ * days are both inside the week, and a match already played this morning is
+ * still today's (same anchoring as startOfTodayInBrasiliaUtc below).
+ *
+ * The flat 24h-per-day step is safe for the same reason as
+ * isTomorrowInBrasilia: Brazil has had a fixed UTC-3 since 2019.
+ */
+export function isWithinNextDaysInBrasilia(kickoffUtc: string, days: number, now: Date = new Date()): boolean {
+  const kickoffDay = brasiliaDayKey(kickoffUtc);
+  const firstDay = brasiliaDayKey(now);
+  const dayAfterWindow = brasiliaDayKey(new Date(now.getTime() + days * 24 * 60 * 60 * 1000));
+  return kickoffDay >= firstDay && kickoffDay < dayAfterWindow;
+}
+
 // Midnight BRT = 03:00 UTC on the same calendar day (fixed UTC-3, no DST,
 // same assumption as isTomorrowInBrasilia above) — used as the `from` the
 // frontend sends /api/matches, instead of leaving that param off entirely

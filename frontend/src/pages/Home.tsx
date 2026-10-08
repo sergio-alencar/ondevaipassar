@@ -1,39 +1,37 @@
-import { isTodayInBrasilia, isTomorrowInBrasilia } from "@ondevaipassar/shared";
+import { type MatchView } from "@ondevaipassar/shared";
 import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DivisionTabs from "../Components/DivisionTabs";
+import FavoriteStar from "../Components/FavoriteStar";
+import SectionTabs from "../Components/SectionTabs";
 import TeamCrest from "../Components/TeamCrest";
 import { MatchesContext } from "../context/MatchesContext";
 import { findSourceCrestUrl } from "../lib/assets";
+import { HOME_TABS, useHomeTab } from "../lib/useHomeTab";
 import { useDivisionSearchParam } from "../lib/useDivisionSearchParam";
-import MatchCard from "./MatchCard";
+import { usePreferences } from "../lib/usePreferences";
+import CampeonatosTab from "./home/CampeonatosTab";
+import CanaisTab from "./home/CanaisTab";
+import DayFeed from "./home/DayFeed";
+import MeusTimes from "./home/MeusTimes";
 import type { SetSelectedTeam } from "../types";
 
-interface HomeProps {
+interface TimesTabProps {
+  matches: MatchView[];
   setSelectedTeam: SetSelectedTeam;
 }
 
-const Home = ({ setSelectedTeam }: HomeProps) => {
-  const { matches, loading, error } = useContext(MatchesContext);
+/** The team grid, by division — the Home's original and still default view. */
+const TimesTab = ({ matches, setSelectedTeam }: TimesTabProps) => {
   // URL-backed (?divisao=b), not plain state: opening a team page and going
   // back used to always land on Série A regardless of what was selected —
   // Home fully remounts on that route change, resetting a useState. See
   // useDivisionSearchParam's own comment.
   const { division, setDivision, teamsInDivision } = useDivisionSearchParam();
-
-  useEffect(() => {
-    setSelectedTeam(null);
-  }, [setSelectedTeam]);
-
-  const matchesToday = matches.filter((match) => isTodayInBrasilia(match.kickoffUtc));
-  const matchesTomorrow = matches.filter((match) => isTomorrowInBrasilia(match.kickoffUtc));
+  const { preferences, toggleTeam } = usePreferences();
 
   return (
-    <main className="py-4 max-lg:grow max-w-7xl mx-auto px-4">
-      <div>
-        <p className="text-4xl font-bold mb-8 pt-8 uppercase text-center max-sm:text-2xl text-gray-800">
-          Escolha seu time
-        </p>
+    <>
         <div className="mb-8">
           <DivisionTabs active={division} onChange={setDivision} />
         </div>
@@ -59,7 +57,7 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
         */}
         <ul className="flex flex-wrap gap-10 justify-items-center justify-center lg:grid lg:grid-cols-[repeat(5,max-content)] lg:justify-center lg:gap-x-8 lg:gap-y-6 max-sm:grid max-sm:grid-cols-4 max-sm:gap-x-2 max-sm:gap-y-4">
           {teamsInDivision.map((team) => (
-            <li key={team.id} onClick={() => setSelectedTeam(team)}>
+            <li key={team.id} className="relative" onClick={() => setSelectedTeam(team)}>
               <Link to={`/time/${team.id}`}>
                 {/*
                   h-* w-auto, not h-* w-* (both fixed): a browser's default
@@ -89,41 +87,50 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
                   className="h-24 w-auto max-w-30 px-2 py-1 hover:scale-105 transition max-sm:h-18 max-sm:max-w-22.5"
                 />
               </Link>
+              {/* Over the crest's corner, outside the <Link> so tapping it never opens the team. */}
+              <span className="absolute -right-1 top-0">
+                <FavoriteStar
+                  active={preferences.teams.includes(team.id)}
+                  onToggle={() => toggleTeam(team.id)}
+                  label={preferences.teams.includes(team.id) ? `Deixar de seguir ${team.displayName}` : `Seguir ${team.displayName}`}
+                  className="size-5 max-sm:size-4"
+                />
+              </span>
             </li>
           ))}
         </ul>
+    </>
+  );
+};
+
+interface HomeProps {
+  setSelectedTeam: SetSelectedTeam;
+}
+
+const Home = ({ setSelectedTeam }: HomeProps) => {
+  const { matches, loading, error } = useContext(MatchesContext);
+  const { tab, setTab } = useHomeTab();
+
+  useEffect(() => {
+    setSelectedTeam(null);
+  }, [setSelectedTeam]);
+
+  return (
+    <main className="py-4 max-lg:grow max-w-7xl mx-auto px-4">
+      {!loading && !error && <MeusTimes matches={matches} />}
+      <div>
+        <div className="mb-8 pt-8">
+          <SectionTabs options={HOME_TABS} active={tab} onChange={setTab} />
+        </div>
+        {tab === "times" && <TimesTab matches={matches} setSelectedTeam={setSelectedTeam} />}
+        {tab === "campeonatos" && <CampeonatosTab matches={matches} />}
+        {tab === "canais" && <CanaisTab matches={matches} />}
       </div>
 
       {loading && <p className="text-center text-lg mt-16">Carregando jogos...</p>}
       {error && <p className="text-center text-lg text-red-500 mt-16">Erro: {error}</p>}
 
-      {!loading && !error && matchesToday.length > 0 && (
-        <div className="mt-16">
-          <h2 className="text-4xl font-bold mb-8 pt-8 uppercase text-center max-sm:text-2xl text-gray-800">
-            Jogos de Hoje
-          </h2>
-
-          <ul className="divide-y divide-gray-300 my-8">
-            {matchesToday.map((match) => (
-              <MatchCard key={match.id} match={match} />
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {!loading && !error && matchesTomorrow.length > 0 && (
-        <div className="mt-16">
-          <h2 className="text-4xl font-bold mb-8 pt-8 uppercase text-center max-sm:text-2xl text-gray-800">
-            Jogos de Amanhã
-          </h2>
-
-          <ul className="divide-y divide-gray-300 my-8">
-            {matchesTomorrow.map((match) => (
-              <MatchCard key={match.id} match={match} />
-            ))}
-          </ul>
-        </div>
-      )}
+      {!loading && !error && <DayFeed matches={matches} />}
     </main>
   );
 };

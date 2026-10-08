@@ -136,6 +136,16 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
             </li>
           ))}
           <li>
+            <Link to="/gratis" onClick={() => setIsMenuVisible(false)}>
+              Jogos grátis
+            </Link>
+          </li>
+          <li>
+            <Link to="/meus-canais" onClick={() => setIsMenuVisible(false)}>
+              Meus canais
+            </Link>
+          </li>
+          <li>
             <Link to="/sobre" onClick={() => setIsMenuVisible(false)}>
               Sobre
             </Link>

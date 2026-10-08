@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { REGIONAL_CAVEAT_TEXT, REGIONAL_PRACA_CAVEAT, type MatchView } from "@ondevaipassar/shared";
-import { channelLogoUrl } from "../lib/assets";
+import { canWatchBroadcast, REGIONAL_CAVEAT_TEXT, REGIONAL_PRACA_CAVEAT, type MatchView } from "@ondevaipassar/shared";
+import ChannelLogo from "../Components/ChannelLogo";
+import { usePreferences } from "../lib/usePreferences";
 import { textColorClass } from "../lib/colors";
 
 interface MatchBroadcastsProps {
@@ -23,50 +23,8 @@ const REGIONAL_TOOLTIP_SUFFIX = " — pode variar por região, confira a program
 // generously.
 const LOGO_BOX = "w-28 h-28 max-lg:w-22 max-lg:h-22 max-sm:w-20 max-sm:h-20";
 
-/**
- * The channel's logo, falling back in order: our own curated art, then the
- * source's logo, then the channel's NAME. The last step used to be "hide the
- * image", which made a channel without art vanish from the card entirely —
- * the viewer saw one broadcaster fewer than we had, and nothing said so. A
- * new channel is now visible the moment it's added, ugly until its art
- * arrives, rather than invisible until then.
- */
-const ChannelLogo = ({ broadcast, title }: { broadcast: MatchView["broadcasts"][number]; title: string }) => {
-  const [src, setSrc] = useState(channelLogoUrl(broadcast.channelId));
-  const [failed, setFailed] = useState(false);
-
-  if (failed) {
-    return (
-      <span
-        title={title}
-        className="flex h-full w-full items-center justify-center rounded-2xl bg-gray-200 p-2 text-center text-sm font-bold leading-tight text-gray-900"
-      >
-        {broadcast.displayName}
-      </span>
-    );
-  }
-
-  return (
-    <img
-      src={src}
-      alt={broadcast.displayName}
-      title={title}
-      // Applied unconditionally: curated art that already has its
-      // own transparent rounded corners (e.g. ESPN, Premiere) has
-      // nothing left to clip here, so this is a no-op for those —
-      // but it's what rounds the flat-cornered ones (e.g. Globo,
-      // CazéTV) instead of them reading as a stray square tile.
-      className="max-w-full max-h-full object-contain rounded-2xl"
-      loading="lazy"
-      onError={() => {
-        if (broadcast.logoUrl && src !== broadcast.logoUrl) setSrc(broadcast.logoUrl);
-        else setFailed(true);
-      }}
-    />
-  );
-};
-
 const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) => {
+  const { preferences } = usePreferences();
   if (broadcasts.length === 0) {
     return (
       <div className="text-center">
@@ -99,6 +57,12 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
             : broadcast.regionalCaveat
               ? REGIONAL_TOOLTIP_SUFFIX
               : "";
+          // Dimmed — never hidden — once the visitor has said which channels
+          // they have: a paid channel they didn't tick is still where the game
+          // is, and still clickable, just not theirs. Left alone when they've
+          // ticked nothing, or every logo would be grayed for someone who
+          // hasn't set anything up.
+          const unavailable = preferences.channels.length > 0 && !canWatchBroadcast(broadcast, preferences.channels);
 
           return (
             <div key={broadcast.channelId} className="flex flex-col items-center gap-1">
@@ -106,9 +70,14 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
                 href={broadcast.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`relative flex items-center justify-center hover:scale-105 transition ${LOGO_BOX}`}
+                className={`relative flex items-center justify-center hover:scale-105 transition ${LOGO_BOX} ${unavailable ? "opacity-40" : ""}`}
               >
-                <ChannelLogo broadcast={broadcast} title={`${broadcast.displayName}${tooltipSuffix}`} />
+                <ChannelLogo
+                  channelId={broadcast.channelId}
+                  displayName={broadcast.displayName}
+                  sourceLogoUrl={broadcast.logoUrl}
+                  title={`${broadcast.displayName}${tooltipSuffix}${unavailable ? " — você marcou que não tem este canal" : ""}`}
+                />
                 {/* Só o que é grátis ganha marca. Marcar TV e YouTube
                     marcava 22 dos 30 canais — isso é taxonomia, não sinal.
                     "Dá pra ver sem pagar?" é a pergunta que o torcedor faz

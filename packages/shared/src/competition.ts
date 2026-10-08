@@ -139,3 +139,52 @@ export function isWomensCompetitionName(name: string): boolean {
   const normalized = normalizeText(name);
   return WOMENS_COMPETITION_PATTERNS.some((pattern) => pattern.test(normalized));
 }
+
+export interface CompetitionGroup<T> {
+  id: string;
+  name: string;
+  foreign: boolean;
+  priority: number;
+  matches: T[];
+}
+
+/**
+ * Groups matches by competition, in the order a Brazilian reader expects:
+ * competitions with Brazilian clubs before foreign ones (see
+ * Competition.foreign); then pinned competitions in their set order
+ * (Competition.priority — Série A, B, C); then everything else in the order
+ * it first appears, which for a kickoff-sorted list means chronological.
+ *
+ * Both exceptions came from running this against a real Saturday: European
+ * leagues kick off in the morning, so pure chronological order put Premier
+ * League, Bundesliga and La Liga above Brasileirão; and within the Brazilian
+ * block, Série C's 9h match put it above Série A.
+ *
+ * Lives here, not in the digest, because the site's "Jogos de hoje" needs the
+ * exact same order — two copies of this rule would drift.
+ */
+export function groupMatchesByCompetition<T extends { competitionId: string; competitionName: string }>(
+  matches: T[],
+): CompetitionGroup<T>[] {
+  const groups = new Map<string, CompetitionGroup<T>>();
+  for (const match of matches) {
+    const competition = findCompetitionById(match.competitionId);
+    const group = groups.get(match.competitionId) ?? {
+      id: match.competitionId,
+      name: match.competitionName,
+      foreign: competition?.foreign === true,
+      // Unpinned competitions keep the order they first appear in, which
+      // (the list being sorted by kickoff) means chronological.
+      priority: competition?.priority ?? Number.MAX_SAFE_INTEGER,
+      matches: [],
+    };
+    group.matches.push(match);
+    groups.set(match.competitionId, group);
+  }
+
+  // Array#sort is stable per spec, so same-priority groups keep the
+  // chronological order they were inserted in.
+  const byPriority = (toSort: CompetitionGroup<T>[]): CompetitionGroup<T>[] => [...toSort].sort((a, b) => a.priority - b.priority);
+  const ordered = [...groups.values()];
+  return [...byPriority(ordered.filter((group) => !group.foreign)), ...byPriority(ordered.filter((group) => group.foreign))];
+}

@@ -1,7 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { findTeamById } from "@ondevaipassar/shared";
+import FavoriteStar from "../Components/FavoriteStar";
 import { MatchesContext } from "../context/MatchesContext";
+import { usePreferences } from "../lib/usePreferences";
 import { textColorClass } from "../lib/colors";
 import MatchCard from "./MatchCard";
 import type { SetSelectedTeam } from "../types";
@@ -17,6 +19,7 @@ const TeamPage = ({ setSelectedTeam }: TeamPageProps) => {
   const { teamId } = useParams<{ teamId: string }>();
   const { matches, loading, error } = useContext(MatchesContext);
   const team = teamId ? findTeamById(teamId) : undefined;
+  const { preferences, toggleTeam } = usePreferences();
 
   useEffect(() => {
     setSelectedTeam(team ?? null);
@@ -49,11 +52,15 @@ const TeamPage = ({ setSelectedTeam }: TeamPageProps) => {
 
   return (
     <div className="grid grid-cols-1 items-center max-w-7xl mx-auto px-4">
-      <p
-        className={`text-4xl max-sm:text-2xl font-bold uppercase justify-self-center pt-8 max-sm:py-4 ${textColorClass(team.color, "gray-800")}`}
-      >
-        {team.displayName}
-      </p>
+      <div className="flex items-center justify-self-center gap-3 pt-8 max-sm:py-4">
+        <p className={`text-4xl max-sm:text-2xl font-bold uppercase ${textColorClass(team.color, "gray-800")}`}>{team.displayName}</p>
+        <FavoriteStar
+          active={preferences.teams.includes(team.id)}
+          onToggle={() => toggleTeam(team.id)}
+          label={preferences.teams.includes(team.id) ? `Deixar de seguir ${team.displayName}` : `Seguir ${team.displayName}`}
+          className="size-8 max-sm:size-6"
+        />
+      </div>
 
       <ul className="divide-y divide-gray-300 my-8">
         {visibleMatches.length > 0 ? (

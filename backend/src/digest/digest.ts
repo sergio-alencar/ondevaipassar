@@ -1,7 +1,7 @@
 import {
-  findCompetitionById,
   formatDateLabel,
   formatTimeLabel,
+  groupMatchesByCompetition,
   REGIONAL_CAVEAT_TEXT,
   REGIONAL_PRACA_CAVEAT,
   type MatchView,
@@ -39,50 +39,6 @@ const REGIONAL_FOOTNOTE = `${REGIONAL_MARK} — ${REGIONAL_CAVEAT_TEXT}`;
 // the mark — the emoji reads as "FREE", which is close enough to guess but
 // not close enough to leave unsaid.
 const FREE_FOOTNOTE = `${FREE_MARK} — dá pra assistir de graça`;
-
-interface CompetitionGroup {
-  id: string;
-  name: string;
-  foreign: boolean;
-  priority: number;
-  matches: MatchView[];
-}
-
-/**
- * Ordering, outermost rule first: competitions with Brazilian clubs before
- * foreign ones (see Competition.foreign); then pinned competitions in their
- * set order (Competition.priority — Série A, B, C); then everything else in
- * the order it first appears, which for a kickoff-sorted list means
- * chronological.
- *
- * Both exceptions came from running this against a real Saturday: European
- * leagues kick off in the morning, so pure chronological order put Premier
- * League, Bundesliga and La Liga above Brasileirão; and within the Brazilian
- * block, Série C's 9h match put it above Série A.
- */
-function groupByCompetition(matches: MatchView[]): CompetitionGroup[] {
-  const groups = new Map<string, CompetitionGroup>();
-  for (const match of matches) {
-    const competition = findCompetitionById(match.competitionId);
-    const group = groups.get(match.competitionId) ?? {
-      id: match.competitionId,
-      name: match.competitionName,
-      foreign: competition?.foreign === true,
-      // Unpinned competitions keep the order they first appear in, which
-      // (the list being sorted by kickoff) means chronological.
-      priority: competition?.priority ?? Number.MAX_SAFE_INTEGER,
-      matches: [],
-    };
-    group.matches.push(match);
-    groups.set(match.competitionId, group);
-  }
-
-  // Array#sort is stable per spec, so same-priority groups keep the
-  // chronological order they were inserted in.
-  const byPriority = (toSort: CompetitionGroup[]): CompetitionGroup[] => [...toSort].sort((a, b) => a.priority - b.priority);
-  const ordered = [...groups.values()];
-  return [...byPriority(ordered.filter((group) => !group.foreign)), ...byPriority(ordered.filter((group) => group.foreign))];
-}
 
 interface MatchLine {
   text: string;
@@ -161,7 +117,7 @@ export function buildDigest(matches: MatchView[], date: Date = new Date(), day: 
   let anyRegionalMark = false;
   let anyFreeMark = false;
 
-  for (const group of groupByCompetition(matches)) {
+  for (const group of groupMatchesByCompetition(matches)) {
     const lines = [`*${group.name}*`];
     for (const match of group.matches) {
       const line = buildMatchLine(match, true);
@@ -209,7 +165,7 @@ export function buildThreadDigest(matches: MatchView[], date: Date = new Date(),
   let anyRegionalMark = false;
   let anyFreeMark = false;
 
-  for (const group of groupByCompetition(matches)) {
+  for (const group of groupMatchesByCompetition(matches)) {
     const lines: string[] = [];
     for (const match of group.matches) {
       const line = buildMatchLine(match, false);

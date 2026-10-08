@@ -28,6 +28,16 @@ export interface Channel {
    * being the exception — 53 of 246 live broadcast rows, about one in five.
    */
   free?: true;
+  /**
+   * The channel's logo spells its name legibly, so a caption under it only
+   * repeats it. Curated by eye, never assumed: a logo that is just a symbol
+   * (Meu Timão's fist, OneFootball's "1") or an abbreviation ("RTv.", "SNet")
+   * needs its name beside it, and so do two channels that share one image —
+   * Canal UOL and UOL Esporte both show "uol", and the text is all that tells
+   * them apart. Unset means "show the name", the safe default for a new
+   * channel whose art nobody has looked at yet.
+   */
+  logoShowsName?: true;
   /** Handle (no "@"), for tagging the broadcaster in the Instagram poster's caption — manually verified against each channel's real profile, not guessed. */
   instagramHandle?: string;
 }
@@ -41,6 +51,7 @@ const CHANNELS: Channel[] = [
     id: "band",
     displayName: "Band",
     kind: "tv",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://www.band.com.br/ao-vivo",
     instagramHandle: "esportenaband",
@@ -56,12 +67,14 @@ const CHANNELS: Channel[] = [
     id: "bandsports",
     displayName: "BandSports",
     kind: "tv",
+    logoShowsName: true,
     officialUrl: "https://bandsports.uol.com.br",
   },
   {
     id: "canaldobenja",
     displayName: "Canal do Benja",
     kind: "youtube",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://www.youtube.com/@canaldobenjaoficial/streams",
   },
@@ -69,6 +82,7 @@ const CHANNELS: Channel[] = [
     id: "goat",
     displayName: "Canal GOAT",
     kind: "youtube",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://www.youtube.com/@canalgoatbr/streams",
     instagramHandle: "canalgoatbr",
@@ -91,6 +105,7 @@ const CHANNELS: Channel[] = [
     id: "cazetv",
     displayName: "CazéTV",
     kind: "youtube",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://www.youtube.com/cazetv/streams",
     instagramHandle: "cazetv",
@@ -99,12 +114,14 @@ const CHANNELS: Channel[] = [
     id: "dazn",
     displayName: "DAZN",
     kind: "streaming",
+    logoShowsName: true,
     officialUrl: "https://www.dazn.com/pt-BR",
   },
   {
     id: "disneyplus",
     displayName: "Disney+",
     kind: "streaming",
+    logoShowsName: true,
     officialUrl: "https://www.disneyplus.com/pt-br",
     instagramHandle: "disneyplusbr",
   },
@@ -112,6 +129,7 @@ const CHANNELS: Channel[] = [
     id: "espn",
     displayName: "ESPN",
     kind: "tv",
+    logoShowsName: true,
     officialUrl: "https://www.espn.com.br",
     instagramHandle: "espnbrasil",
   },
@@ -119,6 +137,7 @@ const CHANNELS: Channel[] = [
     id: "fpftv",
     displayName: "FPF TV",
     kind: "youtube",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://www.youtube.com/@federacaopr/streams",
     instagramHandle: "federacaopr",
@@ -127,6 +146,7 @@ const CHANNELS: Channel[] = [
     id: "getv",
     displayName: "ge TV",
     kind: "youtube",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://www.youtube.com/@getv/streams",
     instagramHandle: "getv",
@@ -135,6 +155,7 @@ const CHANNELS: Channel[] = [
     id: "globo",
     displayName: "Globo",
     kind: "tv",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://globoplay.globo.com/tv-globo/ao-vivo/6120663",
     regionalCaveat: true,
@@ -151,6 +172,7 @@ const CHANNELS: Channel[] = [
     id: "globoplay",
     displayName: "Globoplay",
     kind: "streaming",
+    logoShowsName: true,
     officialUrl: "https://globoplay.globo.com",
     instagramHandle: "globoplay",
   },
@@ -163,6 +185,7 @@ const CHANNELS: Channel[] = [
     id: "hbomax",
     displayName: "HBO Max",
     kind: "streaming",
+    logoShowsName: true,
     officialUrl: "https://www.hbomax.com/br/pt/sports",
     instagramHandle: "hbomaxbrasil",
   },
@@ -181,6 +204,7 @@ const CHANNELS: Channel[] = [
     id: "nsports",
     displayName: "N Sports",
     kind: "youtube",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://www.youtube.com/@NSports/streams",
     instagramHandle: "nsports",
@@ -220,6 +244,7 @@ const CHANNELS: Channel[] = [
     id: "paramountplus",
     displayName: "Paramount Plus",
     kind: "streaming",
+    logoShowsName: true,
     officialUrl: "https://www.paramountplus.com/br/collections/sports-hub-br",
     instagramHandle: "paramountplusesportes",
   },
@@ -229,6 +254,7 @@ const CHANNELS: Channel[] = [
     id: "pluto",
     displayName: "Pluto TV",
     kind: "streaming",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://pluto.tv/br/watch/live-tv/category/esportes-br/",
     instagramHandle: "plutotvbr",
@@ -237,6 +263,7 @@ const CHANNELS: Channel[] = [
     id: "premiere",
     displayName: "Premiere",
     kind: "tv",
+    logoShowsName: true,
     officialUrl: "https://globoplay.globo.com/canais/premiere",
     instagramHandle: "premiere",
   },
@@ -244,6 +271,7 @@ const CHANNELS: Channel[] = [
     id: "primevideo",
     displayName: "Prime Video",
     kind: "streaming",
+    logoShowsName: true,
     officialUrl: "https://www.primevideo.com/sports",
     instagramHandle: "primevideosportbr",
   },
@@ -251,6 +279,7 @@ const CHANNELS: Channel[] = [
     id: "record",
     displayName: "Record",
     kind: "tv",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://www.recordplus.com/Live/LiveEvent",
     instagramHandle: "sigarecord",
@@ -259,6 +288,7 @@ const CHANNELS: Channel[] = [
     id: "sbt",
     displayName: "SBT",
     kind: "tv",
+    logoShowsName: true,
     free: true,
     // SBT also streams from its main channel (youtube.com/@sbt/streams), and
     // that used to render as an "outro link" under the logo. Sérgio asked
@@ -273,6 +303,7 @@ const CHANNELS: Channel[] = [
     id: "space",
     displayName: "Space",
     kind: "tv",
+    logoShowsName: true,
     officialUrl: "https://www.hbomax.com/br/pt/sports",
     instagramHandle: "canalspacebr",
   },
@@ -280,6 +311,7 @@ const CHANNELS: Channel[] = [
     id: "sportv",
     displayName: "SporTV",
     kind: "tv",
+    logoShowsName: true,
     officialUrl: "https://globoplay.globo.com/sportv/ao-vivo/7339108",
     instagramHandle: "sportv",
   },
@@ -304,6 +336,7 @@ const CHANNELS: Channel[] = [
     id: "tnt",
     displayName: "TNT",
     kind: "tv",
+    logoShowsName: true,
     officialUrl: "https://www.hbomax.com/br/pt/sports",
     instagramHandle: "tntbr",
   },
@@ -311,6 +344,7 @@ const CHANNELS: Channel[] = [
     id: "tntsports",
     displayName: "TNT Sports",
     kind: "youtube",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://www.youtube.com/@TNTSportsBR/streams",
     instagramHandle: "tntsportsbr",
@@ -319,6 +353,7 @@ const CHANNELS: Channel[] = [
     id: "tvbrasil",
     displayName: "TV Brasil",
     kind: "tv",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://play.ebc.com.br/tvs",
     instagramHandle: "tvbrasil",
@@ -330,6 +365,7 @@ const CHANNELS: Channel[] = [
     id: "tvpalmeiras",
     displayName: "TV Palmeiras",
     kind: "youtube",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://www.youtube.com/@Palmeiras/streams",
     instagramHandle: "palmeiras",
@@ -350,6 +386,7 @@ const CHANNELS: Channel[] = [
     // mirrors matches on its own YouTube. Being carried by Claro/Sky/Vivo
     // as well doesn't make it paid, same as Globo.
     kind: "tv",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://www.xsports.com.br",
     instagramHandle: "xsports.brasil",
@@ -358,6 +395,7 @@ const CHANNELS: Channel[] = [
     id: "youtube",
     displayName: "YouTube",
     kind: "youtube",
+    logoShowsName: true,
     free: true,
     officialUrl: "https://youtube.com",
     instagramHandle: "youtubebrasil",
@@ -451,6 +489,34 @@ export function resolveChannelId(rawName: string): string | null {
 
 export function findChannelById(id: string): Channel | undefined {
   return CHANNELS.find((channel) => channel.id === id);
+}
+
+/** Every channel we know, for screens that list them (the channels tab, "Meus canais"). */
+export function listChannels(): readonly Channel[] {
+  return CHANNELS;
+}
+
+/**
+ * How a viewer thinks of where a game is shown, which is neither `kind` nor
+ * `free` alone: "TV aberta" is broadcast TV (tv + free), "TV paga" is the
+ * cable/satellite channels (tv + not free), and streaming apps and YouTube
+ * channels stand on their own. Derived, never stored, so it can't drift from
+ * the two fields it comes from.
+ */
+export type ChannelGroup = "tv-aberta" | "tv-paga" | "streaming" | "youtube";
+
+export const CHANNEL_GROUP_ORDER: readonly ChannelGroup[] = ["tv-aberta", "tv-paga", "streaming", "youtube"];
+
+export const CHANNEL_GROUP_LABELS: Record<ChannelGroup, string> = {
+  "tv-aberta": "TV aberta",
+  "tv-paga": "TV paga",
+  streaming: "Streaming",
+  youtube: "YouTube",
+};
+
+export function channelGroupOf(channel: Pick<Channel, "kind" | "free">): ChannelGroup {
+  if (channel.kind === "tv") return channel.free ? "tv-aberta" : "tv-paga";
+  return channel.kind;
 }
 
 /**

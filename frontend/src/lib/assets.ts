@@ -87,6 +87,30 @@ const RASTER_EXTENSION: Record<string, string> = {
   youtube: "png",
 };
 
+// Competition logos for the site, SYMBOL ONLY — the competition's name is
+// printed beside them, so a logo that spells it too would say it twice. Files
+// live in images/campeonatos/site/, named by competition id, with the empty
+// margin cropped off (several originals are a small symbol floating in a
+// 1800x1800 canvas, which rendered as a speck next to the name). An explicit
+// map and not a guess from the id: a guessed path 404s as a broken image, and
+// an entry here is also the answer to "which competitions still need art". A
+// competition with no entry just shows its name.
+const COMPETITION_LOGOS: Record<string, string> = {
+  "brasileirao-serie-a": "brasileirao-serie-a.svg",
+  "brasileirao-serie-b": "brasileirao-serie-b.svg",
+  "brasileirao-serie-c": "brasileirao-serie-c.svg",
+  libertadores: "libertadores.svg",
+  "libertadores-feminina": "libertadores-feminina.svg",
+  "sul-americana": "sul-americana.svg",
+  "copa-do-brasil-feminina": "copa-do-brasil-feminina.png",
+};
+
+/** URL of a competition's symbol-only logo, or null when we don't have one yet. */
+export function competitionLogoUrl(competitionId: string): string | null {
+  const file = COMPETITION_LOGOS[competitionId];
+  return file ? `${import.meta.env.BASE_URL}images/campeonatos/site/${file}` : null;
+}
+
 /**
  * Channel logo: local asset when we have one, else the source-provided logo
  * (e.g. a brand-new channel we haven't sourced art for). Caller's onError
