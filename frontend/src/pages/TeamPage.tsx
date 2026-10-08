@@ -8,6 +8,7 @@ import { usePreferences } from "../lib/usePreferences";
 import { textColorClass } from "../lib/colors";
 import MatchCard from "./MatchCard";
 import type { SetSelectedTeam } from "../types";
+import { ActionButton } from "../Components/Action";
 
 interface TeamPageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -63,12 +64,11 @@ const TeamPage = ({ setSelectedTeam }: TeamPageProps) => {
       </ul>
 
       {teamMatches.length > visibleCount && (
-        <button
-          className="bg-gray-800 hover:bg-gray-700 w-auto justify-self-center text-white uppercase rounded-full font-bold px-6 py-3 mb-12 cursor-pointer transition-colors"
-          onClick={() => setVisibleCount((prev) => prev + MATCHES_PER_PAGE)}
-        >
-          Ver mais jogos
-        </button>
+        <div className="mb-12 flex justify-center">
+          <ActionButton icon="down" onClick={() => setVisibleCount((prev) => prev + MATCHES_PER_PAGE)}>
+            Ver mais jogos
+          </ActionButton>
+        </div>
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ACTION_CLASS } from "./Action";
 
 interface FollowButtonProps {
   active: boolean;
@@ -33,9 +34,7 @@ const FollowButton = ({ active, onToggle, name, size = "large" }: FollowButtonPr
       setTapped(true);
       onToggle();
     }}
-    className={`inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-2 px-3 font-bold uppercase transition-colors hover:underline ${
-      size === "large" ? "text-base" : "text-sm"
-    } ${active ? "text-gray-500 hover:text-gray-700" : "text-gray-800 hover:text-gray-600"}`}
+    className={`${ACTION_CLASS} ${size === "large" ? "text-base" : "text-sm"} ${active ? "!text-gray-500 hover:!text-gray-700" : ""}`}
   >
     {/* keyed by state so each change remounts the icon and replays its entrance */}
     <span key={active ? "icon-on" : "icon-off"} className={`flex ${tapped ? "follow-icon-animate" : ""}`}>

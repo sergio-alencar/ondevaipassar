@@ -1,11 +1,11 @@
 import { isWithinNextDaysInBrasilia } from "@ondevaipassar/shared";
 import { useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
 import DataState from "../Components/DataState";
 import MatchesByCompetition from "../Components/MatchesByCompetition";
 import { MatchesContext } from "../context/MatchesContext";
 import { WEEK_DAYS } from "../lib/windows";
 import type { SetSelectedTeam } from "../types";
+import { ActionLink } from "../Components/Action";
 
 interface GratisPageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -38,10 +38,10 @@ const GratisPage = ({ setSelectedTeam }: GratisPageProps) => {
           )}
         </div>
 
-        <div className="mt-8 text-center">
-          <Link to="/" className="text-sm text-gray-600 underline hover:text-gray-900">
+        <div className="mt-8 flex justify-center">
+          <ActionLink to="/" icon="back">
             Voltar ao início
-          </Link>
+          </ActionLink>
         </div>
       </div>
     </DataState>

@@ -1,12 +1,13 @@
 import { channelGroupOf, CHANNEL_GROUP_LABELS, findChannelById, isWithinNextDaysInBrasilia, REGIONAL_CAVEAT_TEXT } from "@ondevaipassar/shared";
 import { useContext, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ChannelLogo from "../Components/ChannelLogo";
 import DataState from "../Components/DataState";
 import MatchesByCompetition from "../Components/MatchesByCompetition";
 import { MatchesContext } from "../context/MatchesContext";
 import { WEEK_DAYS } from "../lib/windows";
 import type { SetSelectedTeam } from "../types";
+import { ActionLink, InlineLink } from "../Components/Action";
 
 interface CanalPageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -66,9 +67,7 @@ const CanalPage = ({ setSelectedTeam }: CanalPageProps) => {
             <p className="mx-auto mt-4 max-w-2xl text-center text-sm text-gray-600">
               {note.text}{" "}
               {note.linkTo && (
-                <Link to={note.linkTo} className="underline hover:text-gray-900">
-                  {note.linkLabel}
-                </Link>
+                <InlineLink to={note.linkTo}>{note.linkLabel}</InlineLink>
               )}
             </p>
           )}
@@ -85,10 +84,10 @@ const CanalPage = ({ setSelectedTeam }: CanalPageProps) => {
             )}
           </div>
 
-          <div className="mt-8 text-center">
-            <Link to="/?aba=canais" className="text-sm text-gray-600 underline hover:text-gray-900">
+          <div className="mt-8 flex justify-center">
+            <ActionLink to="/?aba=canais" icon="back">
               Todos os canais
-            </Link>
+            </ActionLink>
           </div>
         </div>
       )}

@@ -1,11 +1,11 @@
 import { CHANNEL_GROUP_LABELS, CHANNEL_GROUP_ORDER, channelGroupOf, listChannels } from "@ondevaipassar/shared";
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
 import { googleLoginUrl } from "../api/client";
 import ChannelLogo from "../Components/ChannelLogo";
 import { useAuth } from "../lib/useAuth";
 import { usePreferences } from "../lib/usePreferences";
 import type { SetSelectedTeam } from "../types";
+import { ActionButton, ActionLink, InlineAnchor } from "../Components/Action";
 
 interface MeusCanaisPageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -34,9 +34,7 @@ const MeusCanaisPage = ({ setSelectedTeam }: MeusCanaisPageProps) => {
             {loginAvailable && (
               <>
                 {" "}
-                <a href={googleLoginUrl} className="underline hover:text-gray-600">
-                  Entre com Google
-                </a>{" "}
+                <InlineAnchor href={googleLoginUrl}>Entre com Google</InlineAnchor>{" "}
                 para levar para outros aparelhos.
               </>
             )}
@@ -77,15 +75,15 @@ const MeusCanaisPage = ({ setSelectedTeam }: MeusCanaisPageProps) => {
         );
       })}
 
-      <div className="mt-8 flex items-center justify-center gap-6 text-sm">
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-x-4">
         {preferences.channels.length > 0 && (
-          <button type="button" onClick={clearChannels} className="cursor-pointer text-gray-600 underline hover:text-gray-900">
+          <ActionButton icon="close" onClick={clearChannels}>
             Limpar escolhas
-          </button>
+          </ActionButton>
         )}
-        <Link to="/" className="text-gray-600 underline hover:text-gray-900">
+        <ActionLink to="/" icon="back">
           Voltar ao início
-        </Link>
+        </ActionLink>
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import TeamCrest from "../../Components/TeamCrest";
 import { MatchesContext } from "../../context/MatchesContext";
 import { findSourceCrestUrl } from "../../lib/assets";
 import { usePreferences } from "../../lib/usePreferences";
+import { ActionLink, InlineLink } from "../../Components/Action";
 
 const Section = ({ title, children, action }: { title: string; children: ReactNode; action?: ReactNode }) => (
   <section className="mt-6 first:mt-0">
@@ -47,7 +48,7 @@ const ContaFavorites = () => {
         <Section title="Times">
           {teams.length === 0 ? (
             <Empty>
-              Nenhum time ainda. Abra um time <Link to="/" className="underline">na página inicial</Link> e toque em Seguir.
+              Nenhum time ainda. Abra um time <InlineLink to="/">na página inicial</InlineLink> e toque em Seguir.
             </Empty>
           ) : (
             <ul className="grid grid-cols-2 gap-2 max-sm:grid-cols-1">
@@ -67,7 +68,7 @@ const ContaFavorites = () => {
         <Section title="Campeonatos">
           {competitions.length === 0 ? (
             <Empty>
-              Nenhum campeonato ainda. Abra um campeonato <Link to="/?aba=campeonatos" className="underline">na aba Campeonatos</Link> e toque em Seguir.
+              Nenhum campeonato ainda. Abra um campeonato <InlineLink to="/?aba=campeonatos">na aba Campeonatos</InlineLink> e toque em Seguir.
             </Empty>
           ) : (
             <ul className="grid grid-cols-2 gap-2 max-sm:grid-cols-1">
@@ -87,14 +88,14 @@ const ContaFavorites = () => {
         <Section
           title="Canais que eu tenho"
           action={
-            <Link to="/meus-canais" className="text-sm text-gray-600 underline hover:text-gray-900">
+            <ActionLink to="/meus-canais" icon="edit" className="-my-2">
               Editar
-            </Link>
+            </ActionLink>
           }
         >
           {channels.length === 0 ? (
             <Empty>
-              Nenhum canal pago marcado. Os gratuitos já valem para todo mundo; marque os seus em <Link to="/meus-canais" className="underline">Meus canais</Link>.
+              Nenhum canal pago marcado. Os gratuitos já valem para todo mundo; marque os seus em <InlineLink to="/meus-canais">Meus canais</InlineLink>.
             </Empty>
           ) : (
             <ul className="grid grid-cols-2 gap-2 max-sm:grid-cols-1">

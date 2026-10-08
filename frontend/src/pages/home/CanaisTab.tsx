@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import ChannelLogo from "../../Components/ChannelLogo";
 import { WEEK_DAYS } from "../../lib/windows";
+import { InlineLink } from "../../Components/Action";
 
 interface CanaisTabProps {
   matches: MatchView[];
@@ -37,12 +38,8 @@ const CanaisTab = ({ matches }: CanaisTabProps) => {
           <input type="checkbox" checked={onlyFree} onChange={(event) => setOnlyFree(event.target.checked)} />
           Só os gratuitos
         </label>
-        <Link to="/gratis" className="underline hover:text-gray-900">
-          Jogos grátis desta semana
-        </Link>
-        <Link to="/meus-canais" className="underline hover:text-gray-900">
-          Meus canais
-        </Link>
+        <InlineLink to="/gratis">Jogos grátis desta semana</InlineLink>
+        <InlineLink to="/meus-canais">Meus canais</InlineLink>
       </div>
 
       {channels.length === 0 && <p className="py-8 text-center text-lg text-gray-500">Nenhum canal com jogo confirmado nos próximos dias.</p>}

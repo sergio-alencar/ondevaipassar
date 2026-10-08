@@ -7,7 +7,7 @@ const LoginNotice = () => {
   return (
     <div role="alert" className="bg-yellow-100 px-4 py-3 text-center text-sm text-yellow-900">
       Não foi possível entrar. Tente de novo.{" "}
-      <button type="button" onClick={dismissLoginFailure} className="cursor-pointer font-bold underline">
+      <button type="button" onClick={dismissLoginFailure} className="cursor-pointer font-bold hover:opacity-70">
         Fechar
       </button>
     </div>

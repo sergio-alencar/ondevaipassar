@@ -1,6 +1,6 @@
 import { findCompetitionById } from "@ondevaipassar/shared";
 import { useContext, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import CompetitionLogo from "../Components/CompetitionLogo";
 import DataState from "../Components/DataState";
 import FollowButton from "../Components/FollowButton";
@@ -8,6 +8,7 @@ import { MatchesContext } from "../context/MatchesContext";
 import { usePreferences } from "../lib/usePreferences";
 import MatchCard from "./MatchCard";
 import type { SetSelectedTeam } from "../types";
+import { ActionButton, ActionLink } from "../Components/Action";
 
 const MATCHES_PER_PAGE = 5;
 
@@ -51,18 +52,18 @@ const CampeonatoContent = ({ id }: { id: string }) => {
           </ul>
 
           {competitionMatches.length > visibleCount && (
-            <button
-              type="button"
-              className="mb-12 w-auto cursor-pointer justify-self-center rounded-full bg-gray-800 px-6 py-3 font-bold uppercase text-white transition-colors hover:bg-gray-700"
-              onClick={() => setVisibleCount((previous) => previous + MATCHES_PER_PAGE)}
-            >
-              Ver mais jogos
-            </button>
+            <div className="mb-2 flex justify-center">
+              <ActionButton icon="down" onClick={() => setVisibleCount((previous) => previous + MATCHES_PER_PAGE)}>
+                Ver mais jogos
+              </ActionButton>
+            </div>
           )}
 
-          <Link to="/?aba=campeonatos" className="mb-12 justify-self-center text-sm text-gray-600 underline hover:text-gray-900">
-            Todos os campeonatos
-          </Link>
+          <div className="mb-12 flex justify-center">
+            <ActionLink to="/?aba=campeonatos" icon="back">
+              Todos os campeonatos
+            </ActionLink>
+          </div>
         </div>
       )}
     </DataState>

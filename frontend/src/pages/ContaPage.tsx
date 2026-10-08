@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { devLoginUrl, googleLoginUrl } from "../api/client";
 import GoogleSignInButton from "../Components/GoogleSignInButton";
 import { useAuth } from "../lib/useAuth";
 import { usePreferences } from "../lib/usePreferences";
 import type { SetSelectedTeam } from "../types";
 import ContaFavorites from "./conta/ContaFavorites";
+import { ActionButton, ActionLink, InlineAnchor } from "../Components/Action";
 
 interface ContaPageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -73,9 +73,9 @@ const ContaPage = ({ setSelectedTeam }: ContaPageProps) => {
                 <button type="button" disabled={busy} onClick={() => void run(deleteAccount)} className={`${buttonClass} bg-red-700 text-white hover:bg-red-600`}>
                   Sim, excluir tudo
                 </button>
-                <button type="button" disabled={busy} onClick={() => setConfirmingDelete(false)} className="cursor-pointer text-sm text-gray-600 underline hover:text-gray-900">
+                <ActionButton disabled={busy} onClick={() => setConfirmingDelete(false)}>
                   Cancelar
-                </button>
+                </ActionButton>
               </div>
             ) : (
               <button type="button" disabled={busy} onClick={() => setConfirmingDelete(true)} className={`${buttonClass} mt-4 bg-gray-200 text-red-700 hover:bg-gray-300`}>
@@ -99,19 +99,17 @@ const ContaPage = ({ setSelectedTeam }: ContaPageProps) => {
             </div>
           )}
           {devLogin && (
-            <a href={devLoginUrl("teste@example.com")} className="mt-4 block text-sm text-gray-500 underline">
+            <InlineAnchor href={devLoginUrl("teste@example.com")} className="mt-4 block text-sm">
               Entrar com a conta de teste (só em desenvolvimento)
-            </a>
+            </InlineAnchor>
           )}
           {!loginAvailable && !devLogin && <p className="mt-4 text-sm text-gray-400">As contas ainda não estão disponíveis.</p>}
         </div>
       )}
 
-      <p className="mt-6 text-center text-sm">
-        <Link to="/privacidade" className="text-gray-600 underline hover:text-gray-900">
-          O que guardamos e por quê
-        </Link>
-      </p>
+      <div className="mt-4 flex justify-center">
+        <ActionLink to="/privacidade">O que guardamos e por quê</ActionLink>
+      </div>
     </div>
   );
 };

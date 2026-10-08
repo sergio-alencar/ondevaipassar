@@ -1,10 +1,10 @@
 import { canWatchMatch, isTodayInBrasilia, isTomorrowInBrasilia, isWithinNextDaysInBrasilia, type MatchView } from "@ondevaipassar/shared";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import MatchesByCompetition from "../../Components/MatchesByCompetition";
 import SectionTabs from "../../Components/SectionTabs";
 import { usePreferences } from "../../lib/usePreferences";
 import { WEEK_DAYS } from "../../lib/windows";
+import { InlineLink } from "../../Components/Action";
 
 type Window = "hoje" | "amanha" | "semana";
 
@@ -63,9 +63,7 @@ const DayFeed = ({ matches }: DayFeedProps) => {
           <input type="checkbox" checked={onlyWatchable} onChange={(event) => setOnlyWatchable(event.target.checked)} />
           {hasPaidChannels ? "Só o que eu consigo assistir" : "Só o que passa de graça"}
         </label>
-        <Link to="/meus-canais" className="underline hover:text-gray-900">
-          {hasPaidChannels ? "Mudar meus canais" : "Dizer quais canais eu tenho"}
-        </Link>
+        <InlineLink to="/meus-canais">{hasPaidChannels ? "Mudar meus canais" : "Dizer quais canais eu tenho"}</InlineLink>
       </div>
 
       <div className="mt-8">
