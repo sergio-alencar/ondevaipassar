@@ -162,7 +162,7 @@ export function authRoutes(options: AuthRoutesOptions = {}) {
       if (!requireOwnOrigin(request, reply)) return reply;
       const user = await requireUser(request, reply);
       if (!user) return reply;
-      const clean = sanitizePreferences(request.body);
+      const clean = sanitizePreferences(request.body, (await getPreferences(user.id)).competitions);
       if (!clean) return reply.code(400).send({ error: "invalid body" });
       return savePreferences(user.id, clean, now());
     });

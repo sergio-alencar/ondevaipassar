@@ -149,7 +149,15 @@ describe("signed-in visitor (test login)", () => {
   });
 
   it("starts with empty preferences and no save time", async () => {
-    expect((await h.app.inject({ url: "/api/preferences", headers: { cookie } })).json()).toEqual({ teams: [], channels: [], updatedAt: null });
+    expect((await h.app.inject({ url: "/api/preferences", headers: { cookie } })).json()).toEqual({ teams: [], competitions: [], channels: [], updatedAt: null });
+  });
+
+  it("keeps followed competitions, and an older client that omits them leaves them alone", async () => {
+    const put = (payload: unknown) => h.app.inject({ method: "PUT", url: "/api/preferences", headers: { cookie, origin: ORIGIN }, payload: payload as object });
+    await put({ teams: [], competitions: ["libertadores", "inventada"], channels: [] });
+    expect((await h.app.inject({ url: "/api/preferences", headers: { cookie } })).json().competitions).toEqual(["libertadores"]);
+    await put({ teams: ["flamengo"], channels: [] });
+    expect((await h.app.inject({ url: "/api/preferences", headers: { cookie } })).json()).toMatchObject({ teams: ["flamengo"], competitions: ["libertadores"] });
   });
 
   it("only stores ids the site knows, once each", async () => {

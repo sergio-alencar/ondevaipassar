@@ -1,15 +1,16 @@
 /**
- * What a visitor tells us about themselves: the teams they follow and the
- * channels they can actually watch. Kept as plain ids so the same object lives
+ * What a visitor tells us about themselves: the teams and competitions they
+ * follow and the channels they can actually watch. Kept as plain ids so the same object lives
  * in the browser's localStorage today and could sit in a user account later
  * without changing shape — signing in is then just a merge of two of these.
  */
 export interface Preferences {
   teams: string[];
+  competitions: string[];
   channels: string[];
 }
 
-export const EMPTY_PREFERENCES: Preferences = { teams: [], channels: [] };
+export const EMPTY_PREFERENCES: Preferences = { teams: [], competitions: [], channels: [] };
 
 // Not a real limit anyone reaches (there are ~100 teams and ~35 channels);
 // it only stops a corrupted or hostile localStorage value from becoming a
@@ -28,14 +29,15 @@ function cleanIds(value: unknown): string[] {
  * older version of the site wrote.
  */
 export function parsePreferences(raw: string | null | undefined): Preferences {
-  if (!raw) return { teams: [], channels: [] };
+  if (!raw) return { teams: [], competitions: [], channels: [] };
   try {
     const parsed: unknown = JSON.parse(raw);
-    if (typeof parsed !== "object" || parsed === null) return { teams: [], channels: [] };
+    if (typeof parsed !== "object" || parsed === null) return { teams: [], competitions: [], channels: [] };
     const record = parsed as Record<string, unknown>;
-    return { teams: cleanIds(record.teams), channels: cleanIds(record.channels) };
+    // `competitions` is missing from anything saved before it existed: that is just "none".
+    return { teams: cleanIds(record.teams), competitions: cleanIds(record.competitions), channels: cleanIds(record.channels) };
   } catch {
-    return { teams: [], channels: [] };
+    return { teams: [], competitions: [], channels: [] };
   }
 }
 
@@ -63,14 +65,15 @@ export function canWatchMatch(broadcasts: readonly { channelId: string; free: bo
 export function unionPreferences(a: Preferences, b: Preferences): Preferences {
   return {
     teams: [...new Set([...a.teams, ...b.teams])].slice(0, MAX_IDS),
+    competitions: [...new Set([...a.competitions, ...b.competitions])].slice(0, MAX_IDS),
     channels: [...new Set([...a.channels, ...b.channels])].slice(0, MAX_IDS),
   };
 }
 
-/** Same teams and same channels, in any order. */
+/** Same teams, competitions and channels, in any order. */
 export function samePreferences(a: Preferences, b: Preferences): boolean {
   const same = (x: readonly string[], y: readonly string[]) => x.length === y.length && x.every((id) => y.includes(id));
-  return same(a.teams, b.teams) && same(a.channels, b.channels);
+  return same(a.teams, b.teams) && same(a.competitions, b.competitions) && same(a.channels, b.channels);
 }
 
 export interface ReconcileInput {

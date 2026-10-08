@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { devLoginUrl, googleLoginUrl } from "../api/client";
+import GoogleSignInButton from "../Components/GoogleSignInButton";
 import { useAuth } from "../lib/useAuth";
 import { usePreferences } from "../lib/usePreferences";
 import type { SetSelectedTeam } from "../types";
+import ContaFavorites from "./conta/ContaFavorites";
 
 interface ContaPageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -46,11 +48,13 @@ const ContaPage = ({ setSelectedTeam }: ContaPageProps) => {
       <h1 className="pt-8 text-center text-4xl font-bold uppercase text-gray-800 max-sm:py-4 max-sm:text-2xl">Minha conta</h1>
 
       {user ? (
+        <>
+        <ContaFavorites />
         <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-gray-600">Conectado como</p>
           <p className="break-all text-xl font-bold text-gray-800">{user.email}</p>
           <p className="mt-4 text-sm text-gray-500">
-            Seus times e canais ficam guardados na conta e aparecem em qualquer aparelho em que você entrar.
+            Seus times, campeonatos e canais ficam guardados na conta e aparecem em qualquer aparelho em que você entrar.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
@@ -62,7 +66,7 @@ const ContaPage = ({ setSelectedTeam }: ContaPageProps) => {
           <div className="mt-10 border-t border-gray-200 pt-6">
             <h2 className="font-bold uppercase text-gray-800">Excluir minha conta</h2>
             <p className="mt-2 text-sm text-gray-500">
-              Apaga agora a conta, os times e canais guardados nela e encerra o acesso em todos os aparelhos. Os favoritos que estão neste navegador continuam aqui. Não dá para desfazer.
+              Apaga agora a conta, os times, campeonatos e canais guardados nela e encerra o acesso em todos os aparelhos. Os favoritos que estão neste navegador continuam aqui. Não dá para desfazer.
             </p>
             {confirmingDelete ? (
               <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -82,16 +86,17 @@ const ContaPage = ({ setSelectedTeam }: ContaPageProps) => {
 
           {failed && <p className="mt-4 text-sm text-red-700">Não foi possível concluir agora. Nada mudou; tente de novo em instantes.</p>}
         </div>
+        </>
       ) : (
         <div className="mt-8 rounded-2xl bg-white p-6 text-center shadow-sm">
           <p className="text-gray-700">Você não está conectado.</p>
           <p className="mt-2 text-sm text-gray-500">
-            O site funciona normalmente sem conta. Entrar serve só para levar seus times e canais favoritos para outros aparelhos.
+            O site funciona normalmente sem conta. Entrar serve só para levar seus times, campeonatos e canais favoritos para outros aparelhos.
           </p>
           {loginAvailable && (
-            <a href={googleLoginUrl} className={`${buttonClass} mt-6 inline-block bg-gray-800 text-white hover:bg-gray-700`}>
-              Entrar com Google
-            </a>
+            <div className="mt-6">
+              <GoogleSignInButton href={googleLoginUrl} />
+            </div>
           )}
           {devLogin && (
             <a href={devLoginUrl("teste@example.com")} className="mt-4 block text-sm text-gray-500 underline">

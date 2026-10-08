@@ -3,7 +3,9 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CompetitionLogo from "../Components/CompetitionLogo";
 import DataState from "../Components/DataState";
+import FavoriteStar from "../Components/FavoriteStar";
 import { MatchesContext } from "../context/MatchesContext";
+import { usePreferences } from "../lib/usePreferences";
 import MatchCard from "./MatchCard";
 import type { SetSelectedTeam } from "../types";
 
@@ -16,6 +18,7 @@ interface CampeonatoPageProps {
 const CampeonatoContent = ({ id }: { id: string }) => {
   const { matches, loading, error } = useContext(MatchesContext);
   const [visibleCount, setVisibleCount] = useState(MATCHES_PER_PAGE);
+  const { preferences, toggleCompetition } = usePreferences();
 
   const competitionMatches = matches.filter((match) => match.competitionId === id);
   // A competition no one has registered yet still has a page, named by what
@@ -31,6 +34,15 @@ const CampeonatoContent = ({ id }: { id: string }) => {
           <h1 className="flex items-center justify-center gap-4 justify-self-center pt-8 text-center text-4xl font-bold uppercase text-gray-800 max-sm:gap-3 max-sm:py-4 max-sm:text-2xl">
             <CompetitionLogo competitionId={id} className="size-14 max-sm:size-10" />
             {name}
+            {/* Only a registered competition can be followed: an id the registry doesn't know isn't kept on an account. */}
+            {findCompetitionById(id) && (
+              <FavoriteStar
+                active={preferences.competitions.includes(id)}
+                onToggle={() => toggleCompetition(id)}
+                label={preferences.competitions.includes(id) ? `Deixar de seguir ${name}` : `Seguir ${name}`}
+                className="size-8 max-sm:size-6"
+              />
+            )}
           </h1>
 
           <ul className="my-8 divide-y divide-gray-300">

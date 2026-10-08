@@ -31,13 +31,23 @@ export interface StoredPreferences extends Preferences {
 
 export async function getPreferences(userId: string): Promise<StoredPreferences> {
   const [row] = await db.select().from(userPreferences).where(eq(userPreferences.userId, userId)).limit(1);
-  if (!row) return { teams: [], channels: [], updatedAt: null };
-  return { teams: JSON.parse(row.teamsJson) as string[], channels: JSON.parse(row.channelsJson) as string[], updatedAt: row.updatedAt };
+  if (!row) return { teams: [], competitions: [], channels: [], updatedAt: null };
+  return {
+    teams: JSON.parse(row.teamsJson) as string[],
+    competitions: JSON.parse(row.competitionsJson) as string[],
+    channels: JSON.parse(row.channelsJson) as string[],
+    updatedAt: row.updatedAt,
+  };
 }
 
 export async function savePreferences(userId: string, preferences: Preferences, now: Date = new Date()): Promise<StoredPreferences> {
   const updatedAt = now.toISOString();
-  const values = { teamsJson: JSON.stringify(preferences.teams), channelsJson: JSON.stringify(preferences.channels), updatedAt };
+  const values = {
+    teamsJson: JSON.stringify(preferences.teams),
+    competitionsJson: JSON.stringify(preferences.competitions),
+    channelsJson: JSON.stringify(preferences.channels),
+    updatedAt,
+  };
   await db
     .insert(userPreferences)
     .values({ userId, ...values })

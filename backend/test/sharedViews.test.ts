@@ -118,16 +118,21 @@ describe("channel groups", () => {
 
 describe("preferences", () => {
   it("reads back what was stored", () => {
-    expect(parsePreferences(JSON.stringify({ teams: ["flamengo"], channels: ["globo", "espn"] }))).toEqual({
+    expect(parsePreferences(JSON.stringify({ teams: ["flamengo"], competitions: ["libertadores"], channels: ["globo", "espn"] }))).toEqual({
       teams: ["flamengo"],
+      competitions: ["libertadores"],
       channels: ["globo", "espn"],
     });
+  });
+
+  it("reads a value saved before competitions existed as following none", () => {
+    expect(parsePreferences(JSON.stringify({ teams: ["flamengo"], channels: [] })).competitions).toEqual([]);
   });
 
   // localStorage is user-editable and holds whatever an older version wrote;
   // none of this may take the page down.
   it("falls back to empty on anything missing or malformed, without throwing", () => {
-    const empty = { teams: [], channels: [] };
+    const empty = { teams: [], competitions: [], channels: [] };
     expect(parsePreferences(null)).toEqual(empty);
     expect(parsePreferences(undefined)).toEqual(empty);
     expect(parsePreferences("")).toEqual(empty);
@@ -183,7 +188,7 @@ describe("what a visitor can watch", () => {
 });
 
 describe("reconcilePreferences", () => {
-  const prefs = (teams: string[], channels: string[] = []) => ({ teams, channels });
+  const prefs = (teams: string[], channels: string[] = [], competitions: string[] = []) => ({ teams, competitions, channels });
 
   // Someone who picked teams before ever signing in: the empty account must
   // not erase them.
@@ -221,6 +226,21 @@ describe("reconcilePreferences", () => {
 
   it("does not push when the dirty browser already matches the account", () => {
     expect(reconcilePreferences({ local: prefs(["a"]), server: prefs(["a"]), hasSynced: true, dirty: true }).pushToServer).toBe(false);
+  });
+
+  it("carries followed competitions through every case", () => {
+    const first = reconcilePreferences({ local: prefs([], [], ["libertadores"]), server: prefs([], [], ["copa-do-brasil"]), hasSynced: false, dirty: false });
+    expect([...first.preferences.competitions].sort()).toEqual(["copa-do-brasil", "libertadores"]);
+    expect(first.pushToServer).toBe(true);
+    const connected = reconcilePreferences({ local: prefs([], [], ["libertadores"]), server: prefs([]), hasSynced: true, dirty: false });
+    expect(connected.preferences.competitions).toEqual([]);
+    const dirty = reconcilePreferences({ local: prefs([], [], ["libertadores"]), server: prefs([]), hasSynced: true, dirty: true });
+    expect(dirty.preferences.competitions).toEqual(["libertadores"]);
+    expect(dirty.pushToServer).toBe(true);
+  });
+
+  it("notices a difference that is only in the competitions", () => {
+    expect(samePreferences(prefs(["a"], [], ["libertadores"]), prefs(["a"]))).toBe(false);
   });
 
   it("treats the same ids in a different order as the same preferences", () => {

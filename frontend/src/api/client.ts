@@ -49,6 +49,7 @@ export interface MeResponse {
 
 export interface ServerPreferences {
   teams: string[];
+  competitions: string[];
   channels: string[];
   /** Null until the account has saved something. */
   updatedAt: string | null;
@@ -70,7 +71,7 @@ export async function fetchServerPreferences(): Promise<ServerPreferences> {
   return response.json() as Promise<ServerPreferences>;
 }
 
-export async function saveServerPreferences(preferences: { teams: string[]; channels: string[] }): Promise<ServerPreferences> {
+export async function saveServerPreferences(preferences: { teams: string[]; competitions: string[]; channels: string[] }): Promise<ServerPreferences> {
   const response = await fetch(`${API_BASE_URL}/api/preferences`, {
     method: "PUT",
     credentials: "include",

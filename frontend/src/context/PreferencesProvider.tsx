@@ -31,7 +31,7 @@ function readStored(): Preferences {
   try {
     return parsePreferences(window.localStorage.getItem(STORAGE_KEY));
   } catch {
-    return { teams: [], channels: [] };
+    return { teams: [], competitions: [], channels: [] };
   }
 }
 
@@ -64,7 +64,7 @@ function writeSync(marker: SyncMarker): void {
 }
 
 /**
- * The visitor's followed teams and channels. They live in this browser; when
+ * The visitor's followed teams and competitions, and the channels they have. They live in this browser; when
  * the visitor is signed in they are also kept on their account, so they follow
  * them to another device. How the two are settled when they disagree is
  * reconcilePreferences' job (packages/shared), where it can be tested.
@@ -156,7 +156,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
         const result = reconcilePreferences({
           local: latest.current,
-          server: { teams: server.teams, channels: server.channels },
+          server: { teams: server.teams, competitions: server.competitions, channels: server.channels },
           hasSynced: marker.current.syncedAt !== null,
           dirty: marker.current.dirty,
         });
@@ -184,6 +184,13 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     },
     [noteLocalChange],
   );
+  const toggleCompetition = useCallback(
+    (competitionId: string) => {
+      setPreferences((current) => ({ ...current, competitions: toggleId(current.competitions, competitionId) }));
+      noteLocalChange();
+    },
+    [noteLocalChange],
+  );
   const toggleChannel = useCallback(
     (channelId: string) => {
       setPreferences((current) => ({ ...current, channels: toggleId(current.channels, channelId) }));
@@ -202,8 +209,8 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   }, [setMarker]);
 
   const value = useMemo(
-    () => ({ preferences, toggleTeam, toggleChannel, clearChannels, detachAccount }),
-    [preferences, toggleTeam, toggleChannel, clearChannels, detachAccount],
+    () => ({ preferences, toggleTeam, toggleCompetition, toggleChannel, clearChannels, detachAccount }),
+    [preferences, toggleTeam, toggleCompetition, toggleChannel, clearChannels, detachAccount],
   );
 
   return <PreferencesContext.Provider value={value}>{children}</PreferencesContext.Provider>;

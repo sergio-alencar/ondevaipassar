@@ -127,6 +127,8 @@ const COMPETITION_LOGOS: Record<string, CompetitionLogoSpec> = {
   "europa-league": { file: "europa-league.svg" },
   "fa-cup": { file: "fa-cup.svg" },
   "copa-del-rey": { file: "copa-del-rey.svg" },
+  "copa-verde": { file: "copa-verde.png" },
+  "copa-centro-oeste": { file: "copa-centro-oeste.png" },
   "campeonato-mineiro": { file: "campeonato-mineiro.svg" },
   "campeonato-carioca": { file: "campeonato-carioca.svg" },
   "campeonato-paulista": { file: "campeonato-paulista.svg" },

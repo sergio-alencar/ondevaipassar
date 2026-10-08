@@ -164,13 +164,25 @@ describe("sanitizePreferences", () => {
   it("keeps known teams and channels", () => {
     expect(sanitizePreferences({ teams: ["flamengo", "corinthians_feminino"], channels: ["espn", "globo"] })).toEqual({
       teams: ["flamengo", "corinthians_feminino"],
+      competitions: [],
       channels: ["espn", "globo"],
     });
+  });
+
+  it("keeps known competitions, drops unknown ones", () => {
+    expect(sanitizePreferences({ teams: [], competitions: ["libertadores", "libertadores", "inventada"], channels: [] })?.competitions).toEqual(["libertadores"]);
+  });
+
+  // An old cached copy of the site never sends the field; it must not wipe the account's.
+  it("falls back to the stored competitions when the body has none", () => {
+    expect(sanitizePreferences({ teams: [], channels: [] }, ["libertadores"])?.competitions).toEqual(["libertadores"]);
+    expect(sanitizePreferences({ teams: [], competitions: [], channels: [] }, ["libertadores"])?.competitions).toEqual([]);
   });
 
   it("drops ids that aren't in the registry, and collapses duplicates", () => {
     expect(sanitizePreferences({ teams: ["flamengo", "flamengo", "<script>", "nao_existe"], channels: ["espn", "canal-inventado"] })).toEqual({
       teams: ["flamengo"],
+      competitions: [],
       channels: ["espn"],
     });
   });

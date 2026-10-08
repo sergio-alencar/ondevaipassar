@@ -106,6 +106,8 @@ export const userPreferences = sqliteTable("user_preferences", {
   userId: text("user_id").primaryKey(),
   teamsJson: text("teams_json").notNull(),
   channelsJson: text("channels_json").notNull(),
+  // Added after the table first shipped, so older rows read "[]".
+  competitionsJson: text("competitions_json").notNull().default("[]"),
   updatedAt: text("updated_at").notNull(),
 });
 

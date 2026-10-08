@@ -130,7 +130,8 @@ export function ensureSchema(): Promise<unknown> {
     `)
       .then(() => addColumnIfMissing("matches", "kickoff_time_confirmed INTEGER NOT NULL DEFAULT 1"))
       .then(() => addColumnIfMissing("broadcasts", "watch_url TEXT"))
-      .then(() => addColumnIfMissing("broadcasts", "regional_detail TEXT"));
+      .then(() => addColumnIfMissing("broadcasts", "regional_detail TEXT"))
+      .then(() => addColumnIfMissing("user_preferences", "competitions_json TEXT NOT NULL DEFAULT '[]'"));
   }
   return ready;
 }

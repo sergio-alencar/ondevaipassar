@@ -4,6 +4,7 @@ import { EMPTY_PREFERENCES, type Preferences } from "@ondevaipassar/shared";
 export interface PreferencesContextValue {
   preferences: Preferences;
   toggleTeam: (teamId: string) => void;
+  toggleCompetition: (competitionId: string) => void;
   toggleChannel: (channelId: string) => void;
   clearChannels: () => void;
   /** Forget that this browser was ever connected to an account — called on sign-out and account deletion. The favourites themselves stay on the device. */
@@ -16,6 +17,7 @@ export interface PreferencesContextValue {
 export const PreferencesContext = createContext<PreferencesContextValue>({
   preferences: EMPTY_PREFERENCES,
   toggleTeam: () => {},
+  toggleCompetition: () => {},
   toggleChannel: () => {},
   clearChannels: () => {},
   detachAccount: () => {},
