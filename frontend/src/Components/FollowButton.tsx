@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface FollowButtonProps {
   active: boolean;
   onToggle: () => void;
@@ -16,7 +18,11 @@ interface FollowButtonProps {
  * padding and min height keep the touch target even though nothing is drawn
  * around it.
  */
-const FollowButton = ({ active, onToggle, name, size = "large" }: FollowButtonProps) => (
+const FollowButton = ({ active, onToggle, name, size = "large" }: FollowButtonProps) => {
+  // Animate only what the visitor just did, never a page that merely loads
+  // already following.
+  const [tapped, setTapped] = useState(false);
+  return (
   <button
     type="button"
     aria-pressed={active}
@@ -24,23 +30,28 @@ const FollowButton = ({ active, onToggle, name, size = "large" }: FollowButtonPr
     onClick={(event) => {
       event.preventDefault();
       event.stopPropagation();
+      setTapped(true);
       onToggle();
     }}
     className={`inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-2 px-3 font-bold uppercase transition-colors hover:underline ${
       size === "large" ? "text-base" : "text-sm"
     } ${active ? "text-gray-500 hover:text-gray-700" : "text-gray-800 hover:text-gray-600"}`}
   >
-    {active ? (
+    {/* keyed by state so each change remounts the icon and replays its entrance */}
+    <span key={active ? "icon-on" : "icon-off"} className={`flex ${tapped ? "follow-icon-animate" : ""}`}>
       <svg viewBox="0 0 20 20" className="size-5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M4 10.5l4 4 8-9" />
+        {active ? (
+          <path d="M4 10.5l4 4 8-9" pathLength={1} className={tapped ? "follow-check-animate" : ""} />
+        ) : (
+          <path d="M10 4v12M4 10h12" />
+        )}
       </svg>
-    ) : (
-      <svg viewBox="0 0 20 20" className="size-5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true">
-        <path d="M10 4v12M4 10h12" />
-      </svg>
-    )}
-    {active ? "Seguindo" : "Seguir"}
+    </span>
+    <span key={active ? "word-on" : "word-off"} className={tapped ? "follow-word-animate" : ""}>
+      {active ? "Seguindo" : "Seguir"}
+    </span>
   </button>
-);
+  );
+};
 
 export default FollowButton;

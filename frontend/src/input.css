@@ -1,1 +1,46 @@
 @import "tailwindcss";
+
+/* Loading indicator (Components/TvLoader.tsx): the TV sways, the dot of the
+   question mark bounces and squashes where it lands. */
+@keyframes tv-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+@keyframes tv-dot {
+  0%, 100% { transform: translateY(0) scale(1.15, 0.8); }
+  15% { transform: translateY(0) scale(1, 1); }
+  50% { transform: translateY(-16px) scale(0.95, 1.08); }
+  85% { transform: translateY(0) scale(1, 1); }
+}
+.tv-loader {
+  transform-origin: 50% 90%;
+  animation: tv-sway 1.2s ease-in-out infinite;
+}
+.tv-loader-dot {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: tv-dot 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Follow button (Components/FollowButton.tsx): the new icon pops in, the check
+   draws itself, and the word slides up into place. Only applied after a tap. */
+@keyframes follow-pop {
+  0% { transform: scale(0.4) rotate(-90deg); opacity: 0; }
+  60% { transform: scale(1.25) rotate(8deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes follow-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes follow-word {
+  from { transform: translateY(40%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.follow-icon-animate { animation: follow-pop 0.4s ease-out; }
+.follow-check-animate { stroke-dasharray: 1; animation: follow-draw 0.35s ease-out 0.1s backwards; }
+.follow-word-animate { animation: follow-word 0.25s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tv-loader, .tv-loader-dot, .follow-icon-animate, .follow-check-animate, .follow-word-animate { animation: none; }
+}

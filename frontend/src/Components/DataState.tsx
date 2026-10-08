@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import TvLoader from "./TvLoader";
 
 interface DataStateProps {
   loading: boolean;
@@ -6,14 +7,10 @@ interface DataStateProps {
   children: ReactNode;
 }
 
-/** The loading spinner and error message every page that reads the matches shares, so each one doesn't carry its own copy. Renders the children only once the data is there. */
+/** The loading indicator and error message every page that reads the matches shares, so each one doesn't carry its own copy. Renders the children only once the data is there. */
 const DataState = ({ loading, error, children }: DataStateProps) => {
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <TvLoader />;
   }
   if (error) {
     return (

@@ -3,6 +3,7 @@ import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DivisionTabs from "../Components/DivisionTabs";
 import FollowedMark from "../Components/FollowedMark";
+import TvLoader from "../Components/TvLoader";
 import SectionTabs from "../Components/SectionTabs";
 import TeamCrest from "../Components/TeamCrest";
 import { MatchesContext } from "../context/MatchesContext";
@@ -124,7 +125,7 @@ const Home = ({ setSelectedTeam }: HomeProps) => {
         {tab === "canais" && <CanaisTab matches={matches} />}
       </div>
 
-      {loading && <p className="text-center text-lg mt-16">Carregando jogos...</p>}
+      {loading && <TvLoader />}
       {error && <p className="text-center text-lg text-red-500 mt-16">Erro: {error}</p>}
 
       {!loading && !error && <DayFeed matches={matches} />}

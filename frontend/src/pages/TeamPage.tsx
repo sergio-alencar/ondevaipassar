@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { findTeamById } from "@ondevaipassar/shared";
+import TvLoader from "../Components/TvLoader";
 import FollowButton from "../Components/FollowButton";
 import { MatchesContext } from "../context/MatchesContext";
 import { usePreferences } from "../lib/usePreferences";
@@ -27,11 +28,7 @@ const TeamPage = ({ setSelectedTeam }: TeamPageProps) => {
   }, [team, setSelectedTeam]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <TvLoader />;
   }
 
   if (!team) {
