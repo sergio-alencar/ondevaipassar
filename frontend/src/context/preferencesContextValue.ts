@@ -6,6 +6,8 @@ export interface PreferencesContextValue {
   toggleTeam: (teamId: string) => void;
   toggleChannel: (channelId: string) => void;
   clearChannels: () => void;
+  /** Forget that this browser was ever connected to an account — called on sign-out and account deletion. The favourites themselves stay on the device. */
+  detachAccount: () => void;
 }
 
 // Split from the provider so that file exports only a component — a file that
@@ -16,4 +18,5 @@ export const PreferencesContext = createContext<PreferencesContextValue>({
   toggleTeam: () => {},
   toggleChannel: () => {},
   clearChannels: () => {},
+  detachAccount: () => {},
 });

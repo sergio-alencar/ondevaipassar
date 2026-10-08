@@ -103,6 +103,30 @@ export function ensureSchema(): Promise<unknown> {
         error_message TEXT,
         created_at TEXT NOT NULL
       );
+
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        provider TEXT NOT NULL,
+        provider_id TEXT NOT NULL,
+        email TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (provider, provider_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS user_preferences (
+        user_id TEXT PRIMARY KEY,
+        teams_json TEXT NOT NULL,
+        channels_json TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS sessions (
+        id_hash TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        expires_at TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS sessions_user_idx ON sessions (user_id);
     `)
       .then(() => addColumnIfMissing("matches", "kickoff_time_confirmed INTEGER NOT NULL DEFAULT 1"))
       .then(() => addColumnIfMissing("broadcasts", "watch_url TEXT"))

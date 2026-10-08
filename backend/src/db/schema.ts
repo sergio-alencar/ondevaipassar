@@ -88,3 +88,34 @@ export const instagramPosts = sqliteTable("instagram_posts", {
   errorMessage: text("error_message"),
   createdAt: text("created_at").notNull(),
 });
+
+// Optional accounts: the site works without one, an account only syncs the
+// visitor's favourite teams and channels between devices. Deliberately the
+// least personal data that does the job — a provider id and an e-mail (shown
+// back as "connected as ..."), nothing else; no name, no photo.
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  // "google", or "dev" for the local-only test login (see routes/auth.ts)
+  provider: text("provider").notNull(),
+  providerId: text("provider_id").notNull(),
+  email: text("email").notNull(),
+  createdAt: text("created_at").notNull(),
+});
+
+export const userPreferences = sqliteTable("user_preferences", {
+  userId: text("user_id").primaryKey(),
+  teamsJson: text("teams_json").notNull(),
+  channelsJson: text("channels_json").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+// Server-side sessions rather than a signed cookie, so signing out and
+// deleting an account actually end the session — a stateless token would stay
+// valid until it expired. Only the SHA-256 of the token is stored: a leaked
+// database can't be replayed as logins.
+export const sessions = sqliteTable("sessions", {
+  idHash: text("id_hash").primaryKey(),
+  userId: text("user_id").notNull(),
+  createdAt: text("created_at").notNull(),
+  expiresAt: text("expires_at").notNull(),
+});

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { InstagramIcon, WhatsAppIcon, XIcon } from "./icons/SocialIcons";
 import { backgroundColorClass } from "../lib/colors";
 import { SOCIAL_LINKS } from "../lib/socialLinks";
@@ -29,7 +30,12 @@ const Footer = ({ selectedTeam }: FooterProps) => {
             );
           })}
         </ul>
-        <p className="font-bold uppercase text-xs text-white">Onde Vai Passar &copy; {new Date().getFullYear()}</p>
+        <p className="font-bold uppercase text-xs text-white">
+          Onde Vai Passar &copy; {new Date().getFullYear()} ·{" "}
+          <Link to="/privacidade" className="hover:underline">
+            Privacidade
+          </Link>
+        </p>
       </div>
     </footer>
   );

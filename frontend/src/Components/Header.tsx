@@ -4,7 +4,9 @@ import DropdownMenu from "./DropdownMenu";
 import logoHeader from "../assets/images/icones/logo-3.svg";
 import escudo from "../assets/images/icones/escudo.svg";
 import { backgroundColorClass } from "../lib/colors";
+import { googleLoginUrl, devLoginUrl } from "../api/client";
 import { SOCIAL_LINKS } from "../lib/socialLinks";
+import { useAuth } from "../lib/useAuth";
 import type { SelectedTeam, SetSelectedTeam } from "../types";
 
 interface HeaderProps {
@@ -14,6 +16,7 @@ interface HeaderProps {
 
 const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const { user, loginAvailable, devLogin } = useAuth();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const escudoRef = useRef<HTMLButtonElement>(null);
@@ -145,9 +148,34 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
               Meus canais
             </Link>
           </li>
+          {user ? (
+            <li>
+              <Link to="/conta" onClick={() => setIsMenuVisible(false)}>
+                Minha conta
+              </Link>
+            </li>
+          ) : (
+            <>
+              {loginAvailable && (
+                <li>
+                  <a href={googleLoginUrl}>Entrar com Google</a>
+                </li>
+              )}
+              {devLogin && (
+                <li>
+                  <a href={devLoginUrl("teste@example.com")}>Entrar (teste)</a>
+                </li>
+              )}
+            </>
+          )}
           <li>
             <Link to="/sobre" onClick={() => setIsMenuVisible(false)}>
               Sobre
+            </Link>
+          </li>
+          <li>
+            <Link to="/privacidade" onClick={() => setIsMenuVisible(false)}>
+              Privacidade
             </Link>
           </li>
         </ul>

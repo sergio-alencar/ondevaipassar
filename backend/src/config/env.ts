@@ -53,6 +53,27 @@ const envSchema = z.object({
   // step is skipped, same "degrade gracefully" pattern as the other optional
   // integrations above.
   YOUTUBE_API_KEY: z.string().optional(),
+  // "Entrar com Google" (OAuth 2.0 authorization-code flow, console.cloud.google.com
+  // > APIs & Services > Credentials > OAuth client ID, type "Web application",
+  // authorized redirect URI = PUBLIC_BASE_URL + /api/auth-google-callback).
+  // Both unset just means accounts are switched off: /api/me reports
+  // loginAvailable:false and the site never shows a login button.
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  // Where the browser is sent after signing in. A fixed address from the
+  // environment, never taken from the request, so the login redirect can't be
+  // turned into an open redirect.
+  PUBLIC_SITE_URL: z.string().default("http://localhost:5173"),
+  // ".ondevaipassar.com" in production so the session cookie set by
+  // api.ondevaipassar.com is also sent by the site's own subdomain; unset in
+  // local dev, where a host-only cookie on localhost is shared across ports.
+  COOKIE_DOMAIN: z.string().optional(),
+  // Local-only test login that skips Google entirely (/api/auth-dev). Ignored
+  // — the route is not even registered — whenever NODE_ENV is "production".
+  AUTH_DEV_LOGIN: z
+    .string()
+    .optional()
+    .transform((value) => value === "true"),
 });
 
 export const env = envSchema.parse(process.env);

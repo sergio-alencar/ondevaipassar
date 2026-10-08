@@ -1,7 +1,9 @@
 import { CHANNEL_GROUP_LABELS, CHANNEL_GROUP_ORDER, channelGroupOf, listChannels } from "@ondevaipassar/shared";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { googleLoginUrl } from "../api/client";
 import ChannelLogo from "../Components/ChannelLogo";
+import { useAuth } from "../lib/useAuth";
 import { usePreferences } from "../lib/usePreferences";
 import type { SetSelectedTeam } from "../types";
 
@@ -11,6 +13,7 @@ interface MeusCanaisPageProps {
 
 const MeusCanaisPage = ({ setSelectedTeam }: MeusCanaisPageProps) => {
   const { preferences, toggleChannel, clearChannels } = usePreferences();
+  const { user, loginAvailable } = useAuth();
 
   useEffect(() => {
     setSelectedTeam(null);
@@ -22,7 +25,24 @@ const MeusCanaisPage = ({ setSelectedTeam }: MeusCanaisPageProps) => {
       <p className="mx-auto mt-3 max-w-xl text-center text-sm text-gray-500">
         Marque onde você consegue assistir. Nos jogos, os canais que você não tem ficam esmaecidos, e dá para ver só o que passa nos seus. Os gratuitos valem para todo mundo, então já vêm incluídos.
       </p>
-      <p className="mx-auto mt-2 max-w-xl text-center text-xs text-gray-400">Fica guardado só neste navegador. Não pedimos nenhum dado seu.</p>
+      <p className="mx-auto mt-2 max-w-xl text-center text-xs text-gray-400">
+        {user ? (
+          <>Guardado na sua conta ({user.email}) e neste navegador.</>
+        ) : (
+          <>
+            Fica guardado só neste navegador. Não pedimos nenhum dado seu.
+            {loginAvailable && (
+              <>
+                {" "}
+                <a href={googleLoginUrl} className="underline hover:text-gray-600">
+                  Entre com Google
+                </a>{" "}
+                para levar para outros aparelhos.
+              </>
+            )}
+          </>
+        )}
+      </p>
 
       {CHANNEL_GROUP_ORDER.map((group) => {
         const channels = listChannels().filter((channel) => channelGroupOf(channel) === group);

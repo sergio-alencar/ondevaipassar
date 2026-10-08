@@ -8,6 +8,8 @@ import {
   isWithinNextDaysInBrasilia,
   listChannels,
   parsePreferences,
+  reconcilePreferences,
+  samePreferences,
   toggleId,
 } from "@ondevaipassar/shared";
 import { describe, expect, it } from "vitest";
@@ -177,5 +179,52 @@ describe("what a visitor can watch", () => {
   // "Transmissão a confirmar" is not something anyone can watch yet.
   it("is false for a match with no confirmed broadcast", () => {
     expect(canWatchMatch([], ["espn"])).toBe(false);
+  });
+});
+
+describe("reconcilePreferences", () => {
+  const prefs = (teams: string[], channels: string[] = []) => ({ teams, channels });
+
+  // Someone who picked teams before ever signing in: the empty account must
+  // not erase them.
+  it("on first contact keeps what the browser had when the account is empty", () => {
+    const result = reconcilePreferences({ local: prefs(["flamengo"], ["espn"]), server: prefs([]), hasSynced: false, dirty: false });
+    expect(result.preferences).toEqual(prefs(["flamengo"], ["espn"]));
+    expect(result.pushToServer).toBe(true);
+  });
+
+  it("on first contact keeps what the account had when the browser is empty, without pushing anything", () => {
+    const result = reconcilePreferences({ local: prefs([]), server: prefs(["corinthians"]), hasSynced: false, dirty: false });
+    expect(result.preferences).toEqual(prefs(["corinthians"]));
+    expect(result.pushToServer).toBe(false);
+  });
+
+  it("on first contact unites both sides without duplicates", () => {
+    const result = reconcilePreferences({ local: prefs(["a", "b"]), server: prefs(["b", "c"]), hasSynced: false, dirty: false });
+    expect([...result.preferences.teams].sort()).toEqual(["a", "b", "c"]);
+    expect(result.pushToServer).toBe(true);
+  });
+
+  // The reason the three cases exist: with a union here, a team removed on the
+  // other device would come straight back and be pushed to the account again.
+  it("lets the account win once connected and unchanged, so a removal elsewhere reaches this device", () => {
+    const result = reconcilePreferences({ local: prefs(["a", "b"]), server: prefs(["a"]), hasSynced: true, dirty: false });
+    expect(result.preferences).toEqual(prefs(["a"]));
+    expect(result.pushToServer).toBe(false);
+  });
+
+  it("lets this browser win when it holds edits the account never received", () => {
+    const result = reconcilePreferences({ local: prefs(["a", "x"]), server: prefs(["a"]), hasSynced: true, dirty: true });
+    expect(result.preferences).toEqual(prefs(["a", "x"]));
+    expect(result.pushToServer).toBe(true);
+  });
+
+  it("does not push when the dirty browser already matches the account", () => {
+    expect(reconcilePreferences({ local: prefs(["a"]), server: prefs(["a"]), hasSynced: true, dirty: true }).pushToServer).toBe(false);
+  });
+
+  it("treats the same ids in a different order as the same preferences", () => {
+    expect(samePreferences(prefs(["a", "b"], ["x", "y"]), prefs(["b", "a"], ["y", "x"]))).toBe(true);
+    expect(samePreferences(prefs(["a"]), prefs(["a", "b"]))).toBe(false);
   });
 });

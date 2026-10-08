@@ -8,6 +8,7 @@ import { crestProxyRoutes } from "./routes/crestProxy.js";
 import { digestRoutes } from "./routes/digest.js";
 import { statusRoutes } from "./routes/status.js";
 import { adminBroadcastRoutes } from "./routes/adminBroadcast.js";
+import { authRoutes } from "./routes/auth.js";
 import { cronRoutes } from "./routes/cron.js";
 import { healthRoutes } from "./routes/health.js";
 import { instagramCronRoutes } from "./routes/instagramCron.js";
@@ -24,7 +25,12 @@ export async function buildApp() {
 
   const app = Fastify({ logger: true });
 
-  await app.register(cors, { origin: env.CORS_ORIGIN });
+  // credentials: true so the browser may send the session cookie on the
+  // site's own API calls. Safe because `origin` is an explicit allowlist and
+  // never "*" — with a wildcard the browser refuses credentials, and echoing
+  // any origin back would hand them to every site. PUT and DELETE are listed
+  // because @fastify/cors only allows GET, HEAD and POST by default.
+  await app.register(cors, { origin: env.CORS_ORIGIN, credentials: true, methods: ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"] });
   await app.register(healthRoutes);
   await app.register(matchesRoutes);
   await app.register(teamsRoutes);
@@ -37,6 +43,7 @@ export async function buildApp() {
   await app.register(digestRoutes);
   await app.register(statusRoutes);
   await app.register(adminBroadcastRoutes);
+  await app.register(authRoutes());
 
   return app;
 }

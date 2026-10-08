@@ -31,6 +31,17 @@ Não existe API estruturada e gratuita para "que canal transmite esse jogo" no B
 - Ao mexer no frontend, suba o dev server (`npm run dev`) e confira no navegador antes de dar por concluído.
 - Deploy é via `vercel deploy --prod` a partir da raiz do repo (precisa estar linkado ao projeto certo — `vercel link --project ondevaipassar-api` pro backend, `--project ondevaipassar` pro front; só um projeto fica linkado por vez em `.vercel/`). Nunca commitar `.env`/tokens — variáveis de produção ficam só no painel da Vercel (`vercel env`).
 
+## Contas opcionais ("Entrar com Google")
+
+O site funciona inteiro sem conta; a conta só **sincroniza** os times e canais favoritos entre aparelhos. As preferências nascem em `localStorage` (`frontend/src/context/PreferencesProvider.tsx`) e a regra de quem vence quando aparelho e conta divergem está em `packages/shared/src/preferences.ts` (`reconcilePreferences`, três casos, com teste).
+
+- Só Google (OAuth 2.0, fluxo de código, server-side). Sessão em tabela própria (`sessions`, guarda só o hash do token), cookie `ovp_session` HttpOnly. Rotas em `backend/src/api/routes/auth.ts`; **todas com um único segmento** depois de `/api/`, pela mesma restrição de roteamento da Vercel do `/api/cron-ingest`.
+- Mutação (`PUT/POST/DELETE`) exige `Origin` na lista de `CORS_ORIGIN` (defesa de CSRF); sem `Origin` é recusada.
+- Variáveis (todas opcionais, ver `backend/.env.example`): `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `PUBLIC_SITE_URL`, `COOKIE_DOMAIN` (`.ondevaipassar.com` em produção). Sem as credenciais do Google o site não mostra botão de login (`/api/me` devolve `loginAvailable:false`).
+- Para ligar em produção: criar um "OAuth client ID" (tipo Web application) em console.cloud.google.com, com redirect URI `https://api.ondevaipassar.com/api/auth-google-callback`, e a página de privacidade `https://ondevaipassar.com/privacidade` na tela de consentimento. `GOOGLE_CLIENT_SECRET` entra como variável **Sensitive**.
+- `AUTH_DEV_LOGIN=true` liga `/api/auth-dev`, um login de teste sem Google, **só em desenvolvimento local**: a rota nem é registrada com `NODE_ENV=production`, e há teste para isso. Nunca configurar em produção.
+- O que se guarda é o mínimo (id do provedor, e-mail, times, canais). Exclusão de conta apaga tudo em lote (`deleteAccount`); a página `/privacidade` descreve exatamente isso, então qualquer mudança no que é guardado exige mudar o texto.
+
 ## Comandos
 
 ```
