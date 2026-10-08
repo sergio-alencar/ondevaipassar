@@ -10,8 +10,8 @@ interface PrivacidadePageProps {
 const INSTAGRAM = SOCIAL_LINKS.find((link) => link.label === "Instagram");
 
 const EMAIL_LINK = (
-  <a href="mailto:afasergio@gmail.com" className="font-bold text-purple-900 hover:text-purple-600">
-    afasergio@gmail.com
+  <a href="mailto:contato@ondevaipassar.com" className="font-bold text-purple-900 hover:text-purple-600">
+    contato@ondevaipassar.com
   </a>
 );
 

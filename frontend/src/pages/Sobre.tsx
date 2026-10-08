@@ -42,7 +42,7 @@ const Sobre = ({ setSelectedTeam }: SobreProps) => {
         </a>{" "}
         ou me mande um{" "}
         <a
-          href="mailto:sergiofalencar@gmail.com"
+          href="mailto:contato@ondevaipassar.com"
           target="_blank"
           rel="noopener noreferrer"
           className="font-bold text-purple-900 hover:text-purple-600"
