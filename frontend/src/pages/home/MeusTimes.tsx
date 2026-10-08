@@ -1,6 +1,6 @@
 import { findTeamById, type MatchView, type Team } from "@ondevaipassar/shared";
 import { Link } from "react-router-dom";
-import FavoriteStar from "../../Components/FavoriteStar";
+import FollowButton from "../../Components/FollowButton";
 import { usePreferences } from "../../lib/usePreferences";
 import MatchCard from "../MatchCard";
 
@@ -26,11 +26,11 @@ const MeusTimes = ({ matches }: MeusTimesProps) => {
           const next = matches.find((match) => match.homeTeamId === team.id || match.awayTeamId === team.id);
           return (
             <li key={team.id}>
-              <div className="flex items-center justify-center gap-2 pt-6">
-                <FavoriteStar active onToggle={() => toggleTeam(team.id)} label={`Deixar de seguir ${team.displayName}`} className="size-6" />
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-6">
                 <Link to={`/time/${team.id}`} className="text-xl font-bold uppercase text-gray-800 hover:underline">
                   {team.displayName}
                 </Link>
+                <FollowButton active onToggle={() => toggleTeam(team.id)} name={team.displayName} size="compact" />
               </div>
               {next ? <MatchCard match={next} team={team} /> : <p className="py-6 text-center text-gray-500">Nenhum jogo agendado para os próximos dias.</p>}
             </li>

@@ -3,7 +3,7 @@ import { useContext, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import ChannelLogo from "../../Components/ChannelLogo";
 import CompetitionLogo from "../../Components/CompetitionLogo";
-import FavoriteStar from "../../Components/FavoriteStar";
+import FollowButton from "../../Components/FollowButton";
 import TeamCrest from "../../Components/TeamCrest";
 import { MatchesContext } from "../../context/MatchesContext";
 import { findSourceCrestUrl } from "../../lib/assets";
@@ -47,7 +47,7 @@ const ContaFavorites = () => {
         <Section title="Times">
           {teams.length === 0 ? (
             <Empty>
-              Nenhum time ainda. Toque na estrela de um time <Link to="/" className="underline">na página inicial</Link>.
+              Nenhum time ainda. Abra um time <Link to="/" className="underline">na página inicial</Link> e toque em Seguir.
             </Empty>
           ) : (
             <ul className="grid grid-cols-2 gap-2 max-sm:grid-cols-1">
@@ -57,7 +57,7 @@ const ContaFavorites = () => {
                     <TeamCrest team={team} name={team.displayName} sourceCrestUrl={findSourceCrestUrl(team.id, matches)} className="h-9 w-9 object-contain" />
                     <span className="min-w-0 font-bold leading-tight text-gray-800">{team.displayName}</span>
                   </Link>
-                  <FavoriteStar active onToggle={() => toggleTeam(team.id)} label={`Deixar de seguir ${team.displayName}`} className="size-5" />
+                  <FollowButton active onToggle={() => toggleTeam(team.id)} name={team.displayName} size="compact" />
                 </li>
               ))}
             </ul>
@@ -67,7 +67,7 @@ const ContaFavorites = () => {
         <Section title="Campeonatos">
           {competitions.length === 0 ? (
             <Empty>
-              Nenhum campeonato ainda. Toque na estrela de um campeonato <Link to="/?aba=campeonatos" className="underline">na aba Campeonatos</Link>.
+              Nenhum campeonato ainda. Abra um campeonato <Link to="/?aba=campeonatos" className="underline">na aba Campeonatos</Link> e toque em Seguir.
             </Empty>
           ) : (
             <ul className="grid grid-cols-2 gap-2 max-sm:grid-cols-1">
@@ -77,7 +77,7 @@ const ContaFavorites = () => {
                     <CompetitionLogo competitionId={competition.id} className="size-9" />
                     <span className="min-w-0 font-bold leading-tight text-gray-800">{competition.displayName}</span>
                   </Link>
-                  <FavoriteStar active onToggle={() => toggleCompetition(competition.id)} label={`Deixar de seguir ${competition.displayName}`} className="size-5" />
+                  <FollowButton active onToggle={() => toggleCompetition(competition.id)} name={competition.displayName} size="compact" />
                 </li>
               ))}
             </ul>

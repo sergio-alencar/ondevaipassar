@@ -1,7 +1,7 @@
 import { findCompetitionById, groupMatchesByCompetition, isWithinNextDaysInBrasilia, type MatchView } from "@ondevaipassar/shared";
 import { Link } from "react-router-dom";
 import CompetitionLogo from "../../Components/CompetitionLogo";
-import FavoriteStar from "../../Components/FavoriteStar";
+import FollowedMark from "../../Components/FollowedMark";
 import { usePreferences } from "../../lib/usePreferences";
 import { WEEK_DAYS } from "../../lib/windows";
 
@@ -16,7 +16,7 @@ interface CampeonatosTabProps {
  * off-season would look like it had been unfollowed.
  */
 const CampeonatosTab = ({ matches }: CampeonatosTabProps) => {
-  const { preferences, toggleCompetition } = usePreferences();
+  const { preferences } = usePreferences();
   const groups = groupMatchesByCompetition(matches.filter((match) => isWithinNextDaysInBrasilia(match.kickoffUtc, WEEK_DAYS)));
 
   const cards = [
@@ -52,15 +52,10 @@ const CampeonatosTab = ({ matches }: CampeonatosTabProps) => {
                 </span>
               </span>
             </Link>
-            {/* Over the card's corner, outside the <Link>, so tapping it never opens the page. Unregistered competitions can't be kept on an account, so they get no star. */}
-            {findCompetitionById(group.id) && (
+            {/* Only a mark: the card opens the competition, whose page has the Seguir button. */}
+            {followed && (
               <span className="absolute right-3 top-3">
-                <FavoriteStar
-                  active={followed}
-                  onToggle={() => toggleCompetition(group.id)}
-                  label={followed ? `Deixar de seguir ${group.name}` : `Seguir ${group.name}`}
-                  className="size-6"
-                />
+                <FollowedMark className="size-6" />
               </span>
             )}
           </li>

@@ -10,8 +10,8 @@ interface PrivacidadePageProps {
 const INSTAGRAM = SOCIAL_LINKS.find((link) => link.label === "Instagram");
 
 const EMAIL_LINK = (
-  <a href="mailto:sergiofalencar@gmail.com" className="font-bold text-purple-900 hover:text-purple-600">
-    sergiofalencar@gmail.com
+  <a href="mailto:afasergio@gmail.com" className="font-bold text-purple-900 hover:text-purple-600">
+    afasergio@gmail.com
   </a>
 );
 
@@ -44,7 +44,7 @@ const PrivacidadePage = ({ setSelectedTeam }: PrivacidadePageProps) => {
 
       <h2 className="mt-10 text-2xl font-bold">Sem conta</h2>
       <p className="mt-2">
-        Os times, campeonatos e canais que você marca com a estrela ficam no armazenamento local do seu navegador (<em>localStorage</em>). Eles não são enviados ao nosso servidor, e não sabemos quem você é. Limpar os dados do navegador apaga essas escolhas. Os dados dos jogos (horários, campeonatos, canais) vêm de fontes públicas e não envolvem dados pessoais.
+        Os times, campeonatos e canais que você segue ficam no armazenamento local do seu navegador (<em>localStorage</em>). Eles não são enviados ao nosso servidor, e não sabemos quem você é. Limpar os dados do navegador apaga essas escolhas. Os dados dos jogos (horários, campeonatos, canais) vêm de fontes públicas e não envolvem dados pessoais.
       </p>
 
       <h2 className="mt-10 text-2xl font-bold">Com conta (Entrar com Google)</h2>

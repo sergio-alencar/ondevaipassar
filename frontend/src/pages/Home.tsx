@@ -2,7 +2,7 @@ import { type MatchView } from "@ondevaipassar/shared";
 import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DivisionTabs from "../Components/DivisionTabs";
-import FavoriteStar from "../Components/FavoriteStar";
+import FollowedMark from "../Components/FollowedMark";
 import SectionTabs from "../Components/SectionTabs";
 import TeamCrest from "../Components/TeamCrest";
 import { MatchesContext } from "../context/MatchesContext";
@@ -28,7 +28,7 @@ const TimesTab = ({ matches, setSelectedTeam }: TimesTabProps) => {
   // Home fully remounts on that route change, resetting a useState. See
   // useDivisionSearchParam's own comment.
   const { division, setDivision, teamsInDivision } = useDivisionSearchParam();
-  const { preferences, toggleTeam } = usePreferences();
+  const { preferences } = usePreferences();
 
   return (
     <>
@@ -87,15 +87,12 @@ const TimesTab = ({ matches, setSelectedTeam }: TimesTabProps) => {
                   className="h-24 w-auto max-w-30 px-2 py-1 hover:scale-105 transition max-sm:h-18 max-sm:max-w-22.5"
                 />
               </Link>
-              {/* Over the crest's corner, outside the <Link> so tapping it never opens the team. */}
-              <span className="absolute -right-1 top-0">
-                <FavoriteStar
-                  active={preferences.teams.includes(team.id)}
-                  onToggle={() => toggleTeam(team.id)}
-                  label={preferences.teams.includes(team.id) ? `Deixar de seguir ${team.displayName}` : `Seguir ${team.displayName}`}
-                  className="size-5 max-sm:size-4"
-                />
-              </span>
+              {/* Only a mark: the tap belongs to the crest (it opens the team); following is done on the team's page. */}
+              {preferences.teams.includes(team.id) && (
+                <span className="absolute -right-1 top-0">
+                  <FollowedMark className="size-5 max-sm:size-4" />
+                </span>
+              )}
             </li>
           ))}
         </ul>
