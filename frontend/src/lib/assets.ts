@@ -90,25 +90,49 @@ const RASTER_EXTENSION: Record<string, string> = {
 // Competition logos for the site, SYMBOL ONLY — the competition's name is
 // printed beside them, so a logo that spells it too would say it twice. Files
 // live in images/campeonatos/site/, named by competition id, with the empty
-// margin cropped off (several originals are a small symbol floating in a
-// 1800x1800 canvas, which rendered as a speck next to the name). An explicit
-// map and not a guess from the id: a guessed path 404s as a broken image, and
-// an entry here is also the answer to "which competitions still need art". A
-// competition with no entry just shows its name.
-const COMPETITION_LOGOS: Record<string, string> = {
-  "brasileirao-serie-a": "brasileirao-serie-a.svg",
-  "brasileirao-serie-b": "brasileirao-serie-b.svg",
-  "brasileirao-serie-c": "brasileirao-serie-c.svg",
-  libertadores: "libertadores.svg",
-  "libertadores-feminina": "libertadores-feminina.svg",
-  "sul-americana": "sul-americana.svg",
-  "copa-do-brasil-feminina": "copa-do-brasil-feminina.png",
+// margin cropped off. An explicit map and not a guess from the id: a guessed
+// path 404s as a broken image, and an entry here is also the answer to "which
+// competitions still need art". A competition with no entry just shows its
+// name.
+//
+// `mono` draws the symbol as a single dark silhouette instead of in its own
+// colours. It is for the Brasileirão family, whose yellow and lime vanish on a
+// white card, and for white-only artwork. It is NOT a house style applied to
+// everything: flattening the Bundesliga turns it into a solid block, and the
+// Sul-Americana and Serie A lose the detail that makes them recognisable.
+interface CompetitionLogoSpec {
+  file: string;
+  mono?: true;
+}
+
+const COMPETITION_LOGOS: Record<string, CompetitionLogoSpec> = {
+  "brasileirao-serie-a": { file: "brasileirao-serie-a.svg", mono: true },
+  "brasileirao-serie-b": { file: "brasileirao-serie-b.svg", mono: true },
+  "brasileirao-serie-c": { file: "brasileirao-serie-c.svg", mono: true },
+  "brasileirao-feminino": { file: "brasileirao-feminino.svg", mono: true },
+  "copa-do-brasil": { file: "copa-do-brasil.svg" },
+  "copa-do-brasil-feminina": { file: "copa-do-brasil-feminina.png" },
+  libertadores: { file: "libertadores.svg" },
+  "libertadores-feminina": { file: "libertadores-feminina.svg" },
+  "sul-americana": { file: "sul-americana.svg" },
+  "copa-intercontinental": { file: "copa-intercontinental.svg", mono: true },
+  "copa-do-nordeste": { file: "copa-do-nordeste.svg" },
+  "premier-league": { file: "premier-league.svg" },
+  "la-liga": { file: "la-liga.svg" },
+  bundesliga: { file: "bundesliga.svg" },
+  "ligue-1": { file: "ligue-1.svg" },
+  "serie-a-italiana": { file: "serie-a-italiana.svg" },
+  "champions-league": { file: "champions-league.svg" },
+  "europa-league": { file: "europa-league.svg" },
+  "fa-cup": { file: "fa-cup.svg" },
+  "copa-del-rey": { file: "copa-del-rey.svg" },
+  "campeonato-mineiro": { file: "campeonato-mineiro.svg" },
 };
 
-/** URL of a competition's symbol-only logo, or null when we don't have one yet. */
-export function competitionLogoUrl(competitionId: string): string | null {
-  const file = COMPETITION_LOGOS[competitionId];
-  return file ? `${import.meta.env.BASE_URL}images/campeonatos/site/${file}` : null;
+/** A competition's symbol-only logo, or null when we don't have one yet. */
+export function competitionLogo(competitionId: string): { url: string; mono: boolean } | null {
+  const spec = COMPETITION_LOGOS[competitionId];
+  return spec ? { url: `${import.meta.env.BASE_URL}images/campeonatos/site/${spec.file}`, mono: spec.mono === true } : null;
 }
 
 /**

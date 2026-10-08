@@ -19,7 +19,7 @@ const MeusTimes = ({ matches }: MeusTimesProps) => {
 
   return (
     <section className="mb-12">
-      <h2 className="text-4xl font-bold mb-2 pt-8 uppercase text-center max-sm:text-2xl text-gray-800">Seus times</h2>
+      <h2 className="text-4xl font-bold mb-2 pt-8 uppercase text-center max-sm:text-2xl text-gray-800">{teams.length === 1 ? "Seu time" : "Seus times"}</h2>
       <ul className="divide-y divide-gray-300">
         {teams.map((team) => {
           // `matches` is in kickoff order, so the first hit is the next game.

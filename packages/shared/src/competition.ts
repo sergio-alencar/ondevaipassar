@@ -63,6 +63,12 @@ export const COMPETITIONS: Competition[] = [
   { id: "supercopa-do-brasil-feminina", displayName: "Supercopa do Brasil Feminina", type: "national-cup", shortName: "Supercopa Fem.", logoCaption: "Feminina" },
   { id: "copa-do-brasil-feminina", displayName: "Copa do Brasil Feminina", type: "national-cup", shortName: "Copa do Brasil Fem.", logoCaption: "Copa do Brasil Feminina" },
   { id: "copa-do-nordeste", displayName: "Copa do Nordeste", type: "national-cup" },
+  // The two regional cups that sit between the state championships and the
+  // national ones. Ids are what slugify() makes of the name a source writes
+  // ("Copa Verde" -> "copa-verde"), so a match already filed under the
+  // stopgap id is picked up by the registry entry with no migration.
+  { id: "copa-verde", displayName: "Copa Verde", type: "national-cup" },
+  { id: "copa-centro-oeste", displayName: "Copa Centro-Oeste", type: "national-cup" },
   { id: "supercopa-do-brasil", displayName: "Supercopa do Brasil", type: "national-cup", shortName: "Supercopa" },
   { id: "libertadores", displayName: "Taça Conmebol Libertadores", type: "continental", shortName: "Libertadores" },
   // Não é `foreign`: Corinthians, Palmeiras e Cruzeiro disputam a edição de
@@ -81,6 +87,28 @@ export const COMPETITIONS: Competition[] = [
   { id: "campeonato-baiano", displayName: "Campeonato Baiano", type: "state", shortName: "Baiano" },
   { id: "campeonato-pernambucano", displayName: "Campeonato Pernambucano", type: "state", shortName: "Pernambucano" },
   { id: "campeonato-cearense", displayName: "Campeonato Cearense", type: "state", shortName: "Cearense" },
+  // The remaining state championships: all 27 federations feed clubs into Série A-C, and each
+  // one missing here would show up on the site under a made-up name.
+  { id: "campeonato-paranaense", displayName: "Campeonato Paranaense", type: "state", shortName: "Paranaense" },
+  { id: "campeonato-catarinense", displayName: "Campeonato Catarinense", type: "state", shortName: "Catarinense" },
+  { id: "campeonato-goiano", displayName: "Campeonato Goiano", type: "state", shortName: "Goiano" },
+  { id: "campeonato-paraense", displayName: "Campeonato Paraense", type: "state", shortName: "Paraense" },
+  { id: "campeonato-maranhense", displayName: "Campeonato Maranhense", type: "state", shortName: "Maranhense" },
+  { id: "campeonato-potiguar", displayName: "Campeonato Potiguar", type: "state", shortName: "Potiguar" },
+  { id: "campeonato-paraibano", displayName: "Campeonato Paraibano", type: "state", shortName: "Paraibano" },
+  { id: "campeonato-sergipano", displayName: "Campeonato Sergipano", type: "state", shortName: "Sergipano" },
+  { id: "campeonato-alagoano", displayName: "Campeonato Alagoano", type: "state", shortName: "Alagoano" },
+  { id: "campeonato-capixaba", displayName: "Campeonato Capixaba", type: "state", shortName: "Capixaba" },
+  { id: "campeonato-amazonense", displayName: "Campeonato Amazonense", type: "state", shortName: "Amazonense" },
+  { id: "campeonato-piauiense", displayName: "Campeonato Piauiense", type: "state", shortName: "Piauiense" },
+  { id: "campeonato-brasiliense", displayName: "Campeonato Brasiliense", type: "state", shortName: "Brasiliense" },
+  { id: "campeonato-sul-mato-grossense", displayName: "Campeonato Sul-Mato-Grossense", type: "state", shortName: "Sul-Mato-Grossense" },
+  { id: "campeonato-mato-grossense", displayName: "Campeonato Mato-Grossense", type: "state", shortName: "Mato-Grossense" },
+  { id: "campeonato-tocantinense", displayName: "Campeonato Tocantinense", type: "state", shortName: "Tocantinense" },
+  { id: "campeonato-acreano", displayName: "Campeonato Acreano", type: "state", shortName: "Acreano" },
+  { id: "campeonato-amapaense", displayName: "Campeonato Amapaense", type: "state", shortName: "Amapaense" },
+  { id: "campeonato-rondoniense", displayName: "Campeonato Rondoniense", type: "state", shortName: "Rondoniense" },
+  { id: "campeonato-roraimense", displayName: "Campeonato Roraimense", type: "state", shortName: "Roraimense" },
   // A distinct competition from Campeonato Paranaense (both appear
   // separately in ge.globo's own Athletico-PR agenda) — a state cup mixing
   // the state's senior pro clubs against smaller in-state teams, closer in
@@ -110,6 +138,14 @@ export const COMPETITIONS: Competition[] = [
   { id: "europa-league", displayName: "Liga Europa", type: "continental", foreign: true, shortName: "Liga Europa" },
   { id: "dfb-pokal", displayName: "Copa da Alemanha", type: "national-cup", foreign: true, shortName: "Copa da Alemanha" },
   { id: "efl-cup", displayName: "Copa da Liga Inglesa", type: "national-cup", foreign: true, shortName: "EFL Cup" },
+  // The other big national cups of the five leagues the site follows. `foreign`
+  // is what orders them with the European competitions instead of ahead of the
+  // Brazilian ones, so a cup missing from this list would be sorted above
+  // Série A on a day Arsenal plays the FA Cup.
+  { id: "fa-cup", displayName: "Copa da Inglaterra", type: "national-cup", foreign: true, shortName: "FA Cup" },
+  { id: "copa-del-rey", displayName: "Copa do Rei", type: "national-cup", foreign: true },
+  { id: "coppa-italia", displayName: "Copa da Itália", type: "national-cup", foreign: true },
+  { id: "coupe-de-france", displayName: "Copa da França", type: "national-cup", foreign: true },
 ];
 
 export function findCompetitionById(id: string): Competition | undefined {
@@ -187,4 +223,23 @@ export function groupMatchesByCompetition<T extends { competitionId: string; com
   const byPriority = (toSort: CompetitionGroup<T>[]): CompetitionGroup<T>[] => [...toSort].sort((a, b) => a.priority - b.priority);
   const ordered = [...groups.values()];
   return [...byPriority(ordered.filter((group) => !group.foreign)), ...byPriority(ordered.filter((group) => group.foreign))];
+}
+
+const LOWERCASE_WORDS = new Set(["de", "da", "do", "das", "dos", "e"]);
+
+/**
+ * A readable name for a competition that has no registry entry yet, made from
+ * the id a source's raw name was slugified into ("campeonato-paranaense" ->
+ * "Campeonato Paranaense"). Without it the site printed the slug itself,
+ * hyphens and all, for every competition the ingest found before anyone
+ * registered it. The accents are already gone from a slug, so "Copa Parana"
+ * rather than "Copa Paraná" — which is the cue that the competition wants a
+ * registry entry.
+ */
+export function humanizeCompetitionId(id: string): string {
+  return id
+    .split("-")
+    .filter((word) => word !== "")
+    .map((word, index) => (index > 0 && LOWERCASE_WORDS.has(word) ? word : word[0].toUpperCase() + word.slice(1)))
+    .join(" ");
 }

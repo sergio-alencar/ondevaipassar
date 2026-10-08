@@ -43,6 +43,22 @@ const COMPETITION_ALIASES: Record<string, string> = {
   "uefa liga europa": "europa-league",
   "dfb-pokal": "dfb-pokal",
   "efl cup": "efl-cup",
+  // The other national cups, under both the English/native name and the one a
+  // Brazilian outlet uses — OneFootball mixes the two ("DFB-Pokal", but "UEFA
+  // Liga dos Campeões"), so neither spelling is safe to assume. None of these
+  // has been seen live yet (all are off-season as of this entry).
+  "fa cup": "fa-cup",
+  "copa da inglaterra": "fa-cup",
+  "copa del rey": "copa-del-rey",
+  "copa do rei": "copa-del-rey",
+  "coppa italia": "coppa-italia",
+  "copa da italia": "coppa-italia",
+  "coupe de france": "coupe-de-france",
+  "copa da franca": "coupe-de-france",
+  // "Copa Centro-Oeste" keeps its hyphen through normalizeText, which strips
+  // accents and case but not punctuation.
+  "copa centro-oeste": "copa-centro-oeste",
+  "copa centro oeste": "copa-centro-oeste",
 };
 
 /** Resolves a raw championship name to our canonical Competition.id. Unrecognized names get a stable slugified stopgap id rather than being dropped — so a new competition shows up immediately, and promoting it to a registry entry (packages/shared/src/competition.ts) is a pure addition, not a rename. */
