@@ -30,19 +30,29 @@ const MatchCard = ({ match, team }: MatchCardProps) => {
           uses for its grid — generous enough that a normal round/square
           badge still renders at full width.
         */}
-        <div className="flex items-center justify-self-end gap-4 max-lg:gap-2 max-lg:justify-self-center">
+        {/*
+          Fixed width, split into two equal halves around the "x": the home
+          crest is pushed against it from the left, the away crest from the
+          right. The "x" therefore sits at the same spot in every row — as one
+          flex group right-aligned (what this was), its position followed the
+          sum of the two crests' widths and wandered from row to row. The
+          width is the widest the two crests can be (2 x max-w-*) plus the
+          "x" and its gaps, per breakpoint: 2*160+24+2*16 / 2*100+16+2*8 /
+          2*90+16+2*8.
+        */}
+        <div className="grid w-94 grid-cols-[1fr_auto_1fr] items-center justify-self-end gap-4 max-lg:w-58 max-lg:justify-self-center max-lg:gap-2 max-sm:w-53">
           <TeamCrest
             team={match.homeTeamId ? findTeamById(match.homeTeamId) : undefined}
             name={match.homeTeamName}
             sourceCrestUrl={match.homeTeamCrestUrl}
-            className="h-32 w-auto max-w-40 max-lg:h-20 max-lg:max-w-25 max-sm:h-18 max-sm:max-w-22.5"
+            className="h-32 w-auto max-w-40 justify-self-end max-lg:h-20 max-lg:max-w-25 max-sm:h-18 max-sm:max-w-22.5"
           />
           <img className="size-6 max-lg:size-4" src={versus} alt="versus" />
           <TeamCrest
             team={match.awayTeamId ? findTeamById(match.awayTeamId) : undefined}
             name={match.awayTeamName}
             sourceCrestUrl={match.awayTeamCrestUrl}
-            className="h-32 w-auto max-w-40 max-lg:h-20 max-lg:max-w-25 max-sm:h-18 max-sm:max-w-22.5"
+            className="h-32 w-auto max-w-40 justify-self-start max-lg:h-20 max-lg:max-w-25 max-sm:h-18 max-sm:max-w-22.5"
           />
         </div>
 
