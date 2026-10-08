@@ -1,6 +1,6 @@
 import type { MatchView } from "@ondevaipassar/shared";
 import { describe, expect, it } from "vitest";
-import { buildDigest, buildThreadDigest, countCharacters, X_CHARACTER_LIMIT } from "../src/digest/digest.js";
+import { buildDigest } from "../src/digest/digest.js";
 
 const NOW = new Date("2026-09-05T18:00:00.000Z"); // sábado, 5/set (15h BRT)
 
@@ -143,7 +143,6 @@ describe("buildDigest", () => {
 
   it("says 'amanhã' in the header when the digest is about tomorrow, not just a different date", () => {
     expect(buildDigest([], NOW, "amanhã")).toContain("⚽ *Onde assistir aos jogos de amanhã — sábado, 5/set*");
-    expect(buildThreadDigest([], NOW, "amanhã")[0]).toContain("⚽ Onde assistir aos jogos de amanhã — sábado, 5/set");
   });
 
   it("still renders the header date on a day with no matches", () => {
@@ -156,92 +155,5 @@ describe("buildDigest", () => {
         "https://ondevaipassar.com",
       ].join("\n"),
     );
-  });
-});
-
-describe("buildThreadDigest", () => {
-  it("opens with the day's headline and closes with the site link", () => {
-    const posts = buildThreadDigest([buildMatch()], NOW);
-    expect(posts[0]).toContain("⚽ Onde assistir aos jogos de hoje — sábado, 5/set");
-    expect(posts[0]).toContain("1 jogo.");
-    expect(posts.at(-1)).toContain("https://ondevaipassar.com");
-  });
-
-  it("numbers every post, and the numbering matches the real post count", () => {
-    const posts = buildThreadDigest([buildMatch(), buildMatch({ id: "b", competitionId: "bundesliga", competitionName: "Bundesliga" })], NOW);
-    posts.forEach((post, index) => expect(post.endsWith(`${index + 1}/${posts.length}`)).toBe(true));
-  });
-
-  it("never writes WhatsApp's *bold* markup, which X would render literally", () => {
-    const posts = buildThreadDigest([buildMatch()], NOW);
-    for (const post of posts) expect(post).not.toContain("*");
-  });
-
-  it("keeps every post within X's limit, numbering included, even with many matches in one competition", () => {
-    const many = Array.from({ length: 12 }, (_, index) =>
-      buildMatch({ id: `m${index}`, kickoffUtc: `2026-09-05T${String(12 + index).padStart(2, "0")}:00:00.000Z` }),
-    );
-    const posts = buildThreadDigest(many, NOW);
-    for (const post of posts) expect(countCharacters(post)).toBeLessThanOrEqual(X_CHARACTER_LIMIT);
-  });
-
-  it("repeats the competition name with 'cont.' when its matches spill into another post", () => {
-    const many = Array.from({ length: 12 }, (_, index) =>
-      buildMatch({ id: `m${index}`, kickoffUtc: `2026-09-05T${String(12 + index).padStart(2, "0")}:00:00.000Z` }),
-    );
-    const joined = buildThreadDigest(many, NOW).join("\n");
-    expect(joined).toContain("Campeonato Brasileiro Série A (cont.)");
-  });
-
-  it("never splits a single match across two posts", () => {
-    const many = Array.from({ length: 12 }, (_, index) =>
-      buildMatch({ id: `m${index}`, kickoffUtc: `2026-09-05T${String(12 + index).padStart(2, "0")}:00:00.000Z` }),
-    );
-    for (const post of buildThreadDigest(many, NOW)) {
-      // A match line always ends in its channel list (or the "a confirmar"
-      // text) — never mid-pairing, which is what a bad split would produce.
-      for (const line of post.split("\n")) {
-        if (line.includes(" x ") && line.includes("—")) expect(line).toMatch(/—\s+\S.*$/);
-      }
-    }
-  });
-
-  it("carries both footnotes in the closing post without blowing the character limit", () => {
-    const posts = buildThreadDigest(
-      [
-        buildMatch({
-          broadcasts: [
-            { channelId: "globo", displayName: "Globo", kind: "tv" as const, free: true, url: "", logoUrl: "", regionalCaveat: true },
-            { channelId: "premiere", displayName: "Premiere", kind: "tv" as const, free: false, url: "", logoUrl: "", regionalCaveat: false },
-          ],
-        } as Partial<MatchView>),
-      ],
-      NOW,
-    );
-    const closing = posts.at(-1) as string;
-    expect(closing).toContain("dá pra assistir de graça");
-    expect(closing).toContain("A transmissão pela Globo pode variar");
-    for (const post of posts) expect(countCharacters(post)).toBeLessThanOrEqual(X_CHARACTER_LIMIT);
-  });
-
-  it("puts Brazilian competitions before foreign ones, and Série A before B before C", () => {
-    const joined = buildThreadDigest(
-      [
-        buildMatch({ id: "eu", competitionId: "premier-league", competitionName: "Premier League", kickoffUtc: "2026-09-05T11:30:00.000Z" }),
-        buildMatch({ id: "c", competitionId: "brasileirao-serie-c", competitionName: "Campeonato Brasileiro Série C", kickoffUtc: "2026-09-05T12:00:00.000Z" }),
-        buildMatch({ id: "b", competitionId: "brasileirao-serie-b", competitionName: "Campeonato Brasileiro Série B", kickoffUtc: "2026-09-05T13:00:00.000Z" }),
-        buildMatch({ id: "a", kickoffUtc: "2026-09-05T21:30:00.000Z" }),
-      ],
-      NOW,
-    ).join("\n");
-
-    expect(joined.indexOf("Série A")).toBeLessThan(joined.indexOf("Série B"));
-    expect(joined.indexOf("Série B")).toBeLessThan(joined.indexOf("Série C"));
-    expect(joined.indexOf("Série C")).toBeLessThan(joined.indexOf("Premier League"));
-  });
-
-  it("counts by code point, so an emoji isn't double-counted against the limit", () => {
-    expect(countCharacters("⚽")).toBe(1);
-    expect(countCharacters("🇧🇷")).toBe(2); // a real 2-code-point flag, not a mistake
   });
 });

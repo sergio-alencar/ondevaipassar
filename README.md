@@ -39,5 +39,4 @@ Ideias e pontos já identificados para desenvolvimento futuro, ainda não priori
 - Incluir times da Série C.
 - Incluir times selecionados da Europa (não a totalidade — curadoria, não cobertura completa).
 - Integração com canal de updates no WhatsApp.
-- Integração com X/Twitter.
 - No Instagram, postar também em Stories (hoje só feed).

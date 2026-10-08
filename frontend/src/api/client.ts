@@ -15,14 +15,14 @@ export async function fetchMatches(): Promise<MatchView[]> {
   return response.json() as Promise<MatchView[]>;
 }
 
-export type DigestFormat = "whatsapp" | "x";
+export type DigestFormat = "whatsapp";
 export type DigestDay = "hoje" | "amanha";
 
 export interface DigestResponse {
   formato: DigestFormat;
   dia: DigestDay;
   matchCount: number;
-  /** One entry per post to publish: a single one for WhatsApp, one per thread post for X. */
+  /** One entry per post to publish (a single one, for the Canal do WhatsApp). */
   posts: string[];
 }
 

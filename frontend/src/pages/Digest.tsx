@@ -6,29 +6,22 @@ interface DigestProps {
   setSelectedTeam: SetSelectedTeam;
 }
 
-const FORMATS: { value: DigestFormat; label: string }[] = [
-  { value: "whatsapp", label: "Canal do WhatsApp" },
-  { value: "x", label: "X/Twitter" },
-];
-
 const DAYS: { value: DigestDay; label: string }[] = [
   { value: "hoje", label: "Hoje" },
   { value: "amanha", label: "Amanhã" },
 ];
 
 /**
- * Operator page: the daily text to paste into the Canal do WhatsApp and
- * into X. Deliberately not linked from the menu or the footer — it shows
+ * Operator page: the daily text to paste into the Canal do WhatsApp. Deliberately not linked from the menu or the footer — it shows
  * the same public data as the rest of the site, but it's a tool for
  * posting, not something a visitor came here for.
  *
- * The whole reason this exists instead of just opening /api/digest in a
- * browser: the X version is a dozen separate posts, and selecting each one
- * by hand without catching the separator (or clipping a character) is both
- * tedious and a real way to publish something wrong.
+ * The reason this exists instead of just opening /api/digest in a browser:
+ * selecting the text by hand without clipping a character is tedious and a
+ * real way to publish something wrong; one tap copies it exactly.
  */
 const Digest = ({ setSelectedTeam }: DigestProps) => {
-  const [formato, setFormato] = useState<DigestFormat>("whatsapp");
+  const formato: DigestFormat = "whatsapp";
   const [dia, setDia] = useState<DigestDay>("hoje");
   const [digest, setDigest] = useState<DigestResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -83,24 +76,6 @@ const Digest = ({ setSelectedTeam }: DigestProps) => {
 
       <div className="flex flex-wrap gap-6 mb-8">
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-bold uppercase text-gray-500">Onde</span>
-          <div className="flex gap-2">
-            {FORMATS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setFormato(option.value)}
-                className={`px-4 py-2 rounded-lg font-bold transition-colors max-sm:text-sm max-sm:px-3 ${
-                  formato === option.value ? "bg-purple-900 text-white" : "bg-white text-purple-900 hover:bg-purple-100"
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
           <span className="text-sm font-bold uppercase text-gray-500">Quando</span>
           <div className="flex gap-2">
             {DAYS.map((option) => (
@@ -135,7 +110,6 @@ const Digest = ({ setSelectedTeam }: DigestProps) => {
                 <div className="flex justify-between items-center gap-4 mb-3">
                   <span className="text-sm font-bold uppercase text-gray-500">
                     {digest.posts.length > 1 ? `Post ${index + 1} de ${digest.posts.length}` : "Mensagem"}
-                    {formato === "x" && ` · ${[...post].length}/280`}
                   </span>
                   <button
                     type="button"

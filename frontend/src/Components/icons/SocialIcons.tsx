@@ -14,12 +14,6 @@ export const InstagramIcon = ({ className }: IconProps) => (
   </svg>
 );
 
-export const XIcon = ({ className }: IconProps) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-    <path d="M18.9 3H21.7L15.4 10.2L23 21H17.1L12.6 14.8L7.5 21H4.6L11.4 13.2L4 3H10L14.1 8.6L18.9 3Z" />
-  </svg>
-);
-
 export const WhatsAppIcon = ({ className }: IconProps) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
     <path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.35 5.06L2 22l5.1-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2Zm0 18c-1.6 0-3.11-.43-4.4-1.19l-.32-.19-3.06.8.82-2.98-.2-.31A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8Z" />

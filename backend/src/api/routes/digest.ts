@@ -1,22 +1,20 @@
 import { isTodayInBrasilia, isTomorrowInBrasilia } from "@ondevaipassar/shared";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { buildDigest, buildThreadDigest } from "../../digest/digest.js";
+import { buildDigest } from "../../digest/digest.js";
 import { getMatchViews } from "../../matches/getMatchViews.js";
 import { startOfTodayInBrasiliaUtc } from "@ondevaipassar/shared";
 
 const querySchema = z.object({
-  // "x" is the 280-character version; "whatsapp" (the default) is the full
-  // day's listing. Sérgio pastes both by hand — neither platform has a
-  // posting API this project can use at $0/month (WhatsApp Channels have
-  // none at all; X ended its free tier for new developers in Feb 2026).
-  formato: z.enum(["whatsapp", "x"]).default("whatsapp"),
+  // The full day's listing for the Canal do WhatsApp, which Sérgio pastes by
+  // hand (WhatsApp Channels have no posting API). It was once one of two
+  // formats; the other, a thread for X, went away with the X account.
+  formato: z.enum(["whatsapp"]).default("whatsapp"),
   // Lets him pull tomorrow's text the night before, same operator escape
   // hatch as instagramCron.ts's own matchId param.
   dia: z.enum(["hoje", "amanha"]).default("hoje"),
-  // The /digest page asks for this so it can give each thread post its own
-  // copy button. Plain text stays the default: opening this route straight
-  // in a browser is still a supported way to use it.
+  // The /digest page asks for this. Plain text stays the default: opening
+  // this route straight in a browser is still a supported way to use it.
   json: z
     .enum(["true", "false"])
     .default("false")
@@ -45,10 +43,9 @@ export async function digestRoutes(app: FastifyInstance): Promise<void> {
 
     const headerDate = dia === "amanha" ? new Date(now.getTime() + 24 * 60 * 60 * 1000) : now;
     const day = dia === "amanha" ? "amanhã" : "hoje";
-    // One post per entry for "x", a single entry for "whatsapp" — the page
-    // renders one copy button per entry either way, so it doesn't need to
-    // know which format it's showing.
-    const posts = formato === "x" ? buildThreadDigest(matches, headerDate, day) : [buildDigest(matches, headerDate, day)];
+    // A list with one entry, so the response keeps its shape (and the page its
+    // one copy button per entry) should a second format ever return.
+    const posts = [buildDigest(matches, headerDate, day)];
     if (json) return { formato, dia, matchCount: matches.length, posts };
 
     // Plain text keeps a visible separator rather than JSON: opening this

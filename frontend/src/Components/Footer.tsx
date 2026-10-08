@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { InstagramIcon, WhatsAppIcon, XIcon } from "./icons/SocialIcons";
+import { InstagramIcon, WhatsAppIcon } from "./icons/SocialIcons";
 import { backgroundColorClass } from "../lib/colors";
 import { SOCIAL_LINKS } from "../lib/socialLinks";
 import type { SelectedTeam } from "../types";
@@ -8,9 +8,9 @@ interface FooterProps {
   selectedTeam: SelectedTeam;
 }
 
-// Same order as SOCIAL_LINKS (Instagram, X, WhatsApp) — index-matched
+// Same order as SOCIAL_LINKS (Instagram, WhatsApp) — index-matched
 // rather than a label lookup since the array is small and fixed.
-const SOCIAL_ICONS = [InstagramIcon, XIcon, WhatsAppIcon];
+const SOCIAL_ICONS = [InstagramIcon, WhatsAppIcon];
 
 const Footer = ({ selectedTeam }: FooterProps) => {
   const footerBgClass = backgroundColorClass(selectedTeam?.color);
