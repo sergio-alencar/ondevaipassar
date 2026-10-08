@@ -87,9 +87,13 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
           </Link>
 
           <div className="flex gap-4 py-6 items-center">
-            <p className="text-white text-xl uppercase font-bold select-none max-sm:!hidden">
-              times
-            </p>
+            {/* The account, for signed-in and signed-out alike: /conta shows the Google button to the latter. */}
+            <Link to="/conta" aria-label="Minha conta" title="Minha conta" className="cursor-pointer">
+              <svg viewBox="0 0 24 24" className="size-7" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+              </svg>
+            </Link>
             <button
               ref={escudoRef}
               type="button"
@@ -148,13 +152,7 @@ const Header = ({ selectedTeam, setSelectedTeam }: HeaderProps) => {
               Meus canais
             </Link>
           </li>
-          {user ? (
-            <li>
-              <Link to="/conta" onClick={() => setIsMenuVisible(false)}>
-                Minha conta
-              </Link>
-            </li>
-          ) : (
+          {!user && (
             <>
               {loginAvailable && (
                 <li>
