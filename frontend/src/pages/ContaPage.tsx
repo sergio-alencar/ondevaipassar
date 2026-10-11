@@ -6,6 +6,7 @@ import { usePreferences } from "../lib/usePreferences";
 import type { SetSelectedTeam } from "../types";
 import ContaFavorites from "./conta/ContaFavorites";
 import { ActionButton, ActionLink, InlineAnchor } from "../Components/Action";
+import { staticPageMeta, usePageMeta } from "../lib/usePageMeta";
 
 interface ContaPageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -20,6 +21,7 @@ const ContaPage = ({ setSelectedTeam }: ContaPageProps) => {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
+  usePageMeta(staticPageMeta("/conta"));
   useEffect(() => {
     setSelectedTeam(null);
   }, [setSelectedTeam]);

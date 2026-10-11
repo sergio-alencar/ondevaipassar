@@ -42,6 +42,11 @@ O site funciona inteiro sem conta; a conta só **sincroniza** os times e canais 
 - `AUTH_DEV_LOGIN=true` liga `/api/auth-dev`, um login de teste sem Google, **só em desenvolvimento local**: a rota nem é registrada com `NODE_ENV=production`, e há teste para isso. Nunca configurar em produção.
 - O que se guarda é o mínimo (id do provedor, e-mail, times, canais). Exclusão de conta apaga tudo em lote (`deleteAccount`); a página `/privacidade` descreve exatamente isso, então qualquer mudança no que é guardado exige mudar o texto.
 
+## SEO e medição de visitas
+
+- **Tags por página**: `packages/shared/src/seo.ts` define título/descrição/endereço de cada página (home, time, campeonato, canal, fixas). `frontend/scripts/prerender.mjs` roda no fim do `npm run build` e grava um `dist/<rota>/index.html` por página com essas tags, mais `sitemap.xml` — a Vercel serve o arquivo real antes do rewrite do SPA, então a prévia de link (WhatsApp, que não executa JavaScript) e o primeiro rastreamento do Google já vêm certos. `usePageMeta` mantém o título e as tags certos ao navegar dentro do app. Página nova do site: entra em `seo.ts` (e some do índice com `noindex` se for da pessoa, não da busca). O texto da prévia da home também está no `frontend/index.html` — mantenha os dois iguais ao mudar a cobertura do site.
+- **Google Analytics 4** (`frontend/src/lib/analytics.ts`): só existe se o build tiver `VITE_GA_MEASUREMENT_ID` (variável do projeto `ondevaipassar` na Vercel; precisa de novo deploy ao mudar). Atrás de consentimento (LGPD): nada é carregado, nenhum cookie criado e nenhuma requisição ao Google antes do "Aceitar". Sinais de publicidade desligados. **Qualquer mudança no que se mede ou no tempo de retenção exige mudar `/privacidade`** (seção "Medição de visitas", hoje prometendo 14 meses — o mesmo valor tem que estar na configuração de retenção do painel do GA4).
+
 ## Comandos
 
 ```

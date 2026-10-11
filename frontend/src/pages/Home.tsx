@@ -1,4 +1,4 @@
-import { type MatchView } from "@ondevaipassar/shared";
+import { HOME_META, type MatchView } from "@ondevaipassar/shared";
 import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DivisionTabs from "../Components/DivisionTabs";
@@ -16,6 +16,7 @@ import CanaisTab from "./home/CanaisTab";
 import DayFeed from "./home/DayFeed";
 import MeusTimes from "./home/MeusTimes";
 import type { SetSelectedTeam } from "../types";
+import { usePageMeta } from "../lib/usePageMeta";
 
 interface TimesTabProps {
   matches: MatchView[];
@@ -108,6 +109,7 @@ interface HomeProps {
 const Home = ({ setSelectedTeam }: HomeProps) => {
   const { matches, loading, error } = useContext(MatchesContext);
   const { tab, setTab } = useHomeTab();
+  usePageMeta(HOME_META);
 
   useEffect(() => {
     setSelectedTeam(null);

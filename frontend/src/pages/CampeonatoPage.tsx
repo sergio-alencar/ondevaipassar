@@ -1,4 +1,4 @@
-import { findCompetitionById } from "@ondevaipassar/shared";
+import { NOT_FOUND_META, competitionMeta, findCompetitionById } from "@ondevaipassar/shared";
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CompetitionLogo from "../Components/CompetitionLogo";
@@ -9,6 +9,7 @@ import { usePreferences } from "../lib/usePreferences";
 import MatchCard from "./MatchCard";
 import type { SetSelectedTeam } from "../types";
 import { ActionButton, ActionLink } from "../Components/Action";
+import { usePageMeta } from "../lib/usePageMeta";
 
 const MATCHES_PER_PAGE = 5;
 
@@ -25,6 +26,9 @@ const CampeonatoContent = ({ id }: { id: string }) => {
   // A competition no one has registered yet still has a page, named by what
   // its matches carry — the same stopgap the ingest gives an unknown one.
   const name = findCompetitionById(id)?.displayName ?? competitionMatches[0]?.competitionName;
+  // While the matches load, the name of an unregistered competition isn't known
+  // yet: say nothing rather than briefly tell a crawler the page is not found.
+  usePageMeta(name !== undefined ? competitionMeta({ id, displayName: name }) : loading ? undefined : NOT_FOUND_META);
 
   return (
     <DataState loading={loading} error={error}>

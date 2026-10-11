@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { InstagramIcon, WhatsAppIcon } from "./icons/SocialIcons";
+import { analyticsAvailable, reopenConsent } from "../lib/analytics";
 import { backgroundColorClass } from "../lib/colors";
 import { SOCIAL_LINKS } from "../lib/socialLinks";
 import type { SelectedTeam } from "../types";
@@ -35,6 +36,15 @@ const Footer = ({ selectedTeam }: FooterProps) => {
           <Link to="/privacidade" className="hover:underline">
             Privacidade
           </Link>
+          {analyticsAvailable && (
+            <>
+              {" "}
+              ·{" "}
+              <button type="button" onClick={reopenConsent} className="cursor-pointer font-bold uppercase hover:underline">
+                Cookies
+              </button>
+            </>
+          )}
         </p>
       </div>
     </footer>

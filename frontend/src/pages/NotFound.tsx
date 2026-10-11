@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { SetSelectedTeam } from "../types";
+import { usePageMeta } from "../lib/usePageMeta";
+import { NOT_FOUND_META } from "@ondevaipassar/shared";
 
 interface NotFoundProps {
   setSelectedTeam: SetSelectedTeam;
@@ -15,6 +17,7 @@ interface NotFoundProps {
  * address".
  */
 const NotFound = ({ setSelectedTeam }: NotFoundProps) => {
+  usePageMeta(NOT_FOUND_META);
   useEffect(() => {
     setSelectedTeam(null);
   }, [setSelectedTeam]);

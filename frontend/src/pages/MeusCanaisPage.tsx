@@ -6,6 +6,7 @@ import { useAuth } from "../lib/useAuth";
 import { usePreferences } from "../lib/usePreferences";
 import type { SetSelectedTeam } from "../types";
 import { ActionButton, ActionLink, InlineAnchor } from "../Components/Action";
+import { staticPageMeta, usePageMeta } from "../lib/usePageMeta";
 
 interface MeusCanaisPageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -15,6 +16,7 @@ const MeusCanaisPage = ({ setSelectedTeam }: MeusCanaisPageProps) => {
   const { preferences, toggleChannel, clearChannels } = usePreferences();
   const { user, loginAvailable } = useAuth();
 
+  usePageMeta(staticPageMeta("/meus-canais"));
   useEffect(() => {
     setSelectedTeam(null);
   }, [setSelectedTeam]);

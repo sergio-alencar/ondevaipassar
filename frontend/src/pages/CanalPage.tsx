@@ -1,4 +1,4 @@
-import { channelGroupOf, CHANNEL_GROUP_LABELS, findChannelById, isWithinNextDaysInBrasilia, REGIONAL_CAVEAT_TEXT } from "@ondevaipassar/shared";
+import { channelGroupOf, CHANNEL_GROUP_LABELS, findChannelById, isWithinNextDaysInBrasilia, NOT_FOUND_META, REGIONAL_CAVEAT_TEXT, channelMeta } from "@ondevaipassar/shared";
 import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ChannelLogo from "../Components/ChannelLogo";
@@ -8,6 +8,7 @@ import { MatchesContext } from "../context/MatchesContext";
 import { WEEK_DAYS } from "../lib/windows";
 import type { SetSelectedTeam } from "../types";
 import { ActionLink, InlineLink } from "../Components/Action";
+import { usePageMeta } from "../lib/usePageMeta";
 
 interface CanalPageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -31,6 +32,7 @@ const CanalPage = ({ setSelectedTeam }: CanalPageProps) => {
   const { id } = useParams<{ id: string }>();
   const { matches, loading, error } = useContext(MatchesContext);
   const channel = id ? findChannelById(id) : undefined;
+  usePageMeta(channel ? channelMeta(channel) : NOT_FOUND_META);
 
   useEffect(() => {
     setSelectedTeam(null);

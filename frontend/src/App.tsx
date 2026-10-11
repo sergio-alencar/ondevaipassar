@@ -12,7 +12,9 @@ import GratisPage from "./pages/GratisPage";
 import MeusCanaisPage from "./pages/MeusCanaisPage";
 import ContaPage from "./pages/ContaPage";
 import PrivacidadePage from "./pages/PrivacidadePage";
+import ConsentBanner from "./Components/ConsentBanner";
 import LoginNotice from "./Components/LoginNotice";
+import PageViewTracker from "./Components/PageViewTracker";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthProvider";
 import { MatchesProvider } from "./context/MatchesContext";
@@ -29,6 +31,7 @@ const App = () => {
           <div className="flex flex-col min-h-screen justify-between bg-gray-100">
             <Header selectedTeam={selectedTeam} setSelectedTeam={setSelectedTeam} />
             <LoginNotice />
+            <PageViewTracker />
 
             <main className="flex-grow">
               <Routes>
@@ -48,6 +51,7 @@ const App = () => {
             </main>
 
             <Footer selectedTeam={selectedTeam} />
+            <ConsentBanner />
           </div>
         </MatchesProvider>
       </PreferencesProvider>

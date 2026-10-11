@@ -1,11 +1,13 @@
 import { useEffect } from "react";
 import type { SetSelectedTeam } from "../types";
+import { staticPageMeta, usePageMeta } from "../lib/usePageMeta";
 
 interface SobreProps {
   setSelectedTeam: SetSelectedTeam;
 }
 
 const Sobre = ({ setSelectedTeam }: SobreProps) => {
+  usePageMeta(staticPageMeta("/sobre"));
   useEffect(() => {
     setSelectedTeam(null);
   }, [setSelectedTeam]);

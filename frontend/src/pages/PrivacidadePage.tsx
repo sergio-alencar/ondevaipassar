@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { SOCIAL_LINKS } from "../lib/socialLinks";
 import type { SetSelectedTeam } from "../types";
+import { staticPageMeta, usePageMeta } from "../lib/usePageMeta";
 
 interface PrivacidadePageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -16,6 +17,7 @@ const EMAIL_LINK = (
 );
 
 const PrivacidadePage = ({ setSelectedTeam }: PrivacidadePageProps) => {
+  usePageMeta(staticPageMeta("/privacidade"));
   useEffect(() => {
     setSelectedTeam(null);
   }, [setSelectedTeam]);
@@ -35,10 +37,10 @@ const PrivacidadePage = ({ setSelectedTeam }: PrivacidadePageProps) => {
 
       <h2 className="mt-10 text-2xl font-bold">Resumo</h2>
       <ul className="mt-4 list-disc space-y-2 pl-6">
-        <li>Sem conta, não coletamos nenhum dado pessoal seu: seus favoritos ficam só no seu navegador.</li>
+        <li>Sem conta, seus favoritos ficam só no seu navegador, e não coletamos dados pessoais seus.</li>
         <li>Com conta, guardamos seu e-mail e seus favoritos para sincronizá-los entre aparelhos. Nada além disso.</li>
         <li>Não vendemos, não alugamos e não compartilhamos seus dados com ninguém para fins de publicidade ou qualquer outro uso.</li>
-        <li>Não usamos cookies de rastreamento, nem ferramentas de análise de acesso, nem publicidade.</li>
+        <li>Só medimos as visitas com o Google Analytics se você aceitar, e você pode recusar ou mudar de ideia quando quiser. Não usamos publicidade.</li>
         <li>Você exclui a conta e todos os dados a qualquer momento, na hora, em &ldquo;Minha conta&rdquo;.</li>
       </ul>
 
@@ -46,6 +48,35 @@ const PrivacidadePage = ({ setSelectedTeam }: PrivacidadePageProps) => {
       <p className="mt-2">
         Os times, campeonatos e canais que você segue ficam no armazenamento local do seu navegador (<em>localStorage</em>). Eles não são enviados ao nosso servidor, e não sabemos quem você é. Limpar os dados do navegador apaga essas escolhas. Os dados dos jogos (horários, campeonatos, canais) vêm de fontes públicas e não envolvem dados pessoais.
       </p>
+
+      <h2 className="mt-10 text-2xl font-bold">Medição de visitas (Google Analytics)</h2>
+      <p className="mt-2">
+        Para saber quais páginas as pessoas usam e de onde chegam ao site, usamos o <strong>Google Analytics 4</strong>. Ele <strong>só é ativado se você clicar em &ldquo;Aceitar&rdquo;</strong> no aviso que aparece na primeira visita. Se você recusar, nenhum script do Google Analytics é carregado e nenhum cookie de medição é criado.
+      </p>
+      <ul className="mt-4 list-disc space-y-2 pl-6">
+        <li>
+          <strong>O que é medido:</strong> as páginas que você abre, o endereço de onde veio (por exemplo, uma busca ou uma rede social), o tipo de aparelho e de navegador, a localização aproximada (cidade ou estado, nunca o endereço) e alguns cliques do site: seguir ou deixar de seguir um time ou campeonato e abrir um canal de transmissão. O Google Analytics 4 não registra nem guarda o seu endereço IP.
+        </li>
+        <li>
+          <strong>Cookies:</strong> o Google Analytics cria os cookies <code>_ga</code> e <code>_ga_*</code> (identificador anônimo de navegador), que duram até 2 anos.
+        </li>
+        <li>
+          <strong>Para quê:</strong> apenas estatísticas do uso do site, para decidir o que melhorar. Não usamos para publicidade, perfis individuais nem para identificar você, e os recursos de publicidade do Google Analytics ficam desligados.
+        </li>
+        <li>
+          <strong>Por quanto tempo:</strong> os dados de medição são mantidos por 14 meses no Google Analytics e depois apagados.
+        </li>
+        <li>
+          <strong>Quem trata:</strong> o Google, como operador, em servidores que podem ficar fora do Brasil, conforme a{" "}
+          <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer" className="font-bold text-purple-900 hover:text-purple-600">
+            política do Google para sites parceiros
+          </a>
+          .
+        </li>
+        <li>
+          <strong>Mudar de ideia:</strong> use o botão &ldquo;Cookies&rdquo; no rodapé do site para recusar ou aceitar de novo. Recusar apaga os cookies de medição deste navegador. Você também pode bloquear o rastreamento nas configurações do navegador.
+        </li>
+      </ul>
 
       <h2 className="mt-10 text-2xl font-bold">Com conta (Entrar com Google)</h2>
       <p className="mt-2">
@@ -101,11 +132,14 @@ const PrivacidadePage = ({ setSelectedTeam }: PrivacidadePageProps) => {
         <li>
           <strong>Cookie temporário de login</strong>: durante a ida ao Google, um cookie de segurança dura no máximo 10 minutos e serve para impedir que o login seja forjado.
         </li>
-        <li>Não usamos cookies de rastreamento, de análise de acesso nem de publicidade.</li>
+        <li>
+          <strong>Cookies de medição</strong> (só se você aceitar): <code>_ga</code> e <code>_ga_*</code> do Google Analytics, descritos na seção &ldquo;Medição de visitas&rdquo;.
+        </li>
+        <li>Não usamos cookies de publicidade.</li>
       </ul>
 
       <h2 className="mt-10 text-2xl font-bold">Quem mais tem acesso</h2>
-      <p className="mt-2">Os dados da conta ficam em serviços de terceiros que operam o site para nós, como operadores, e só para isso:</p>
+      <p className="mt-2">Os dados da conta e as medições ficam em serviços de terceiros que operam o site para nós, como operadores, e só para isso:</p>
       <ul className="mt-2 list-disc space-y-1 pl-6">
         <li>
           <strong>Vercel</strong>: hospedagem do site e da API. Como qualquer servidor, registra dados técnicos de acesso, como o endereço IP, em logs.
@@ -114,19 +148,19 @@ const PrivacidadePage = ({ setSelectedTeam }: PrivacidadePageProps) => {
           <strong>Turso</strong>: banco de dados onde ficam os dados da conta.
         </li>
         <li>
-          <strong>Google</strong>: realiza o login, conforme as regras e a política de privacidade do próprio Google.
+          <strong>Google</strong>: realiza o login, conforme as regras e a política de privacidade do próprio Google, e, só se você aceitar, mede as visitas com o Google Analytics.
         </li>
       </ul>
       <p className="mt-2">Esses provedores podem processar dados em servidores fora do Brasil. Não há nenhum outro destinatário dos seus dados.</p>
 
       <h2 className="mt-10 text-2xl font-bold">Por quanto tempo guardamos</h2>
       <p className="mt-2">
-        Os dados da conta ficam enquanto a conta existir. Sessões expiram em 30 dias e as vencidas são apagadas. Ao excluir a conta, o registro, os favoritos guardados nela e todas as sessões são apagados na hora. Cópias de segurança do provedor do banco de dados podem reter dados por um período limitado depois de uma exclusão. Logs técnicos de hospedagem seguem o prazo do provedor.
+        Os dados da conta ficam enquanto a conta existir. Sessões expiram em 30 dias e as vencidas são apagadas. Ao excluir a conta, o registro, os favoritos guardados nela e todas as sessões são apagados na hora. Cópias de segurança do provedor do banco de dados podem reter dados por um período limitado depois de uma exclusão. Logs técnicos de hospedagem seguem o prazo do provedor. Os dados do Google Analytics ficam por 14 meses.
       </p>
 
       <h2 className="mt-10 text-2xl font-bold">Seus direitos e como excluir</h2>
       <p className="mt-2">
-        Conforme a Lei Geral de Proteção de Dados (LGPD), você pode confirmar que tratamos seus dados, acessá-los, corrigi-los, pedir a exclusão e revogar o consentimento. O tratamento com conta se baseia no seu consentimento, dado ao escolher entrar.
+        Conforme a Lei Geral de Proteção de Dados (LGPD), você pode confirmar que tratamos seus dados, acessá-los, corrigi-los, pedir a exclusão e revogar o consentimento. O tratamento com conta e a medição de visitas se baseiam no seu consentimento: ao escolher entrar e ao clicar em &ldquo;Aceitar&rdquo;.
       </p>
       <ul className="mt-2 list-disc space-y-1 pl-6">
         <li>

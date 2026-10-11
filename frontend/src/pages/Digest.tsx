@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { fetchDigest, type DigestDay, type DigestFormat, type DigestResponse } from "../api/client";
 import type { SetSelectedTeam } from "../types";
+import { staticPageMeta, usePageMeta } from "../lib/usePageMeta";
 
 interface DigestProps {
   setSelectedTeam: SetSelectedTeam;
@@ -28,6 +29,7 @@ const Digest = ({ setSelectedTeam }: DigestProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
+  usePageMeta(staticPageMeta("/digest"));
   useEffect(() => {
     setSelectedTeam(null);
   }, [setSelectedTeam]);

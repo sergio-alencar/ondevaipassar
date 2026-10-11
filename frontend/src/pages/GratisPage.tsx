@@ -6,6 +6,7 @@ import { MatchesContext } from "../context/MatchesContext";
 import { WEEK_DAYS } from "../lib/windows";
 import type { SetSelectedTeam } from "../types";
 import { ActionLink } from "../Components/Action";
+import { staticPageMeta, usePageMeta } from "../lib/usePageMeta";
 
 interface GratisPageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -14,6 +15,7 @@ interface GratisPageProps {
 const GratisPage = ({ setSelectedTeam }: GratisPageProps) => {
   const { matches, loading, error } = useContext(MatchesContext);
 
+  usePageMeta(staticPageMeta("/gratis"));
   useEffect(() => {
     setSelectedTeam(null);
   }, [setSelectedTeam]);

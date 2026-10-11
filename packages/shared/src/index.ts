@@ -6,3 +6,4 @@ export * from "./api.js";
 export * from "./text.js";
 export * from "./date.js";
 export * from "./preferences.js";
+export * from "./seo.js";

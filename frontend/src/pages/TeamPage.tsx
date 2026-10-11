@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { findTeamById } from "@ondevaipassar/shared";
+import { NOT_FOUND_META, findTeamById, teamMeta } from "@ondevaipassar/shared";
 import TvLoader from "../Components/TvLoader";
 import FollowButton from "../Components/FollowButton";
 import { MatchesContext } from "../context/MatchesContext";
@@ -9,6 +9,7 @@ import { textColorClass } from "../lib/colors";
 import MatchCard from "./MatchCard";
 import type { SetSelectedTeam } from "../types";
 import { ActionButton } from "../Components/Action";
+import { usePageMeta } from "../lib/usePageMeta";
 
 interface TeamPageProps {
   setSelectedTeam: SetSelectedTeam;
@@ -22,6 +23,7 @@ const TeamPage = ({ setSelectedTeam }: TeamPageProps) => {
   const { matches, loading, error } = useContext(MatchesContext);
   const team = teamId ? findTeamById(teamId) : undefined;
   const { preferences, toggleTeam } = usePreferences();
+  usePageMeta(team ? teamMeta(team) : NOT_FOUND_META);
 
   useEffect(() => {
     setSelectedTeam(team ?? null);

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { parsePreferences, reconcilePreferences, samePreferences, toggleId, type Preferences } from "@ondevaipassar/shared";
 import { fetchServerPreferences, saveServerPreferences } from "../api/client";
+import { trackEvent } from "../lib/analytics";
 import { useAuth } from "../lib/useAuth";
 import { PreferencesContext } from "./preferencesContextValue";
 
@@ -179,6 +180,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
 
   const toggleTeam = useCallback(
     (teamId: string) => {
+      trackEvent(latest.current.teams.includes(teamId) ? "unfollow" : "follow", { item_type: "team", item_id: teamId });
       setPreferences((current) => ({ ...current, teams: toggleId(current.teams, teamId) }));
       noteLocalChange();
     },
@@ -186,6 +188,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   );
   const toggleCompetition = useCallback(
     (competitionId: string) => {
+      trackEvent(latest.current.competitions.includes(competitionId) ? "unfollow" : "follow", { item_type: "competition", item_id: competitionId });
       setPreferences((current) => ({ ...current, competitions: toggleId(current.competitions, competitionId) }));
       noteLocalChange();
     },

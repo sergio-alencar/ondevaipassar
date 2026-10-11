@@ -2,6 +2,7 @@ import { canWatchBroadcast, REGIONAL_CAVEAT_TEXT, REGIONAL_PRACA_CAVEAT, type Ma
 import ChannelLogo from "../Components/ChannelLogo";
 import { usePreferences } from "../lib/usePreferences";
 import { textColorClass } from "../lib/colors";
+import { trackEvent } from "../lib/analytics";
 
 interface MatchBroadcastsProps {
   broadcasts: MatchView["broadcasts"];
@@ -70,6 +71,7 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
                 href={broadcast.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent("broadcast_click", { channel_id: broadcast.channelId, free: broadcast.free })}
                 className={`relative flex items-center justify-center hover:scale-105 transition ${LOGO_BOX} ${unavailable ? "opacity-40" : ""}`}
               >
                 <ChannelLogo
