@@ -54,6 +54,12 @@ O site funciona inteiro sem conta; a conta só **sincroniza** os times e canais 
 - **Jogos masculinos**: OneFootball, página de cada uma das 20 seleções em destaque (`TRACKED_NATIONAL_TEAMS` em `onefootballEnrichment.ts`, ids conferidos pelo título da página), só nas competições acima; o canal vem do futnatv (`futnatvEnrichment.ts`), que só enxerga de uma semana atrás a uma semana à frente. **Femininos**: só futnatv (`femininoEnrichment.ts`), onde toda seleção vem com o sufixo " F" — ali isso é o formato, não rascunho como nos clubes. Só entra jogo em que uma das seleções **em destaque** joga.
 - Seleções de base (sub-20, sub-17) não entram: `isYouthCompetitionName` as filtra.
 
+## Imagens: o que é publicado e o que é fonte
+
+- `frontend/public/images/` é **tudo o que o site serve** (e vai para o deploy): `times/` (escudos de clubes e `selecao_*`), `canais/` (um arquivo por canal, na extensão que `RASTER_EXTENSION` em `lib/assets.ts` indica), `campeonatos/site/` (logos recortados, mapeados em `COMPETITION_LOGOS`), `icones/` (só `escudo-cinza.svg` e `favicon-roxo.svg`), `og-image.png`. Arquivo que nenhum código referencia não fica aqui.
+- `frontend/assets-src/` é **material de origem, não publicado**: `selecoes/` (biblioteca de escudos de todos os países, base do importador), `campeonatos/<categoria>/` (artes originais dos campeonatos, de onde saem os de `site/`), `canais/` (versões alternativas de logos), `marca/` (variantes do logo e dos ícones), `escudos-sem-cadastro/` (escudos de clubes que não estão no registro; se um clube entrar, é só copiar de volta para `public/images/times/`).
+- Os escudos do **Instagram** ficam em cópia própria, em `backend/src/instagram/assets/crests/` (já diferem do site em vários clubes).
+
 ## Comandos
 
 ```
