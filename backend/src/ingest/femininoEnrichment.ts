@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { isYouthCompetitionName, normalizeText, resolveChannelId, slugify } from "@ondevaipassar/shared";
 import { db } from "../db/client.js";
+import { staleBroadcastDeletes } from "./staleOwnedBroadcasts.js";
 import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
 import { parseBroadcastChannels } from "../sources/futnatv/broadcastText.js";
 import { fetchAllUpcomingGames } from "../sources/futnatv/client.js";
@@ -441,7 +442,11 @@ export async function runFemininoEnrichment(): Promise<void> {
       return insert.onConflictDoUpdate({ target: broadcasts.id, set: updateFields });
     });
 
-    const upserts = [...staleDeletes, ...matchUpserts, ...broadcastUpserts];
+    // Channels this source wrote for a game it just resolved but no longer names (a channel change).
+    const kickoffByMatchId = new Map(resolvedMatches.map((match) => [match.matchId, match.kickoffUtc]));
+    const broadcastDeletes = await staleBroadcastDeletes(SOURCE_ID, resolvedBroadcasts, kickoffByMatchId);
+
+    const upserts = [...staleDeletes, ...broadcastDeletes, ...matchUpserts, ...broadcastUpserts];
     if (upserts.length > 0) {
       const [first, ...rest] = upserts;
       await db.batch([first, ...rest]);

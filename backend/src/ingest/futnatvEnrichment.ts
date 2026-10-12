@@ -3,6 +3,7 @@ import { db } from "../db/client.js";
 import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
 import { parseBroadcastChannels } from "../sources/futnatv/broadcastText.js";
 import { fetchAllUpcomingGames } from "../sources/futnatv/client.js";
+import { staleBroadcastDeletes } from "./staleOwnedBroadcasts.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
 import { matchStreamsToBroadcasts, type MatchCandidate } from "./broadcastMatching.js";
 import { resolveTeamId } from "./teamResolver.js";
@@ -141,8 +142,13 @@ export async function runFutnatvEnrichment(): Promise<void> {
       return insert.onConflictDoUpdate({ target: broadcasts.id, set: updateFields });
     });
 
-    if (upserts.length > 0) {
-      const [first, ...rest] = upserts;
+    // Channels this source wrote for a game it just resolved but no longer names (a channel change).
+    const kickoffByMatchId = new Map(allMatches.map((match) => [match.id, match.kickoffUtc]));
+    const deletes = await staleBroadcastDeletes(SOURCE_ID, resolved, kickoffByMatchId);
+
+    const writes = [...deletes, ...upserts];
+    if (writes.length > 0) {
+      const [first, ...rest] = writes;
       await db.batch([first, ...rest]);
     }
 
