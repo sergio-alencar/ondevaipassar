@@ -16,7 +16,10 @@ interface MatchesByCompetitionProps {
 const MatchesByCompetition = ({ matches }: MatchesByCompetitionProps) => (
   <div className="space-y-10">
     {groupMatchesByCompetition(matches).map((group) => (
-      <section key={group.id}>
+      // A heavier, darker rule above each competition than the hairline between
+      // two matches inside one: without it the heading read as one more row.
+      // The first competition has nothing above it to separate from.
+      <section key={group.id} className="border-t-2 border-gray-400 pt-10 first:border-t-0 first:pt-0">
         <h3 className="text-2xl max-sm:text-lg font-bold uppercase text-gray-800">
           <Link to={`/campeonato/${group.id}`} className="flex items-center justify-center gap-3 hover:underline">
             <CompetitionLogo competitionId={group.id} className="size-9 max-sm:size-7" />
