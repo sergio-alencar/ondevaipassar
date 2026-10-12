@@ -38,6 +38,7 @@ Repo é **público** no GitHub. `.env` (raiz, com `SERPAPI_KEY`) estava rastread
 
 - **Pendente, só o Sérgio pode fazer**: rotacionar as duas chaves nos respectivos dashboards (SerpApi, football-data.org). É o que efetivamente neutraliza o vazamento — remover do código não apaga o histórico do git.
 - **Já feito**: `.env` tirado do controle de versão (`git rm --cached`); `frontend/deps/` (cache órfão do Vite, rastreado por engano) também. A key da football-data.org nunca mais é hardcoded — o novo backend sempre lê de env var.
+- **Revisão de 12/10/2026**: `npm audit fix` (sem force) atualizou Fastify (DoS em HTTP/2) e outras dependências; cabeçalhos `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` (e `Permissions-Policy` no site) em front e API. Sobram no `npm audit` só pacotes do `@vercel/node` (ferramenta de build, não roda no servidor); a correção é um salto de versão maior (`@vercel/node@23`), arriscado para o deploy — fazer num dia calmo. **Sem CSP ainda**: o GA4 e os estilos inline pedem uma política cuidadosa. Cookie de sessão HttpOnly, CSRF por `Origin`, segredos só em env var, cron com `CRON_SECRET` e admin com token já existiam.
 - Purgar o segredo do histórico do git (`git filter-repo`/BFG + force-push) ficou **fora de escopo** deliberadamente — destrutivo, exige reescrever histórico público, e a rotação da chave já resolve o risco real. Só fazer se pedido explicitamente.
 
 ## Sequenciamento (fases)

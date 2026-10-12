@@ -30,6 +30,12 @@ export async function buildApp() {
   // never "*" — with a wildcard the browser refuses credentials, and echoing
   // any origin back would hand them to every site. PUT and DELETE are listed
   // because @fastify/cors only allows GET, HEAD and POST by default.
+  // Baseline hardening for every response: no content-type sniffing, never framed, no referrer leaked to other sites. (HSTS is already added by Vercel.)
+  app.addHook("onSend", async (_request, reply) => {
+    reply.header("X-Content-Type-Options", "nosniff");
+    reply.header("X-Frame-Options", "DENY");
+    reply.header("Referrer-Policy", "strict-origin-when-cross-origin");
+  });
   await app.register(cors, { origin: env.CORS_ORIGIN, credentials: true, methods: ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"] });
   await app.register(healthRoutes);
   await app.register(matchesRoutes);
