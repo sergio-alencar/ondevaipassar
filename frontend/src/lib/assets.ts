@@ -130,6 +130,8 @@ const COMPETITION_LOGOS: Record<string, CompetitionLogoSpec> = {
   "copa-verde": { file: "copa-verde.png" },
   "copa-centro-oeste": { file: "copa-centro-oeste.png" },
   "campeonato-mineiro": { file: "campeonato-mineiro.svg" },
+  "campeonato-baiano": { file: "campeonato-baiano.svg" },
+  "campeonato-gaucho": { file: "campeonato-gaucho.png" },
   "campeonato-carioca": { file: "campeonato-carioca.svg" },
   "campeonato-paulista": { file: "campeonato-paulista.svg" },
   "campeonato-paranaense": { file: "campeonato-paranaense.svg" },
