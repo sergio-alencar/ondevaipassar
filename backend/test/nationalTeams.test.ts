@@ -1,7 +1,13 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { COMPETITIONS, findCompetitionById, isWomensCompetitionName, TEAMS } from "@ondevaipassar/shared";
 import { describe, expect, it } from "vitest";
 import { resolveFemininoTeamId } from "../src/ingest/femininoTeamResolver.js";
 import { resolveTeamId } from "../src/ingest/teamResolver.js";
+
+const SITE_CRESTS = fileURLToPath(new URL("../../frontend/public/images/times/", import.meta.url));
+const INSTAGRAM_CRESTS = fileURLToPath(new URL("../src/instagram/assets/crests/", import.meta.url));
 
 const MEN = TEAMS.filter((team) => team.division === "SELECOES");
 const WOMEN = TEAMS.filter((team) => team.division === "SELECOES_FEMININO");
@@ -31,8 +37,16 @@ describe("national teams in the registry", () => {
     }
   });
 
-  it("files every national crest under selecao_<country>.svg, apart from the clubs' own art", () => {
-    for (const team of [...MEN, ...WOMEN]) expect(team.crestFile, team.id).toMatch(/^selecao_[a-z_]+\.svg$/);
+  it("files every national crest under selecao_<country>, apart from the clubs' own art", () => {
+    for (const team of [...MEN, ...WOMEN]) expect(team.crestFile, team.id).toMatch(/^selecao_[a-z_]+\.(svg|png)$/);
+  });
+
+  // The site and the Instagram renderer each keep their own copy of a crest.
+  it("ships every national crest in both the site's and the Instagram renderer's folders", () => {
+    for (const team of [...MEN, ...WOMEN]) {
+      expect(existsSync(join(SITE_CRESTS, team.crestFile)), `site: ${team.crestFile}`).toBe(true);
+      expect(existsSync(join(INSTAGRAM_CRESTS, team.crestFile)), `instagram: ${team.crestFile}`).toBe(true);
+    }
   });
 
   it("keeps ids unique across clubs and national teams", () => {

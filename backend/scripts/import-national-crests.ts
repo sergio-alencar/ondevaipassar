@@ -32,12 +32,16 @@ const MATCH: Record<string, string[]> = {
   coreia_do_norte: ["north-korea", "korea-dpr"], nova_zelandia: ["new-zealand"], argelia: ["algeria"], camaroes: ["cameroon"], malawi: ["malawi"],
 };
 
+/** No SVG exists for these (only a PNG, trimmed by hand into selecao_<id>.png in both crest folders): the registry points at the PNG, so this script leaves them alone. */
+const PNG_ONLY = new Set(["argelia", "camaroes", "malawi"]);
+
 const files = existsSync(SOURCE_DIR) ? readdirSync(SOURCE_DIR).filter((name) => name.toLowerCase().endsWith(".svg")) : [];
 if (files.length === 0) throw new Error(`no SVG in ${SOURCE_DIR}`);
 mkdirSync(SITE_CRESTS, { recursive: true });
 
 const missing: string[] = [];
 for (const [id, words] of Object.entries(MATCH)) {
+  if (PNG_ONLY.has(id)) continue;
   // "south-korea" must not be taken for "north-korea": the longest matching word wins ties by listing the specific words first.
   const file = files.find((name) => words.some((word) => name.toLowerCase().includes(word)) && !(id === "coreia_do_sul" && name.includes("north")) && !(id === "coreia_do_norte" && name.includes("south")));
   if (!file) { missing.push(id); continue; }

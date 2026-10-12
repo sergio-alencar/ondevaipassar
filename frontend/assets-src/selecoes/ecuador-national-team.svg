@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   viewBox="0 0 285 350"
+   version="1.1"
+   id="svg34"
+   sodipodi:docname="FEF logo.svg"
+   width="285"
+   height="350"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15, custom)">
+  <title
+     id="title874">FEF logo</title>
+  <metadata
+     id="metadata38">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>FEF logo</dc:title>
+        <cc:license
+           rdf:resource="http://scripts.sil.org/OFL" />
+        <dc:date>7 abr 2020</dc:date>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>EEIM</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>N/A</dc:title>
+          </cc:Agent>
+        </dc:rights>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://scripts.sil.org/OFL">
+        <cc:permits
+           rdf:resource="http://scripts.sil.org/pub/OFL/Reproduction" />
+        <cc:permits
+           rdf:resource="http://scripts.sil.org/pub/OFL/Distribution" />
+        <cc:permits
+           rdf:resource="http://scripts.sil.org/pub/OFL/Embedding" />
+        <cc:permits
+           rdf:resource="http://scripts.sil.org/pub/OFL/DerivativeWorks" />
+        <cc:requires
+           rdf:resource="http://scripts.sil.org/pub/OFL/Notice" />
+        <cc:requires
+           rdf:resource="http://scripts.sil.org/pub/OFL/Attribution" />
+        <cc:requires
+           rdf:resource="http://scripts.sil.org/pub/OFL/ShareAlike" />
+        <cc:requires
+           rdf:resource="http://scripts.sil.org/pub/OFL/DerivativeRenaming" />
+        <cc:requires
+           rdf:resource="http://scripts.sil.org/pub/OFL/BundlingWhenSelling" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="1"
+     gridtolerance="1"
+     guidetolerance="1"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1051"
+     id="namedview36"
+     showgrid="false"
+     inkscape:showpageshadow="false"
+     inkscape:zoom="2"
+     inkscape:cx="144.12397"
+     inkscape:cy="148.38543"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="#336699ff"
+     inkscape:document-rotation="0">
+    <inkscape:grid
+       type="xygrid"
+       id="grid879" />
+  </sodipodi:namedview>
+  <defs
+     id="defs4">
+    <style
+       id="style2">.cls-1{fill:#eb2227;}</style>
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern" />
+    <clipPath
+       id="clipPath18"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path16"
+         d="M 0,800 H 800 V 0 H 0 Z" />
+    </clipPath>
+    <clipPath
+       id="clipPath18-2"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path16-2"
+         d="M 0,800 H 800 V 0 H 0 Z" />
+    </clipPath>
+    <clipPath
+       id="clipPath18-2-9"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         inkscape:connector-curvature="0"
+         id="path16-2-4"
+         d="M 0,800 H 800 V 0 H 0 Z" />
+    </clipPath>
+  </defs>
+  <g
+     id="#d32727ff"
+     transform="matrix(0.01656116,0,0,0.01656116,185.44458,4.260547)"
+     style="fill:#00ff00">
+    <g
+       id="#336699ff"
+       transform="matrix(5.98363,0,0,5.98363,-12942.258,-2969.5715)">
+      <g
+         style="fill:#00ff00"
+         transform="matrix(9.8622894,0,0,-9.6519137,111.09927,6120.8558)"
+         id="g10-4-3">
+        <g
+           id="g12-2-5">
+          <g
+             clip-path="url(#clipPath18-2-9)"
+             id="g14-0-5">
+            <g
+               transform="translate(51.0005,558.2754)"
+               id="g20-3-0">
+              <path
+                 inkscape:connector-curvature="0"
+                 id="path22-3-8"
+                 style="fill:#d3aa75;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                 d="M 0,0 V 28.607 H 226.368 V 0 h 32.337 v -184.701 c 0,0 3.213,-50.788 -36.276,-95.562 0,0 -40.423,-47.885 -110.386,-56.282 0,0 -58.768,5.908 -103.544,51.306 0,0 -39.489,35.447 -41.044,99.503 V -0.104 Z" />
+            </g>
+            <path
+               inkscape:connector-curvature="0"
+               id="path24-9-5"
+               style="fill:#ffce00;fill-opacity:1;fill-rule:nonzero;stroke:none"
+               d="M 164.112,560.97 H 57.634 v 19.279 h 106.478 z" />
+            <path
+               inkscape:connector-curvature="0"
+               id="path28-8-6"
+               style="fill:#e5073a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+               d="m 270.629,560.97 h -43.221 v 19.279 h 43.221 z" />
+            <g
+               transform="translate(25.2964,551.3311)"
+               id="g30-2-1" />
+            <g
+               transform="translate(57.6338,527.3887)"
+               id="g34-7-7" />
+            <g
+               transform="translate(270.6294,527.3887)"
+               id="g38-7-5" />
+            <g
+               transform="translate(57.6338,473.9058)"
+               id="g42-4-4" />
+            <g
+               transform="translate(270.6294,473.9058)"
+               id="g46-7-9" />
+            <g
+               transform="translate(57.6338,429.7515)"
+               id="g50-0-2" />
+            <g
+               transform="translate(370.5044,446.4224)"
+               id="g54-7-1" />
+            <g
+               transform="translate(460.3867,313.2939)"
+               id="g58-2-7" />
+            <g
+               transform="translate(405.0107,495.0708)"
+               id="g62-2-6" />
+            <g
+               transform="translate(370.584,428.5791)"
+               id="g66-1-0" />
+            <g
+               transform="translate(483.0371,495.0708)"
+               id="g70-8-3" />
+            <g
+               transform="translate(453.5049,484.1919)"
+               id="g74-1-7" />
+            <g
+               transform="translate(412.627,362.0215)"
+               id="g78-0-4" />
+            <g
+               transform="translate(383.3589,351.1426)"
+               id="g82-9-6" />
+            <g
+               transform="translate(531.5312,484.1919)"
+               id="g86-8-4" />
+            <g
+               transform="translate(612.2109,417.6982)"
+               id="g90-5-2" />
+            <g
+               transform="translate(574.4307,464.6069)"
+               id="g94-5-6" />
+            <g
+               transform="translate(498.0205,398.1133)"
+               id="g98-2-5" />
+            <g
+               transform="translate(674.9561,398.1133)"
+               id="g102-1-8" />
+            <g
+               transform="translate(760.251,398.1133)"
+               id="g106-1-6" />
+            <g
+               transform="translate(628.6758,482.6353)"
+               id="g110-6-3" />
+            <g
+               transform="translate(432.7559,415.9907)"
+               id="g114-6-4" />
+            <g
+               transform="translate(667.9229,497.4028)"
+               id="g122-1-3" />
+            <g
+               transform="translate(506.2637,364.0684)"
+               id="g126-0-8" />
+            <g
+               transform="translate(668.8564,462.0815)"
+               id="g130-3-4" />
+            <g
+               transform="translate(569.1729,395.6807)"
+               id="g134-7-2" />
+            <g
+               transform="translate(626.0479,329.0186)"
+               id="g138-4-5" />
+            <g
+               transform="translate(699.165,495.0708)"
+               id="g142-0-2" />
+            <g
+               transform="translate(703.2031,428.5791)"
+               id="g146-5-7" />
+            <g
+               transform="translate(519.5635,428.5791)"
+               id="g150-0-1" />
+            <g
+               transform="translate(534.8652,362.0215)"
+               id="g154-1-4" />
+            <g
+               transform="translate(441.3428,428.5791)"
+               id="g158-8-4" />
+            <g
+               transform="translate(494.6641,361.9424)"
+               id="g162-8-4" />
+            <g
+               transform="translate(656.3359,362.0215)"
+               id="g166-2-2" />
+            <g
+               transform="translate(586.3926,333.0332)"
+               id="g170-8-2" />
+          </g>
+        </g>
+      </g>
+      <path
+         style="fill:#002255;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:9.75655"
+         d="M 1835.4067,517.37055 V 703.4486 h 418.0741 V 517.37055 Z M 361.40861,796.48011 V 2546.1821 c 21.4607,636.2534 490.65628,987.3929 490.65628,987.3929 444.64951,348.1359 877.91101,375.1515 877.91101,375.1515 589.6575,-72.0201 949.7846,-438.1656 949.7846,-438.1656 469.1902,-456.1885 417.0608,-960.3903 417.0608,-960.3903 V 796.48011 Z m 318.91138,231.09449 659.33461,306.1136 v 465.2006 l 214.6637,105.0355 v -570.2361 h 383.3151 v 180.0834 H 1744.452 v 480.1873 l 49.0464,21.009 233.082,-114.055 v 201.0924 l -239.2071,113.5468 -42.9213,-23.5137 v 726.2994 h 190.1202 v 186.062 h -377.19 v -999.3972 l -217.7276,-99.0399 v 999.4115 H 1152.5849 V 1447.7439 L 680.31999,1225.6418 Z m 2100.62421,0 v 195.0694 l -469.1687,225.0999 V 2999.364 H 2124.7032 V 1333.6882 Z M 680.31999,1543.7719 1051.401,1720.8294 v 198.0807 L 680.31999,1744.8527 Z m 2100.62421,0 v 201.0787 l -371.0487,174.0595 v -198.0786 z m -2100.62421,426.1647 185.53916,84.0252 v 450.1986 c 0,0 -23.00479,318.1084 262.19575,600.2236 0,0 217.3207,237.1004 602.3845,240.1015 0,0 286.9359,27.0001 578.2561,-219.1039 0,0 272.9314,-204.0637 286.7393,-624.2328 v -435.1831 l 185.5257,-96.029 v 536.2175 c 0,0 11.2423,392.1539 -283.1578,692.2815 0,0 -200.3495,236.1034 -564.2572,308.1341 0,0 -92.9513,5.9815 -202.8743,90.0221 0,0 -66.9905,-64.0268 -179.4303,-88.0414 0,0 -347.5481,-36.001 -633.76178,-362.1317 0,0 -210.57849,-232.1105 -237.15913,-610.2608 z"
+         id="path26-8-4"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" />
+    </g>
+  </g>
+</svg>
