@@ -41,10 +41,15 @@ describe("women's national teams in futnatv listings", () => {
     expect(resolveNationalFemininoTeamId("Alemanha F")).toBe("alemanha_feminino");
     expect(resolveNationalFemininoTeamId("Brasil F")).toBe("brasil_feminino");
     expect(resolveNationalFemininoTeamId("Coreia do Sul F")).toBe("coreia_do_sul_feminino");
-    expect(resolveNationalFemininoTeamId("Andorra F")).toBeNull();
+    expect(resolveNationalFemininoTeamId("Países Baixos F")).toBe("holanda_feminino");
+    expect(resolveNationalFemininoTeamId("Atlantida F")).toBeNull();
   });
 
-  it("tracks only the 18 qualified sides", () => {
+  // Every country resolves, as an opponent with a crest; only the top 20 make a game worth ingesting.
+  it("resolves every country but tracks only the FIFA top 20", () => {
+    expect(resolveNationalFemininoTeamId("Andorra F")).toBe("andorra_feminino");
+    expect(isTrackedNationalFemininoTeam("andorra_feminino")).toBe(false);
+    expect(isTrackedNationalFemininoTeam("malawi_feminino")).toBe(false);
     expect(isTrackedNationalFemininoTeam("japao_feminino")).toBe(true);
     expect(isTrackedNationalFemininoTeam("japao")).toBe(false);
     expect(isTrackedNationalFemininoTeam("flamengo_feminino")).toBe(false);

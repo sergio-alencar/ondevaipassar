@@ -1,4 +1,4 @@
-import { normalizeText, TEAMS } from "@ondevaipassar/shared";
+import { NATIONAL_NAME_ALIASES, normalizeText, TEAMS } from "@ondevaipassar/shared";
 
 // Deliberately SEPARATE from teamResolver.ts's resolveTeamId, and never
 // imported by it. Brasileirão Feminino team names collide directly with
@@ -36,17 +36,25 @@ export function isTrackedBrazilianFemininoTeam(teamId: string | null): boolean {
  * deciding, from the competition, that the game is between national sides.
  */
 const NORMALIZED_NAME_TO_NATIONAL_FEMININO_ID = new Map(
-  TEAMS.filter((team) => team.division === "SELECOES_FEMININO").map((team) => [normalizeText(team.displayName.replace(/\s*\(Fem\.\)$/, "")), team.id]),
+  TEAMS.filter((team) => team.division === "SELECOES_FEMININO" || team.division === "SELECOES_FEMININO_OUTRAS").map((team) => [
+    normalizeText(team.displayName.replace(/\s*\(Fem\.\)$/, "")),
+    team.id,
+  ]),
 );
+
+/** The top-20 women's sides: the ones that make a game worth ingesting. Every other country resolves too, but only as an opponent. */
+const TRACKED_NATIONAL_FEMININO_IDS: ReadonlySet<string> = new Set(TEAMS.filter((team) => team.division === "SELECOES_FEMININO").map((team) => team.id));
 
 /** The women's national team a futnatv name stands for ("Alemanha F" -> alemanha_feminino), or null for any other country. */
 export function resolveNationalFemininoTeamId(rawName: string): string | null {
-  return NORMALIZED_NAME_TO_NATIONAL_FEMININO_ID.get(normalizeText(rawName.replace(/\s+(F|Feminino|Fem\.?)$/i, ""))) ?? null;
+  const normalized = normalizeText(rawName.replace(/\s+(F|Feminino|Fem\.?)$/i, ""));
+  const alias = NATIONAL_NAME_ALIASES[normalized];
+  return NORMALIZED_NAME_TO_NATIONAL_FEMININO_ID.get(normalized) ?? (alias ? `${alias}_feminino` : null);
 }
 
 /** True for one of the women's national teams this site follows. */
 export function isTrackedNationalFemininoTeam(teamId: string | null): boolean {
-  return teamId !== null && teamId.endsWith("_feminino") && [...NORMALIZED_NAME_TO_NATIONAL_FEMININO_ID.values()].includes(teamId);
+  return teamId !== null && TRACKED_NATIONAL_FEMININO_IDS.has(teamId);
 }
 
 /**

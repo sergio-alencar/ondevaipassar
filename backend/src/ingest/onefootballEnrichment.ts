@@ -96,12 +96,12 @@ const TRACKED_EUROPEAN_TEAMS: { teamId: string; onefootballId: string }[] = [
 ];
 
 /**
- * OneFootball's own ids for the men's national teams we follow — the same
+ * OneFootball's own ids for the 20 men's national teams on the Seleções tab — the same
  * page type as the clubs above, and the same warning: the name in the URL is
  * decorative, so each id was checked against the served page's own <title>
- * ("Jogos do Brasil"). Peru, Venezuela and Bolívia are not here: no id found
- * yet, and none is needed to see them — a match against a team that IS here
- * lists the opponent by name, and the name resolver knows all three.
+ * ("Jogos do Brasil"). Every other country is not fetched, and needs no page
+ * to be seen: a match against one of these lists the opponent by name, and the
+ * name resolver knows them all (the hidden "outras seleções").
  *
  * Women's national teams are not fetched from here: their fixtures come from
  * futnatv (femininoEnrichment.ts), which carries the broadcast too.
@@ -110,24 +110,23 @@ const TRACKED_NATIONAL_TEAMS: { teamId: string; onefootballId: string }[] = [
   { teamId: "brasil", onefootballId: "79" },
   { teamId: "argentina", onefootballId: "55" },
   { teamId: "uruguai", onefootballId: "56" },
-  { teamId: "colombia", onefootballId: "118" },
-  { teamId: "equador", onefootballId: "101" },
-  { teamId: "paraguai", onefootballId: "47" },
-  { teamId: "chile", onefootballId: "35" },
-  { teamId: "portugal", onefootballId: "43" },
-  { teamId: "espanha", onefootballId: "34" },
-  { teamId: "franca", onefootballId: "45" },
-  { teamId: "inglaterra", onefootballId: "61" },
   { teamId: "alemanha", onefootballId: "96" },
   { teamId: "italia", onefootballId: "37" },
+  { teamId: "franca", onefootballId: "45" },
+  { teamId: "espanha", onefootballId: "34" },
+  { teamId: "inglaterra", onefootballId: "61" },
   { teamId: "holanda", onefootballId: "38" },
+  { teamId: "portugal", onefootballId: "43" },
   { teamId: "belgica", onefootballId: "116" },
-  { teamId: "croacia", onefootballId: "99" },
-  { teamId: "dinamarca", onefootballId: "92" },
   { teamId: "mexico", onefootballId: "69" },
+  { teamId: "colombia", onefootballId: "118" },
+  { teamId: "croacia", onefootballId: "99" },
+  { teamId: "suica", onefootballId: "93" },
   { teamId: "estados_unidos", onefootballId: "81" },
   { teamId: "japao", onefootballId: "52" },
   { teamId: "marrocos", onefootballId: "108" },
+  { teamId: "noruega", onefootballId: "115" },
+  { teamId: "senegal", onefootballId: "121" },
 ];
 
 /**

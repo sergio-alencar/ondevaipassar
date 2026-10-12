@@ -11,42 +11,52 @@ const INSTAGRAM_CRESTS = fileURLToPath(new URL("../src/instagram/assets/crests/"
 
 const MEN = TEAMS.filter((team) => team.division === "SELECOES");
 const WOMEN = TEAMS.filter((team) => team.division === "SELECOES_FEMININO");
+const ALL_MEN = TEAMS.filter((team) => team.division === "SELECOES" || team.division === "SELECOES_OUTRAS");
+const ALL_WOMEN = TEAMS.filter((team) => team.division === "SELECOES_FEMININO" || team.division === "SELECOES_FEMININO_OUTRAS");
 
 describe("national teams in the registry", () => {
-  it("has the main men's sides and the 18 women's sides qualified for the 2027 World Cup", () => {
-    expect(MEN.length).toBe(24);
-    expect(WOMEN.length).toBe(18);
-    expect(WOMEN.map((team) => team.id)).toEqual(
-      expect.arrayContaining(["brasil_feminino", "alemanha_feminino", "malawi_feminino", "coreia_do_norte_feminino"]),
-    );
+  it("features 20 men's and 20 women's sides, as Sérgio chose them", () => {
+    expect(MEN.length).toBe(20);
+    expect(WOMEN.length).toBe(20);
+    expect(MEN.map((team) => team.id)).toEqual(expect.arrayContaining(["brasil", "holanda", "estados_unidos", "suica", "noruega", "senegal"]));
+    // The women's tab is the FIFA top 20, not the World Cup qualifiers: Argentina and Malawi qualified but are not in it.
+    expect(WOMEN.map((team) => team.id)).toEqual(expect.arrayContaining(["espanha_feminino", "brasil_feminino", "islandia_feminino", "colombia_feminino"]));
+    expect(WOMEN.map((team) => team.id)).not.toContain("malawi_feminino");
+  });
+
+  // So a match against Singapura shows Singapura's crest, not a generic shield.
+  it("registers every other country too, in divisions with no tab", () => {
+    const others = TEAMS.filter((team) => team.division === "SELECOES_OUTRAS");
+    expect(others.length).toBeGreaterThan(150);
+    expect(TEAMS.find((team) => team.id === "singapura")?.division).toBe("SELECOES_OUTRAS");
+    expect(TEAMS.find((team) => team.id === "singapura_feminino")?.division).toBe("SELECOES_FEMININO_OUTRAS");
   });
 
   it("names the women's sides like the women's clubs: same id pattern, '(Fem.)' on the display name", () => {
-    for (const team of WOMEN) {
+    for (const team of [...WOMEN, ...ALL_WOMEN]) {
       expect(team.id.endsWith("_feminino"), team.id).toBe(true);
       expect(team.displayName.endsWith(" (Fem.)"), team.displayName).toBe(true);
     }
-    for (const team of MEN) expect(team.id.endsWith("_feminino"), team.id).toBe(false);
+    for (const team of ALL_MEN) expect(team.id.endsWith("_feminino"), team.id).toBe(false);
   });
 
   // A federation has one crest, whichever of its two sides plays.
   it("gives a country's men's and women's sides the same crest", () => {
-    for (const woman of WOMEN) {
+    for (const woman of ALL_WOMEN) {
       const man = TEAMS.find((team) => team.id === woman.id.replace(/_feminino$/, ""));
-      if (man) expect(woman.crestFile, woman.id).toBe(man.crestFile);
+      expect(man, woman.id).toBeDefined();
+      expect(woman.crestFile, woman.id).toBe(man!.crestFile);
     }
   });
 
-  it("files every national crest under selecao_<country>, apart from the clubs' own art", () => {
-    for (const team of [...MEN, ...WOMEN]) expect(team.crestFile, team.id).toMatch(/^selecao_[a-z_]+\.(svg|png)$/);
+  it("files every national crest under selecao_<country>", () => {
+    for (const team of [...ALL_MEN, ...ALL_WOMEN]) expect(team.crestFile, team.id).toMatch(/^selecao_[a-z_]+\.(svg|png)$/);
   });
 
-  // The site and the Instagram renderer each keep their own copy of a crest.
-  it("ships every national crest in both the site's and the Instagram renderer's folders", () => {
-    for (const team of [...MEN, ...WOMEN]) {
-      expect(existsSync(join(SITE_CRESTS, team.crestFile)), `site: ${team.crestFile}`).toBe(true);
-      expect(existsSync(join(INSTAGRAM_CRESTS, team.crestFile)), `instagram: ${team.crestFile}`).toBe(true);
-    }
+  // The site draws every country's crest (an opponent counts); the Instagram renderer only the featured ones.
+  it("ships every national crest to the site, and the featured ones to the Instagram renderer too", () => {
+    for (const team of [...ALL_MEN, ...ALL_WOMEN]) expect(existsSync(join(SITE_CRESTS, team.crestFile)), `site: ${team.crestFile}`).toBe(true);
+    for (const team of [...MEN, ...WOMEN]) expect(existsSync(join(INSTAGRAM_CRESTS, team.crestFile)), `instagram: ${team.crestFile}`).toBe(true);
   });
 
   it("keeps ids unique across clubs and national teams", () => {

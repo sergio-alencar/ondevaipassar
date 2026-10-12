@@ -17,6 +17,9 @@ const DIVISION_LABELS: Record<Division, string> = {
   FEMININO: "Feminino",
   SELECOES: "Seleções",
   SELECOES_FEMININO: "Seleções Fem.",
+  // Never rendered, like FEMININO_EXTERIOR: not in DIVISIONS above.
+  SELECOES_OUTRAS: "Outras seleções",
+  SELECOES_FEMININO_OUTRAS: "Outras seleções (Fem.)",
   // Never rendered: FEMININO_EXTERIOR is not in DIVISIONS above. The key is
   // here only because the Record has to cover every Division.
   FEMININO_EXTERIOR: "Feminino (exterior)",

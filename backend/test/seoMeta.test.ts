@@ -37,6 +37,13 @@ describe("page meta", () => {
     expect(indexablePages().some((page) => page.noindex)).toBe(false);
   });
 
+  it("leaves out the countries outside the Seleções tabs, like the foreign clubs", () => {
+    const paths = new Set(indexablePages().map((page) => page.path));
+    expect(paths.has("/time/singapura")).toBe(false);
+    expect(paths.has("/time/brasil")).toBe(true);
+    expect(paths.has("/time/brasil_feminino")).toBe(true);
+  });
+
   it("leaves out the foreign clubs registered only for their crests", () => {
     const paths = new Set(indexablePages().map((page) => page.path));
     const foreign = TEAMS.find((team) => team.division === "FEMININO_EXTERIOR");

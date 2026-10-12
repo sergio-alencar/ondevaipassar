@@ -76,12 +76,17 @@ export const STATIC_PAGES: PageMeta[] = [
 /** The page not found: never worth indexing, and the SPA answers it with a 200, so the tag is what tells a crawler. */
 export const NOT_FOUND_META: PageMeta = { title: `Página não encontrada | ${SITE_NAME}`, description: HOME_META.description, path: "/", noindex: true };
 
-/** Every page worth a search result, for the sitemap and the build's per-page HTML. Teams only from the divisions people browse: the foreign clubs registered for their crests have no page worth finding. */
+// Registered so an opponent has an id and a crest, but with no tab and nothing
+// on their page worth finding: the foreign clubs of the Libertadores Feminina,
+// and every national team outside the main 20.
+const UNBROWSED_DIVISIONS: ReadonlySet<string> = new Set(["FEMININO_EXTERIOR", "SELECOES_OUTRAS", "SELECOES_FEMININO_OUTRAS"]);
+
+/** Every page worth a search result, for the sitemap and the build's per-page HTML. Teams only from the divisions people browse. */
 export function indexablePages(): PageMeta[] {
   return [
     HOME_META,
     ...STATIC_PAGES.filter((page) => !page.noindex),
-    ...TEAMS.filter((team) => team.division !== "FEMININO_EXTERIOR").map(teamMeta),
+    ...TEAMS.filter((team) => !UNBROWSED_DIVISIONS.has(team.division)).map(teamMeta),
     ...COMPETITIONS.map(competitionMeta),
     ...listChannels().map(channelMeta),
   ];
