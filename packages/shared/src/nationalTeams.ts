@@ -252,8 +252,14 @@ export const FEATURED_MEN: readonly string[] = ["brasil", "argentina", "uruguai"
 /** The 20 women's sides on the Seleções Fem. tab: the top 20 of the FIFA women's ranking of 16 June 2026. Update it when the ranking moves enough to matter. */
 export const FEATURED_WOMEN: readonly string[] = ["espanha", "estados_unidos", "alemanha", "inglaterra", "japao", "franca", "brasil", "suecia", "canada", "holanda", "coreia_do_norte", "dinamarca", "italia", "noruega", "australia", "china", "islandia", "belgica", "coreia_do_sul", "colombia"];
 
-// Countries with no SVG on file: only a PNG exists (see ORIGEM.json).
-const PNG_CRESTS: ReadonlySet<string> = new Set(["argelia", "camaroes", "malawi"]);
+/**
+ * Countries whose crest is a PNG, not an SVG: Argélia, Camarões and Malawi have
+ * no SVG on file (see ORIGEM.json); the others are SVGs so heavy (hundreds of
+ * KB of path detail) that a small PNG is the better file for a 100px crest.
+ * scripts/import-national-crests.ts makes the latter and fails if this list
+ * and what it generated disagree.
+ */
+export const PNG_CRESTS: ReadonlySet<string> = new Set(["argelia", "camaroes", "malawi", "botsuana", "guine", "iraque", "laos", "samoa_americana", "suriname"]);
 
 const crestFileOf = (id: string): string => `selecao_${id}.${PNG_CRESTS.has(id) ? "png" : "svg"}`;
 
