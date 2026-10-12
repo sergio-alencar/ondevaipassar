@@ -1,6 +1,6 @@
 import { normalizeText } from "./text.js";
 
-export type CompetitionType = "national-league" | "national-cup" | "state" | "continental" | "friendly";
+export type CompetitionType = "national-league" | "national-cup" | "state" | "continental" | "friendly" | "national-teams";
 
 export interface Competition {
   id: string;
@@ -145,6 +145,23 @@ export const COMPETITIONS: Competition[] = [
   { id: "copa-del-rey", displayName: "Copa do Rei", type: "national-cup", foreign: true },
   { id: "coppa-italia", displayName: "Copa da Itália", type: "national-cup", foreign: true },
   { id: "coupe-de-france", displayName: "Copa da França", type: "national-cup", foreign: true },
+  // National teams. Ids are what slugify() makes of the name a source writes,
+  // like the rest of the registry. Only the ones involving Brazil's own side
+  // (or that Brazilians follow as the main event) sort among the domestic
+  // competitions; the continental ones of other confederations sort with the
+  // European ones (see `foreign`).
+  { id: "copa-do-mundo", displayName: "Copa do Mundo", type: "national-teams" },
+  { id: "copa-do-mundo-feminina", displayName: "Copa do Mundo Feminina", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo", displayName: "Eliminatórias da Copa do Mundo", type: "national-teams", shortName: "Eliminatórias" },
+  { id: "eliminatorias-copa-do-mundo-feminina", displayName: "Eliminatórias da Copa do Mundo Feminina", type: "national-teams", shortName: "Eliminatórias Fem." },
+  { id: "copa-america", displayName: "Copa América", type: "national-teams" },
+  { id: "copa-america-feminina", displayName: "Copa América Feminina", type: "national-teams" },
+  { id: "eurocopa", displayName: "Eurocopa", type: "national-teams", foreign: true },
+  { id: "eurocopa-feminina", displayName: "Eurocopa Feminina", type: "national-teams", foreign: true },
+  { id: "liga-das-nacoes-uefa", displayName: "Liga das Nações da UEFA", type: "national-teams", foreign: true, shortName: "Liga das Nações" },
+  { id: "liga-das-nacoes-concacaf", displayName: "Liga das Nações da CONCACAF", type: "national-teams", foreign: true },
+  { id: "amistosos-internacionais", displayName: "Amistosos Internacionais", type: "friendly", shortName: "Amistosos" },
+  { id: "amistosos-internacionais-femininos", displayName: "Amistosos Internacionais Femininos", type: "friendly", shortName: "Amistosos Fem." },
 ];
 
 export function findCompetitionById(id: string): Competition | undefined {
@@ -161,7 +178,7 @@ export function findCompetitionById(id: string): Competition | undefined {
 // link, once as "Champions League" at 16h — and the youth entry attached
 // its under-19 stream to the senior fixture.
 const YOUTH_COMPETITION_PATTERNS = [/\byouth\b/, /\bsub[\s-]?\d{2}\b/, /\bu\d{2}\b/, /\bjuniores\b/, /\bjuvenil\b/];
-const WOMENS_COMPETITION_PATTERNS = [/\bwsl\b/, /\bnwsl\b/, /\bwomen/, /\bfeminin[ao]\b/];
+const WOMENS_COMPETITION_PATTERNS = [/\bwsl\b/, /\bnwsl\b/, /\bwomen/, /\bfeminin[ao]s?\b/];
 
 /** True when this names an age-group competition. Nothing here tracks youth football, so such a name can only ever produce a wrong attach. */
 export function isYouthCompetitionName(name: string): boolean {

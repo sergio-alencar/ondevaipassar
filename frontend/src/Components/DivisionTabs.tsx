@@ -5,7 +5,7 @@ interface DivisionTabsProps {
   onChange: (division: Division) => void;
 }
 
-const DIVISIONS: Division[] = ["A", "B", "C", "EUROPA", "FEMININO"];
+const DIVISIONS: Division[] = ["A", "B", "C", "EUROPA", "FEMININO", "SELECOES", "SELECOES_FEMININO"];
 
 // "Europa"/"Feminino" aren't a "Série X" — need their own label rather than
 // the template every other division shares.
@@ -15,6 +15,8 @@ const DIVISION_LABELS: Record<Division, string> = {
   C: "Série C",
   EUROPA: "Europa",
   FEMININO: "Feminino",
+  SELECOES: "Seleções",
+  SELECOES_FEMININO: "Seleções Fem.",
   // Never rendered: FEMININO_EXTERIOR is not in DIVISIONS above. The key is
   // here only because the Record has to cover every Division.
   FEMININO_EXTERIOR: "Feminino (exterior)",
