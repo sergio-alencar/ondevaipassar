@@ -1,0 +1,36 @@
+name: Ingest health
+
+# Alerta sem serviço novo: confere /api/status depois do ingest diário e falha
+# o job se alguma fonte não rodou hoje ou falhou na última execução. O GitHub
+# manda e-mail por workflow agendado que falha, então basta isso para o Sérgio
+# saber no mesmo dia — antes, o problema só aparecia quando alguém notava um
+# jogo sem canal (foi assim com a cota do YouTube, 7 fontes em HTTP 429).
+#
+# /api/status é público; as mensagens de erro ficam atrás do ADMIN_TOKEN e este
+# job não precisa delas — o log do Vercel tem o detalhe.
+on:
+  schedule:
+    # 10:40 UTC: o ingest roda às 10:00 e o Instagram termina em torno de 10:30.
+    - cron: "40 10 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Falha se alguma fonte do ingest tem problema
+        run: |
+          set -euo pipefail
+          http_code=$(curl -s -o /tmp/status.json -w "%{http_code}" "https://api.ondevaipassar.com/api/status")
+          if [ "$http_code" != "200" ]; then
+            echo "::error::/api/status respondeu HTTP $http_code (a API pode estar fora do ar)"
+            exit 1
+          fi
+          jq -r '.warnings[]' /tmp/status.json | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY" || true
+          count=$(jq '.warnings | length' /tmp/status.json)
+          if [ "$count" != "0" ]; then
+            jq -r '.warnings[] | "::error::" + .' /tmp/status.json
+            echo "::error::$count aviso(s) no ingest de hoje — abra https://api.ondevaipassar.com/api/status"
+            exit 1
+          fi
+          echo "Ingest de hoje sem avisos."
