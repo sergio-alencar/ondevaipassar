@@ -1,1027 +1,1147 @@
 {
- "afghanistan": {
+ "afeganistao": {
   "commons": null,
   "enwiki": "Afghanistan_national_football_team_logo.svg",
+  "nome_ingles": "afghanistan",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Afghanistan national football team"
  },
+ "africa_do_sul": {
+  "commons": null,
+  "enwiki": "South Africa national soccer team logo.svg",
+  "nome_ingles": "south-africa",
+  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
+  "page": "South Africa national soccer team"
+ },
  "albania": {
   "commons": "Stema e Fanellës së Kombëtares.svg",
+  "nome_ingles": "albania",
   "page": "Albania national football team"
  },
- "algeria": {
-  "enwiki": "Algerian Football Federation logo.png",
-  "nota": "SOMENTE PNG: sem SVG disponível; conferir direitos"
- },
- "american-samoa": {
-  "commons": "Flag of American Samoa.svg",
-  "page": "American Samoa national football team"
+ "alemanha": {
+  "nome_ingles": "germany",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "andorra": {
   "commons": "Coat of arms of Andorra.svg",
+  "nome_ingles": "andorra",
   "page": "Andorra national football team"
  },
  "angola": {
-  "commons": "Flag of Angola.svg",
-  "page": "Angola national football team"
+  "nome_ingles": "angola",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "antigua-and-barbuda": {
+ "antigua_e_barbuda": {
   "commons": null,
   "enwiki": "Antigua and Barbuda FA logo.svg",
+  "nome_ingles": "antigua-and-barbuda",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Antigua and Barbuda national football team"
  },
- "argentina": {
+ "arabia_saudita": {
   "commons": null,
-  "enwiki": "Argentina national football team logo.svg",
+  "enwiki": "Saudi Arabia national football team logo.svg",
+  "nome_ingles": "saudi-arabia",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Argentina national football team"
+  "page": "Saudi Arabia national football team"
+ },
+ "argelia": {
+  "enwiki": "Algerian Football Federation logo.png",
+  "nome_ingles": "algeria",
+  "nota": "SOMENTE PNG: sem SVG disponível; conferir direitos"
+ },
+ "argentina": {
+  "nome_ingles": "argentina",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "armenia": {
   "commons": null,
   "enwiki": "Football Federation of Armenia logo.svg",
+  "nome_ingles": "armenia",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Armenia national football team"
  },
  "australia": {
   "commons": "Australia national football team badge.svg",
   "enwiki": null,
+  "nome_ingles": "australia",
   "nota": "seleção (Commons)"
  },
  "austria": {
   "commons": null,
   "enwiki": "Austria national football team crest.svg",
+  "nome_ingles": "austria",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Austria national football team"
  },
- "azerbaijan": {
+ "azerbaijao": {
   "commons": null,
   "enwiki": "Association of Football Federations of Azerbaijan logo.svg",
+  "nome_ingles": "azerbaijan",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Azerbaijan national football team"
  },
  "bahamas": {
   "commons": null,
   "enwiki": "Bahamas Football Association.svg",
+  "nome_ingles": "bahamas",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Bahamas national football team"
  },
- "bahrain": {
+ "bahrein": {
   "commons": null,
   "enwiki": "Bahrain FA logo.svg",
+  "nome_ingles": "bahrain",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Bahrain national football team"
  },
  "bangladesh": {
   "commons": "Logo of Bangladesh Football Federation.svg",
+  "nome_ingles": "bangladesh",
   "page": "Bangladesh national football team"
  },
  "belarus": {
   "commons": "Coat of arms of Belarus (2020–present).svg",
+  "nome_ingles": "belarus",
   "page": "Belarus national football team"
  },
- "belgium": {
+ "belgica": {
   "commons": null,
   "enwiki": "Royal Belgian FA logo 2019.svg",
+  "nome_ingles": "belgium",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Belgium national football team"
  },
  "belize": {
   "commons": null,
   "enwiki": "Belize_FA_2.svg",
+  "nome_ingles": "belize",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Belize national football team"
  },
  "benin": {
-  "commons": "flag of Benin.svg",
-  "page": "Benin national football team"
+  "nome_ingles": "benin",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "bermuda": {
+ "bermudas": {
   "commons": null,
   "enwiki": "Bermuda FA logo.svg",
+  "nome_ingles": "bermuda",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Bermuda national football team"
- },
- "bhutan": {
-  "commons": null,
-  "enwiki": "Bhutan FF logo.svg",
-  "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
-  "page": "Bhutan national football team"
  },
  "bolivia": {
   "commons": null,
   "enwiki": "Bolivian Football Federation logo.svg",
+  "nome_ingles": "bolivia",
   "nota": "logo da federação (a Wikipédia usava a bandeira no artigo da seleção) — arquivo só na Wikipédia em inglês: conferir direitos"
  },
- "bosnia-and-herzegovina": {
+ "bosnia_e_herzegovina": {
   "commons": null,
   "enwiki": "Football_Association_of_Bosnia_and_Herzegovina_logo.svg",
+  "nome_ingles": "bosnia-and-herzegovina",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Bosnia and Herzegovina national football team"
  },
- "botswana": {
-  "commons": "flag of Botswana.svg",
-  "page": "Botswana national football team"
+ "botsuana": {
+  "nome_ingles": "botswana",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "brazil": {
-  "commons": "Confederação Brasileira de Futebol logo (2020).svg",
-  "page": "Brazil national football team"
- },
- "british-virgin-islands": {
-  "commons": "Flag of the British Virgin Islands.svg",
-  "page": "British Virgin Islands national football team"
+ "brasil": {
+  "nome_ingles": "brazil",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "brunei": {
   "commons": null,
   "enwiki": "Football Association of Brunei Darussalam logo.svg",
+  "nome_ingles": "brunei",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Brunei national football team"
  },
- "burkina-faso": {
-  "commons": "flag of Burkina Faso.svg",
-  "page": "Burkina Faso national football team"
+ "bulgaria": {
+  "nome_ingles": "bulgaria",
+  "origem": "football-logos.cc (baixado pelo Sérgio)"
+ },
+ "burkina_faso": {
+  "nome_ingles": "burkina-faso",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "burundi": {
-  "commons": "flag of Burundi.svg",
-  "page": "Burundi national football team"
+  "nome_ingles": "burundi",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "cabo-verde": {
-  "commons": "Flag of Cape Verde (3-2).svg",
-  "page": "Cape Verde national football team"
+ "butao": {
+  "commons": null,
+  "enwiki": "Bhutan FF logo.svg",
+  "nome_ingles": "bhutan",
+  "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
+  "page": "Bhutan national football team"
  },
- "cambodia": {
+ "cabo_verde": {
+  "nome_ingles": "cabo-verde",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "camaroes": {
+  "enwiki": "Cameroon 2010crest.png",
+  "nome_ingles": "cameroon",
+  "nota": "SOMENTE PNG: sem SVG disponível; conferir direitos"
+ },
+ "camboja": {
   "commons": null,
   "enwiki": "Football Federation of Cambodia logo.svg",
+  "nome_ingles": "cambodia",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Cambodia national football team"
  },
- "cameroon": {
-  "enwiki": "Cameroon 2010crest.png",
-  "nota": "SOMENTE PNG: sem SVG disponível; conferir direitos"
+ "canada": {
+  "nome_ingles": "canada",
+  "origem": "football-logos.cc (baixado pelo Sérgio)"
  },
- "catalonia": {
+ "catalunha": {
   "commons": null,
   "enwiki": "Catalonia national football team crest.svg",
+  "nome_ingles": "catalonia",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Catalonia national football team"
  },
- "cayman-islands": {
+ "catar": {
+  "nome_ingles": "qatar",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "cazaquistao": {
   "commons": null,
-  "enwiki": "Cayman Islands Football Association.svg",
+  "enwiki": "Kazakhstan Football Federation logo.svg",
+  "nome_ingles": "kazakhstan",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
-  "page": "Cayman Islands national football team"
+  "page": "Kazakhstan national football team"
  },
- "central-african-republic": {
-  "commons": "flag of Central African Republic.svg",
-  "page": "Central African Republic national football team"
- },
- "chad": {
-  "commons": "flag of Chad.svg",
-  "page": "Chad national football team"
+ "chade": {
+  "nome_ingles": "chad",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "chile": {
   "commons": "Federación de Fútbol de Chile logo.svg",
+  "nome_ingles": "chile",
   "page": "Chile national football team"
  },
  "china": {
   "commons": null,
   "enwiki": "China national football team.svg",
+  "nome_ingles": "china",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "China national football team"
  },
  "colombia": {
   "commons": "FCF-Logo-2023.svg",
+  "nome_ingles": "colombia",
   "page": "Colombia national football team"
  },
- "comoros": {
-  "commons": "flag of Comoros.svg",
-  "page": "Comoros national football team"
+ "comores": {
+  "nome_ingles": "comoros",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "congo": {
-  "commons": "Flag of Congo.svg",
-  "page": "Congo national football team"
+  "nome_ingles": "congo",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "congo-dr": {
-  "commons": "Flag of the Democratic Republic of the Congo.svg",
-  "page": "DR Congo national football team"
+ "coreia_do_norte": {
+  "commons": "Fed_coree_nord.svg",
+  "nome_ingles": "north-korea",
+  "page": "North Korea national football team"
  },
- "cook-islands": {
+ "coreia_do_sul": {
   "commons": null,
-  "enwiki": "Cook Islands FA.svg",
+  "enwiki": "South Korea national football team.svg",
+  "nome_ingles": "south-korea",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Cook Islands national football team"
+  "page": "South Korea national football team"
  },
- "costa-rica": {
-  "commons": "Costa Rica national football team logo.svg",
-  "page": "Costa Rica national football team"
- },
- "cote-d-ivoire": {
+ "costa_do_marfim": {
   "commons": null,
   "enwiki": "Ivory Coast national football team logo.svg",
+  "nome_ingles": "cote-d-ivoire",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Ivory Coast national football team"
  },
- "croatia": {
+ "costa_rica": {
+  "commons": "Costa Rica national football team logo.svg",
+  "nome_ingles": "costa-rica",
+  "page": "Costa Rica national football team"
+ },
+ "croacia": {
   "commons": null,
   "enwiki": "Croatia national football team logo.svg",
+  "nome_ingles": "croatia",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Croatia national football team"
  },
  "cuba": {
-  "commons": "Football Association of Cuba logo.svg",
-  "enwiki": null,
-  "nota": "escudo da federação",
-  "page": "Cuba national football team"
+  "nome_ingles": "cuba",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "curacao": {
   "commons": null,
   "enwiki": "Curacao_Football_Federation.svg",
+  "nome_ingles": "curacao",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Curaçao national football team"
  },
- "czech-republic": {
-  "commons": null,
-  "enwiki": "Czech Republic national football team logo.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Czech Republic national football team"
- },
- "denmark": {
+ "dinamarca": {
   "commons": "Dansk boldspil union logo.svg",
+  "nome_ingles": "denmark",
   "page": "Denmark national football team"
  },
- "djibouti": {
-  "commons": "flag of Djibouti.svg",
-  "page": "Djibouti national football team"
+ "djibuti": {
+  "nome_ingles": "djibouti",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "dominica": {
-  "commons": "flag of Dominica.svg",
-  "page": "Dominica national football team"
+  "nome_ingles": "dominica",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "dominican-republic": {
-  "commons": "Federación Dominicana de Fútbol logo (2025).svg",
-  "page": "Dominican Republic national football team"
- },
- "dutch": {
-  "commons": null,
-  "enwiki": "Netherlands national football team logo.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Netherlands national football team"
- },
- "ecuador": {
-  "commons": "Logo de la Federación Ecuatoriana de Fútbol (2).svg",
-  "page": "Ecuador national football team"
- },
- "egypt": {
+ "egito": {
   "commons": null,
   "enwiki": "Egyptian Football Association logo.svg",
+  "nome_ingles": "egypt",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Egypt national football team"
  },
- "el-salvador": {
+ "el_salvador": {
   "commons": "El Salvador crest.svg",
+  "nome_ingles": "el-salvador",
   "page": "El Salvador national football team"
  },
- "england": {
+ "equador": {
+  "commons": "Logo de la Federación Ecuatoriana de Fútbol (2).svg",
+  "nome_ingles": "ecuador",
+  "page": "Ecuador national football team"
+ },
+ "eritreia": {
+  "nome_ingles": "eritrea",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "escocia": {
   "commons": null,
-  "enwiki": "England national football team crest.svg",
+  "enwiki": "Scotland national football team logo 2014.svg",
+  "nome_ingles": "scotland",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "England national football team"
+  "page": "Scotland national football team"
  },
- "equatorial-guinea": {
-  "commons": "Flag of Equatorial Guinea.svg",
-  "page": "Equatorial Guinea national football team"
+ "eslovenia": {
+  "commons": null,
+  "enwiki": "Slovenia national football team.svg",
+  "nome_ingles": "slovenia",
+  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
+  "page": "Slovenia national football team"
  },
- "eritrea": {
-  "commons": "flag of Eritrea.svg",
-  "page": "Eritrea national football team"
+ "espanha": {
+  "commons": null,
+  "enwiki": "Spain national football team crest.svg",
+  "nome_ingles": "spain",
+  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
+  "page": "Spain national football team"
+ },
+ "essuatini": {
+  "nome_ingles": "eswatini",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "estados_unidos": {
+  "commons": "United States Soccer Federation logo.svg",
+  "nome_ingles": "usa",
+  "page": "United States men's national soccer team"
  },
  "estonia": {
   "commons": null,
   "enwiki": "Estonian_Football_Association_logo.svg",
+  "nome_ingles": "estonia",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Estonia national football team"
  },
- "eswatini": {
-  "commons": "flag of Eswatini.svg",
-  "page": "Eswatini national football team"
- },
- "ethiopia": {
+ "etiopia": {
   "commons": null,
   "enwiki": "Ethiopian Football Federation.svg",
+  "nome_ingles": "ethiopia",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Ethiopia national football team"
- },
- "faroe-islands": {
-  "commons": "Faroe Islands Football Association logo.svg",
-  "page": "Faroe Islands national football team"
  },
  "fiji": {
   "commons": null,
   "enwiki": "Fiji FA.svg",
+  "nome_ingles": "fiji",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Fiji national football team"
  },
- "finland": {
-  "commons": "Football Association of Finland logo.svg",
+ "filipinas": {
+  "commons": "Logo of Philippine Football Federation.svg",
   "enwiki": null,
+  "nome_ingles": "philippines",
   "nota": "escudo da federação",
-  "page": "Finland national football team"
+  "page": "Philippines national football team"
  },
- "france": {
-  "commons": null,
-  "enwiki": "File:France national football team seal.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "France national football team"
+ "finlandia": {
+  "nome_ingles": "finland",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "french-guiana": {
-  "commons": null,
-  "enwiki": "Ligue de Football de la Guyane.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "French Guiana national football team"
+ "franca": {
+  "nome_ingles": "france",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "gabon": {
-  "commons": "flag of Gabon.svg",
-  "page": "Gabon national football team"
+ "gabao": {
+  "nome_ingles": "gabon",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "gambia": {
-  "commons": "flag of The Gambia.svg",
-  "page": "Gambia national football team"
+  "nome_ingles": "gambia",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "gana": {
+  "commons": null,
+  "enwiki": "Ghana Football Association logo (2001).svg",
+  "nome_ingles": "ghana",
+  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
+  "page": "Ghana national football team"
  },
  "georgia": {
   "commons": null,
   "enwiki": "Georgia national football team crest.svg",
+  "nome_ingles": "georgia",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Georgia national football team"
- },
- "germany": {
-  "commons": null,
-  "enwiki": "DFBEagle.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Germany national football team"
- },
- "ghana": {
-  "commons": null,
-  "enwiki": "Ghana Football Association logo (2001).svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Ghana national football team"
  },
  "gibraltar": {
   "commons": null,
   "enwiki": "Gibraltar Football Association (2020).svg",
+  "nome_ingles": "gibraltar",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Gibraltar national football team"
  },
- "greece": {
+ "granada": {
+  "nome_ingles": "grenada",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "grecia": {
   "commons": "Greece National Football Team.svg",
+  "nome_ingles": "greece",
   "page": "Greece national football team"
  },
- "greenland": {
-  "commons": "Flag of Greenland.svg",
-  "page": "Greenland national football team"
- },
- "grenada": {
-  "commons": "Flag of Grenada.svg",
-  "page": "Grenada national football team"
+ "groenlandia": {
+  "nome_ingles": "greenland",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "guam": {
   "commons": null,
   "enwiki": "Guam national soccer team.svg",
+  "nome_ingles": "guam",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Guam national football team"
  },
  "guatemala": {
   "commons": null,
   "enwiki": "Guatemala national football team logo.svg",
+  "nome_ingles": "guatemala",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Guatemala national football team"
  },
- "guinea": {
+ "guiana": {
+  "nome_ingles": "guyana",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "guiana_francesa": {
+  "commons": null,
+  "enwiki": "Ligue de Football de la Guyane.svg",
+  "nome_ingles": "french-guiana",
+  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
+  "page": "French Guiana national football team"
+ },
+ "guine": {
   "commons": null,
   "enwiki": "Guinean Football Federation logo.svg",
+  "nome_ingles": "guinea",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Guinea national football team"
  },
- "guinea-bissau": {
-  "commons": "flag of Guinea-Bissau.svg",
-  "page": "Guinea-Bissau national football team"
+ "guine_bissau": {
+  "nome_ingles": "guinea-bissau",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "guyana": {
-  "commons": "Flag of Guyana.svg",
-  "page": "Guyana national football team"
+ "guine_equatorial": {
+  "nome_ingles": "equatorial-guinea",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "haiti": {
-  "commons": "Flag of Haiti.svg",
-  "page": "Haiti national football team"
+  "nome_ingles": "haiti",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "holanda": {
+  "nome_ingles": "netherlands (no football-logos.cc: dutch-national-team)",
+  "origem": "football-logos.cc (baixado pelo Sérgio)"
  },
  "honduras": {
   "commons": "Honduras football crest.svg",
+  "nome_ingles": "honduras",
   "page": "Honduras national football team"
  },
- "hong-kong": {
+ "hong_kong": {
   "commons": null,
   "enwiki": "Hong Kong national football team.svg",
+  "nome_ingles": "hong-kong",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Hong Kong national football team"
  },
- "hungary": {
+ "hungria": {
   "commons": "Coat of arms of Hungary.svg",
+  "nome_ingles": "hungary",
   "page": "Hungary national football team"
  },
- "iceland": {
+ "ilhas_cayman": {
   "commons": null,
-  "enwiki": "Iceland national football team logo.svg",
+  "enwiki": "Cayman Islands Football Association.svg",
+  "nome_ingles": "cayman-islands",
+  "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
+  "page": "Cayman Islands national football team"
+ },
+ "ilhas_cook": {
+  "commons": null,
+  "enwiki": "Cook Islands FA.svg",
+  "nome_ingles": "cook-islands",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Iceland national football team"
+  "page": "Cook Islands national football team"
+ },
+ "ilhas_faroe": {
+  "commons": "Faroe Islands Football Association logo.svg",
+  "nome_ingles": "faroe-islands",
+  "page": "Faroe Islands national football team"
+ },
+ "ilhas_marianas_do_norte": {
+  "nome_ingles": "northern-mariana-islands",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "ilhas_salomao": {
+  "nome_ingles": "solomon-islands",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "ilhas_virgens_americanas": {
+  "nome_ingles": "us-virgin-islands",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "ilhas_virgens_britanicas": {
+  "nome_ingles": "british-virgin-islands",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "india": {
   "commons": "All India Football Federation logo.svg",
+  "nome_ingles": "india",
   "page": "India national football team"
  },
  "indonesia": {
   "commons": null,
   "enwiki": "Football Association of Indonesia logo.svg",
+  "nome_ingles": "indonesia",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Indonesia national football team"
  },
- "iran": {
+ "inglaterra": {
+  "nome_ingles": "england",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "ira": {
   "commons": null,
   "enwiki": "Football Federation Islamic Republic of Iran logo.svg",
+  "nome_ingles": "iran",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Iran national football team"
  },
- "iraq": {
+ "iraque": {
   "commons": "Iraq National Team Badge 2021 v1.svg",
+  "nome_ingles": "iraq",
   "page": "Iraq national football team"
  },
- "israel": {
-  "commons": "Flag of Israel.svg",
-  "page": "Israel national football team"
+ "irlanda": {
+  "commons": null,
+  "enwiki": "Republic of Ireland national football team crest.svg",
+  "nome_ingles": "republic-of-ireland",
+  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
+  "page": "Republic of Ireland national football team"
  },
- "italy": {
+ "irlanda_do_norte": {
+  "commons": null,
+  "enwiki": "Irish Football Association logo.svg",
+  "nome_ingles": "northern-ireland",
+  "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
+  "page": "Northern Ireland national football team"
+ },
+ "islandia": {
+  "commons": null,
+  "enwiki": "Iceland national football team logo.svg",
+  "nome_ingles": "iceland",
+  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
+  "page": "Iceland national football team"
+ },
+ "israel": {
+  "nome_ingles": "israel",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "italia": {
   "commons": "Logo Italy National Football Team - 2023.svg",
+  "nome_ingles": "italy",
   "page": "Italy national football team"
  },
  "jamaica": {
   "commons": "Jamaica FA.svg",
+  "nome_ingles": "jamaica",
   "page": "Jamaica national football team"
  },
- "japan": {
+ "japao": {
   "commons": null,
   "enwiki": "Japan_national_football_team_crest.svg",
+  "nome_ingles": "japan",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Japan national football team"
  },
- "jordan": {
+ "jordania": {
   "commons": "Jordan national football team logo 2024.svg",
+  "nome_ingles": "jordan",
   "page": "Jordan national football team"
- },
- "kazakhstan": {
-  "commons": null,
-  "enwiki": "Kazakhstan Football Federation logo.svg",
-  "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
-  "page": "Kazakhstan national football team"
- },
- "kenya": {
-  "commons": "flag of Kenya.svg",
-  "page": "Kenya national football team"
- },
- "kiribati": {
-  "commons": null,
-  "enwiki": "Kiribati Football Association.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Kiribati national football team"
  },
  "kosovo": {
   "commons": "Kosovo National Football Team.svg",
+  "nome_ingles": "kosovo",
   "page": "Kosovo national football team"
  },
  "kuwait": {
   "commons": null,
   "enwiki": "Kuwait Football Association logo.svg",
+  "nome_ingles": "kuwait",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Kuwait national football team"
- },
- "kyrgyzstan": {
-  "commons": "Flag of Kyrgyzstan.svg",
-  "page": "Kyrgyzstan national football team"
  },
  "laos": {
   "commons": null,
   "enwiki": "Lao Football Federation logo.svg",
+  "nome_ingles": "laos",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Laos national football team"
  },
- "latvia": {
+ "lesoto": {
+  "nome_ingles": "lesotho",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "letonia": {
   "commons": null,
   "enwiki": "Latvian Football Federation logo.svg",
+  "nome_ingles": "latvia",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Latvia national football team"
  },
- "lebanon": {
+ "libano": {
   "commons": null,
   "enwiki": "Lebanese Football Association (LFA) logo.svg",
+  "nome_ingles": "lebanon",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Lebanon national football team"
  },
- "lesotho": {
-  "commons": "Flag of Lesotho.svg",
-  "page": "Lesotho national football team"
- },
  "liberia": {
   "commons": "Liberia Football Association logo.svg",
+  "nome_ingles": "liberia",
   "page": "Liberia national football team"
  },
- "libya": {
-  "commons": "Flag of Libya.svg",
-  "page": "Libya national football team"
+ "libia": {
+  "nome_ingles": "libya",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "liechtenstein": {
   "commons": "Crown of Liechtenstein.svg",
+  "nome_ingles": "liechtenstein",
   "page": "Liechtenstein national football team"
  },
- "lithuania": {
+ "lituania": {
   "commons": null,
   "enwiki": "Lithuanian Football Federation logo.svg",
+  "nome_ingles": "lithuania",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Lithuania national football team"
  },
- "luxembourg": {
+ "luxemburgo": {
   "commons": null,
   "enwiki": "Luxembourg Football Federation logo.svg",
+  "nome_ingles": "luxembourg",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Luxembourg national football team"
  },
  "macau": {
-  "commons": "Flag of Macau.svg",
-  "page": "Macau national football team"
+  "nome_ingles": "macau",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "macedonia_do_norte": {
+  "commons": "Coat of arms of the President of North Macedonia.svg",
+  "nome_ingles": "north-macedonia",
+  "page": "North Macedonia national football team"
  },
  "madagascar": {
-  "commons": "flag of Madagascar.svg",
-  "page": "Madagascar national football team"
+  "nome_ingles": "madagascar",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "malawi": {
-  "enwiki": "Malawi FA (logo).png",
-  "nota": "SOMENTE PNG (o SVG baixado antes era a bandeira): conferir direitos"
- },
- "malaysia": {
+ "malasia": {
   "commons": null,
   "enwiki": "Football Association of Malaysia crest.svg",
+  "nome_ingles": "malaysia",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Malaysia national football team"
  },
- "maldives": {
-  "commons": "Flag of Maldives.svg",
-  "page": "Maldives national football team"
+ "malawi": {
+  "enwiki": "Malawi FA (logo).png",
+  "nome_ingles": "malawi",
+  "nota": "SOMENTE PNG (o SVG baixado antes era a bandeira): conferir direitos"
+ },
+ "maldivas": {
+  "nome_ingles": "maldives",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "mali": {
-  "commons": "flag of Mali.svg",
-  "page": "Mali national football team"
+  "nome_ingles": "mali",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "malta": {
   "commons": "Malta national football team crest.svg",
+  "nome_ingles": "malta",
   "page": "Malta national football team"
  },
- "martinique": {
+ "marrocos": {
+  "commons": null,
+  "enwiki": "Royal Moroccan Football Federation logo.svg",
+  "nome_ingles": "morocco",
+  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
+  "page": "Morocco national football team"
+ },
+ "martinica": {
   "commons": null,
   "enwiki": "LFM Martinique.SVG",
+  "nome_ingles": "martinique",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Martinique national football team"
+ },
+ "mauricio": {
+  "nome_ingles": "mauritius",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "mauritania": {
   "commons": null,
   "enwiki": "Football Federation of the Islamic Republic of Mauritania logo.svg",
+  "nome_ingles": "mauritania",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Mauritania national football team"
- },
- "mauritius": {
-  "commons": "Flag of Mauritius.svg",
-  "page": "Mauritius national football team"
  },
  "mexico": {
   "commons": null,
   "enwiki": "Mexico national football team crest.svg",
+  "nome_ingles": "mexico",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Mexico national football team"
  },
- "moldova": {
+ "mianmar": {
+  "commons": null,
+  "enwiki": "Myanmar national football team crest.svg",
+  "nome_ingles": "myanmar",
+  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
+  "page": "Myanmar national football team"
+ },
+ "mocambique": {
+  "nome_ingles": "mozambique",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "moldavia": {
   "commons": null,
   "enwiki": "Moldova national football team.svg",
+  "nome_ingles": "moldova",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Moldova national football team"
  },
  "mongolia": {
-  "commons": "Flag of Mongolia.svg",
-  "page": "Mongolia national football team"
+  "nome_ingles": "mongolia",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "montenegro": {
   "commons": null,
   "enwiki": "Football Association of Montenegro logo.svg",
+  "nome_ingles": "montenegro",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Montenegro national football team"
  },
  "montserrat": {
   "commons": null,
   "enwiki": "Montserrat Football Association.svg",
+  "nome_ingles": "montserrat",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Montserrat national football team"
- },
- "morocco": {
-  "commons": null,
-  "enwiki": "Royal Moroccan Football Federation logo.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Morocco national football team"
- },
- "mozambique": {
-  "commons": "flag of Mozambique.svg",
-  "page": "Mozambique national football team"
- },
- "myanmar": {
-  "commons": null,
-  "enwiki": "Myanmar national football team crest.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Myanmar national football team"
  },
  "namibia": {
   "commons": null,
   "enwiki": "Namibia Football Association logo.svg",
+  "nome_ingles": "namibia",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Namibia national football team"
  },
  "nepal": {
-  "commons": "Flag of Nepal.svg",
-  "page": "Nepal national football team"
- },
- "netherlands": {
-  "commons": null,
-  "enwiki": "Netherlands national football team logo.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Netherlands national football team"
- },
- "new-caledonia": {
-  "commons": "File:Flags of New Caledonia.svg",
-  "page": "New Caledonia national football team"
- },
- "new-zealand": {
-  "commons": null,
-  "enwiki": "New Zealand Football logo.svg",
-  "nota": "logo da federação (arquivo só na Wikipédia em inglês: conferir direitos)"
+  "nome_ingles": "nepal",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "nicaragua": {
   "commons": null,
   "enwiki": "Nicaragua FA logo.svg",
+  "nome_ingles": "nicaragua",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Nicaragua national football team"
  },
  "niger": {
-  "commons": "flag of Niger.svg",
-  "page": "Niger national football team"
+  "nome_ingles": "niger",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "nigeria": {
   "commons": null,
   "enwiki": "Nigeria Football Federation logo.svg",
+  "nome_ingles": "nigeria",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Nigeria national football team"
  },
- "north-korea": {
-  "commons": "Fed_coree_nord.svg",
-  "page": "North Korea national football team"
- },
- "north-macedonia": {
-  "commons": "Coat of arms of the President of North Macedonia.svg",
-  "page": "North Macedonia national football team"
- },
- "northern-ireland": {
-  "commons": null,
-  "enwiki": "Irish Football Association logo.svg",
-  "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
-  "page": "Northern Ireland national football team"
- },
- "northern-mariana-islands": {
-  "commons": "Flag of the Northern Mariana Islands.svg",
-  "page": "Northern Mariana Islands national football team"
- },
- "norway": {
+ "noruega": {
   "commons": null,
   "enwiki": "Norway national football team logo.svg",
+  "nome_ingles": "norway",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Norway national football team"
  },
- "oman": {
-  "commons": "Flag of Oman.svg",
-  "page": "Oman national football team"
+ "nova_caledonia": {
+  "nome_ingles": "new-caledonia",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "pakistan": {
-  "commons": "Flag of Pakistan.svg",
-  "page": "Pakistan national football team"
+ "nova_zelandia": {
+  "nome_ingles": "new-zealand",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "palestine": {
+ "oma": {
+  "nome_ingles": "oman",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "pais_de_gales": {
+  "commons": null,
+  "enwiki": "Wales national football team logo.svg",
+  "nome_ingles": "wales",
+  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
+  "page": "Wales national football team"
+ },
+ "palestina": {
   "commons": "2024 Palestine Football National Team Badge.svg",
+  "nome_ingles": "palestine",
   "page": "Palestine national football team"
  },
  "panama": {
   "commons": null,
   "enwiki": "Panamanian Football Federation logo 2024.svg",
+  "nome_ingles": "panama",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Panama national football team"
  },
- "papua-new-guinea": {
+ "papua_nova_guine": {
   "commons": null,
   "enwiki": "PNGFA Logo.svg",
+  "nome_ingles": "papua-new-guinea",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Papua New Guinea national soccer team"
  },
- "paraguay": {
+ "paquistao": {
+  "nome_ingles": "pakistan",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "paraguai": {
   "commons": "Asociación Paraguaya de Fútbol logo.svg",
+  "nome_ingles": "paraguay",
   "page": "Paraguay national football team"
  },
  "peru": {
   "commons": null,
   "enwiki": "Fpf-logo.svg",
+  "nome_ingles": "peru",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Peru national football team"
  },
- "philippines": {
-  "commons": "Logo of Philippine Football Federation.svg",
-  "enwiki": null,
-  "nota": "escudo da federação",
-  "page": "Philippines national football team"
- },
- "poland": {
+ "polonia": {
   "commons": "Herb Polski.svg",
+  "nome_ingles": "poland",
   "page": "Poland national football team"
+ },
+ "porto_rico": {
+  "commons": "Puerto Rican Football Federation logo.svg",
+  "nome_ingles": "puerto-rico",
+  "page": "Puerto Rico national football team"
  },
  "portugal": {
   "commons": null,
   "enwiki": "Portugal national football team logo.svg",
+  "nome_ingles": "portugal",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Portugal national football team"
  },
- "puerto-rico": {
-  "commons": "Puerto Rican Football Federation logo.svg",
-  "page": "Puerto Rico national football team"
+ "quenia": {
+  "nome_ingles": "kenya",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "qatar": {
-  "commons": "Flag of Qatar.svg",
-  "page": "Qatar national football team"
+ "quirguistao": {
+  "nome_ingles": "kyrgyzstan",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "republic-of-ireland": {
+ "quiribati": {
   "commons": null,
-  "enwiki": "Republic of Ireland national football team crest.svg",
+  "enwiki": "Kiribati Football Association.svg",
+  "nome_ingles": "kiribati",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Republic of Ireland national football team"
+  "page": "Kiribati national football team"
  },
- "reunion": {
-  "commons": "Proposed flag of Réunion (VAR).svg",
-  "page": "Réunion national football team"
+ "rd_congo": {
+  "nome_ingles": "congo-dr",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "romania": {
+ "republica_centro_africana": {
+  "nome_ingles": "central-african-republic",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "republica_dominicana": {
+  "commons": "Federación Dominicana de Fútbol logo (2025).svg",
+  "nome_ingles": "dominican-republic",
+  "page": "Dominican Republic national football team"
+ },
+ "reuniao": {
+  "nome_ingles": "reunion",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "romenia": {
   "commons": null,
   "enwiki": "Romania national football team logo.svg",
+  "nome_ingles": "romania",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Romania national football team"
  },
+ "ruanda": {
+  "nome_ingles": "rwanda",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
  "russia": {
   "commons": "Coat of Arms of the Russian Federation 2.svg",
+  "nome_ingles": "russia",
   "page": "Russia national football team"
  },
- "rwanda": {
-  "commons": "flag of Rwanda.svg",
-  "page": "Rwanda national football team"
+ "samoa_americana": {
+  "nome_ingles": "american-samoa",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "saint-vincent-and-the-grenadines": {
-  "commons": null,
-  "enwiki": "Saint Vincent and the Grenadines Football Federation logo.svg",
-  "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
-  "page": "Saint Vincent and the Grenadines national football team"
- },
- "san-marino": {
+ "san_marino": {
   "commons": "San Marino Football Federation logo.svg",
   "enwiki": null,
+  "nome_ingles": "san-marino",
   "nota": "escudo da federação",
   "page": "San Marino national football team"
  },
- "sao-tome-and-principe": {
-  "commons": "flag of São Tomé and Príncipe.svg",
-  "page": "São Tomé and Príncipe national football team"
- },
- "saudi-arabia": {
+ "sao_cristovao_e_nevis": {
   "commons": null,
-  "enwiki": "Saudi Arabia national football team logo.svg",
+  "enwiki": "Saint Kitts & Nevis Football Association.svg",
+  "nome_ingles": "st-kitts-and-nevis",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Saudi Arabia national football team"
+  "page": "Saint Kitts and Nevis national football team"
  },
- "scotland": {
+ "sao_tome_e_principe": {
+  "nome_ingles": "sao-tome-and-principe",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "sao_vicente_e_granadinas": {
   "commons": null,
-  "enwiki": "Scotland national football team logo 2014.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Scotland national football team"
+  "enwiki": "Saint Vincent and the Grenadines Football Federation logo.svg",
+  "nome_ingles": "saint-vincent-and-the-grenadines",
+  "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
+  "page": "Saint Vincent and the Grenadines national football team"
+ },
+ "seicheles": {
+  "nome_ingles": "seychelles",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "senegal": {
   "commons": null,
   "enwiki": "Senegalese Football Federation logo.svg",
+  "nome_ingles": "senegal",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Senegal national football team"
  },
- "serbia": {
+ "servia": {
   "commons": null,
   "enwiki": "Football Association of Serbia logo.svg",
+  "nome_ingles": "serbia",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Serbia national football team"
  },
- "seychelles": {
-  "commons": "flag of Seychelles.svg",
-  "page": "Seychelles national football team"
+ "singapura": {
+  "nome_ingles": "singapore",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "singapore": {
-  "commons": "Flag of Singapore.svg",
-  "page": "Singapore national football team"
- },
- "slovenia": {
-  "commons": null,
-  "enwiki": "Slovenia national football team.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Slovenia national football team"
- },
- "solomon-islands": {
-  "commons": "Flag of Solomon Islands.svg",
-  "page": "Solomon Islands national football team"
+ "siria": {
+  "nome_ingles": "syria",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "somalia": {
   "commons": "Somali Football Federation logo.svg",
+  "nome_ingles": "somalia",
   "page": "Somalia national football team"
  },
- "south-africa": {
+ "sri_lanka": {
+  "nome_ingles": "sri-lanka",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "sudao": {
+  "nome_ingles": "sudan",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "sudao_do_sul": {
+  "nome_ingles": "south-sudan",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "suecia": {
+  "nome_ingles": "sweden",
+  "origem": "football-logos.cc (baixado pelo Sérgio)"
+ },
+ "suica": {
   "commons": null,
-  "enwiki": "South Africa national soccer team logo.svg",
+  "enwiki": "SFV Logo.svg",
+  "nome_ingles": "switzerland",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "South Africa national soccer team"
- },
- "south-korea": {
-  "commons": null,
-  "enwiki": "South Korea national football team.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "South Korea national football team"
- },
- "south-sudan": {
-  "commons": "flag of South Sudan.svg",
-  "page": "South Sudan national football team"
- },
- "spain": {
-  "commons": null,
-  "enwiki": "Spain national football team crest.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Spain national football team"
- },
- "sri-lanka": {
-  "commons": "flag of Sri Lanka.svg",
-  "page": "Sri Lanka national football team"
- },
- "st-kitts-and-nevis": {
-  "commons": null,
-  "enwiki": "Saint Kitts & Nevis Football Association.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Saint Kitts and Nevis national football team"
- },
- "sudan": {
-  "commons": "flag of Sudan.svg",
-  "page": "Sudan national football team"
+  "page": "Switzerland national football team"
  },
  "suriname": {
   "commons": null,
   "enwiki": "Surinaamse Voetbal Bond logo.svg",
+  "nome_ingles": "suriname",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Suriname national football team"
  },
- "switzerland": {
+ "tailandia": {
   "commons": null,
-  "enwiki": "SFV Logo.svg",
+  "enwiki": "Thailand national football team logo.svg",
+  "nome_ingles": "thailand",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Switzerland national football team"
+  "page": "Thailand national football team"
  },
- "syria": {
-  "commons": "flag of Syria.svg",
-  "page": "Syria national football team"
- },
- "tahiti": {
+ "taiti": {
   "commons": null,
   "enwiki": "Tahiti FA (2016–).svg",
+  "nome_ingles": "tahiti",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Tahiti national football team"
  },
  "taiwan": {
   "commons": null,
   "enwiki": "Chinese Taipei Football Association logo.svg",
+  "nome_ingles": "taiwan",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Chinese Taipei national football team"
  },
- "tajikistan": {
-  "commons": "flag of Tajikistan.svg",
-  "page": "Tajikistan national football team"
+ "tajiquistao": {
+  "nome_ingles": "tajikistan",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "tanzania": {
-  "commons": "flag of Tanzania.svg",
-  "page": "Tanzania national football team"
+  "nome_ingles": "tanzania",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "thailand": {
+ "tchequia": {
   "commons": null,
-  "enwiki": "Thailand national football team logo.svg",
+  "enwiki": "Czech Republic national football team logo.svg",
+  "nome_ingles": "czech-republic",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Thailand national football team"
+  "page": "Czech Republic national football team"
  },
- "timor-leste": {
-  "commons": "flag of East Timor.svg",
-  "page": "Timor-Leste national football team"
+ "timor_leste": {
+  "nome_ingles": "timor-leste",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "togo": {
-  "commons": "Flag of Togo.svg",
-  "page": "Togo national football team"
+  "nome_ingles": "togo",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "tonga": {
-  "commons": "Flag of Tonga.svg",
-  "page": "Tonga national football team"
+  "nome_ingles": "tonga",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "trinidad-and-tobago": {
+ "trinidad_e_tobago": {
   "commons": null,
   "enwiki": "Trinidad and Tobago Football Association logo.svg",
+  "nome_ingles": "trinidad-and-tobago",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Trinidad and Tobago national football team"
  },
  "tunisia": {
   "commons": null,
   "enwiki": "File:Tunisian Football Federation logo.svg",
+  "nome_ingles": "tunisia",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Tunisia national football team"
  },
- "turkey": {
+ "turcomenistao": {
+  "nome_ingles": "turkmenistan",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "turquia": {
   "commons": "Roundel flag of Turkey.svg",
+  "nome_ingles": "turkey",
   "page": "Turkey national football team"
  },
- "turkmenistan": {
-  "commons": "flag of Turkmenistan.svg",
-  "page": "Turkmenistan national football team"
- },
  "tuvalu": {
-  "commons": "Flag of Tuvalu.svg",
-  "page": "Tuvalu national football team"
+  "nome_ingles": "tuvalu",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
+ },
+ "ucrania": {
+  "commons": "Logo Fédération Ukraine Football 2016.svg",
+  "nome_ingles": "ukraine",
+  "page": "Ukraine national football team"
  },
  "uganda": {
   "commons": null,
   "enwiki": "Federation of Uganda Football Associations logo.svg",
+  "nome_ingles": "uganda",
   "nota": "escudo da federação (arquivo só na Wikipédia em inglês: conferir direitos)",
   "page": "Uganda national football team"
  },
- "ukraine": {
-  "commons": "Logo Fédération Ukraine Football 2016.svg",
-  "page": "Ukraine national football team"
+ "uruguai": {
+  "nome_ingles": "uruguay",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "uruguay": {
-  "commons": null,
-  "enwiki": "Uruguay national football team seal.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Uruguay national football team"
- },
- "us-virgin-islands": {
-  "commons": "Flag of the United States Virgin Islands.svg",
-  "page": "United States Virgin Islands national soccer team"
- },
- "usa": {
-  "commons": "United States Soccer Federation logo.svg",
-  "page": "United States men's national soccer team"
- },
- "uzbekistan": {
+ "uzbequistao": {
   "commons": null,
   "enwiki": "Uzbekistan Football Association.svg",
+  "nome_ingles": "uzbekistan",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Uzbekistan national football team"
  },
  "vanuatu": {
-  "commons": "Flag of Vanuatu.svg",
-  "page": "Vanuatu national football team"
+  "nome_ingles": "vanuatu",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
- "vatican-city": {
+ "vaticano": {
   "commons": "Vatican City national football team.svg",
+  "nome_ingles": "vatican-city",
   "page": "Vatican City national football team"
  },
  "venezuela": {
   "commons": "Logotipo de la Federación Venezolana de Fútbol.svg",
+  "nome_ingles": "venezuela",
   "page": "Venezuela national football team"
  },
- "vietnam": {
+ "vietna": {
   "commons": "Flag of Vietnam.svg",
+  "nome_ingles": "vietnam",
   "page": "Vietnam national football team"
  },
- "wales": {
-  "commons": null,
-  "enwiki": "Wales national football team logo.svg",
-  "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
-  "page": "Wales national football team"
- },
  "zambia": {
-  "commons": "Flag of Zambia.svg",
-  "page": "Zambia national football team"
+  "nome_ingles": "zambia",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "zanzibar": {
-  "commons": "Flag of Zanzibar.svg",
-  "page": "Zanzibar national football team"
+  "nome_ingles": "zanzibar",
+  "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  }
 }

@@ -59,7 +59,9 @@ describe("national teams and the name resolvers", () => {
   it("resolves a country's name to its national team", () => {
     expect(resolveTeamId("Brasil")).toBe("brasil");
     expect(resolveTeamId("Colômbia")).toBe("colombia");
-    expect(resolveTeamId("Países Baixos")).toBe("paises_baixos");
+    // Brazilian football says Holanda; the sources say Países Baixos.
+    expect(resolveTeamId("Holanda")).toBe("holanda");
+    expect(resolveTeamId("Países Baixos")).toBe("holanda");
   });
 
   // A country's name is also the start of club names ("Brasil de Pelotas",
