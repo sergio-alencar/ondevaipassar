@@ -1,7 +1,8 @@
 import { env } from "../config/env.js";
 import { db } from "../db/client.js";
 import { mapWithConcurrency } from "../lib/concurrency.js";
-import { broadcasts, matches } from "../db/schema.js";
+import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
+import { desc, eq } from "drizzle-orm";
 import { fetchUpcomingStreams } from "../sources/youtube/adapter.js";
 import { attachBroadcastsFromStreams, runBroadcastSource, type BroadcastRow } from "./attachBroadcasts.js";
 import type { MatchCandidate } from "./broadcastMatching.js";
@@ -140,8 +141,30 @@ async function runChannel(
   });
 }
 
+/**
+ * How long a channel's last good run stands in for a new one. YouTube's search
+ * costs 100 quota units a call against a 10,000 a day allowance, and an ingest
+ * runs ~35 channels: the daily cron fits, but a few extra ingests forced by
+ * hand in one day (while testing) used it all up, and the rest of the day every
+ * channel failed with HTTP 429. Streams are announced hours or days ahead, so
+ * a six-hour-old answer is as good as a fresh one.
+ */
+export const MIN_HOURS_BETWEEN_YOUTUBE_RUNS = 6;
+
+/** Whether a channel's last run is recent enough, and clean enough, to skip asking YouTube again. A failure counts too when it was the quota: asking again can't succeed before the allowance resets. */
+export function canSkipYoutubeRun(
+  lastRun: { status: string; startedAt: string; errorMessage: string | null } | undefined,
+  now: Date,
+): boolean {
+  if (!lastRun) return false;
+  const ageHours = (now.getTime() - Date.parse(lastRun.startedAt)) / (60 * 60 * 1000);
+  if (ageHours >= MIN_HOURS_BETWEEN_YOUTUBE_RUNS) return false;
+  if (lastRun.status === "ok" || lastRun.status === "partial") return true;
+  return lastRun.status === "failed" && /\b429\b|quota/i.test(lastRun.errorMessage ?? "");
+}
+
 /** Enriches already-ingested matches with broadcasts from every tracked YouTube-only channel. A no-op (logged, not an error) if YOUTUBE_API_KEY isn't configured — same "degrade gracefully" pattern the Instagram poster uses for its own optional credentials. */
-export async function runYoutubeEnrichment(): Promise<void> {
+export async function runYoutubeEnrichment(options: { force?: boolean } = {}): Promise<void> {
   const apiKey = env.YOUTUBE_API_KEY;
   if (!apiKey) {
     console.log("[youtube] YOUTUBE_API_KEY not configured, skipping");
@@ -155,7 +178,12 @@ export async function runYoutubeEnrichment(): Promise<void> {
   // that has a hard 60s ceiling (see ingest/budget.ts). Safe to overlap — each
   // channel writes only rows of its OWN channelId, reads the shared snapshots
   // without modifying them, and runBroadcastSource contains its own failures.
-  await mapWithConcurrency(TRACKED_CHANNELS, YOUTUBE_CONCURRENCY, (channel) =>
-    runBroadcastSource(channel.sourceId, () => runChannel(channel, apiKey, allMatches, allBroadcasts)),
-  );
+  const now = new Date();
+  await mapWithConcurrency(TRACKED_CHANNELS, YOUTUBE_CONCURRENCY, async (channel) => {
+    if (!options.force) {
+      const [lastRun] = await db.select().from(scrapeRuns).where(eq(scrapeRuns.sourceId, channel.sourceId)).orderBy(desc(scrapeRuns.startedAt)).limit(1);
+      if (canSkipYoutubeRun(lastRun, now)) return;
+    }
+    await runBroadcastSource(channel.sourceId, () => runChannel(channel, apiKey, allMatches, allBroadcasts));
+  });
 }

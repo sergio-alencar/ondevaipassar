@@ -65,7 +65,8 @@ export async function cronRoutes(app: FastifyInstance): Promise<void> {
       // Every enrichment below runs last on purpose: they only attach a
       // broadcast to a match some earlier step already ingested this run,
       // never create one themselves.
-      { name: "youtube", run: runYoutubeEnrichment, needsMs: 6_000 },
+      // `?youtube=force` skips the quota guard (see canSkipYoutubeRun): for a deliberate refresh, not for testing.
+      { name: "youtube", run: () => runYoutubeEnrichment({ force: (request.query as { youtube?: string }).youtube === "force" }), needsMs: 6_000 },
       { name: "premiere", run: runPremiereEnrichment, needsMs: 3_000 },
       { name: "onde-assistir", run: runOndeAssistirEnrichment, needsMs: 14_000 },
       { name: "futebol-interior", run: runFutebolInteriorEnrichment, needsMs: 4_000 },
