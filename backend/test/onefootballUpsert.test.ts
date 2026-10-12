@@ -1,11 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { isUpsertNoOp } from "../src/ingest/onefootballEnrichment.js";
 
-const row = { homeTeamCrestUrl: "https://img/h.png", awayTeamCrestUrl: "https://img/a.png", kickoffUtc: "2026-10-21T19:00:00.000Z", round: 3 };
+const row = { homeTeamId: "japao" as string | null, awayTeamId: null as string | null, homeTeamCrestUrl: "https://img/h.png", awayTeamCrestUrl: "https://img/a.png", kickoffUtc: "2026-10-21T19:00:00.000Z", round: 3 };
 
 describe("isUpsertNoOp", () => {
   it("is true for a stored row that already matches what the page says", () => {
     expect(isUpsertNoOp(row, { ...row })).toBe(true);
+  });
+
+  // Real bug: a row stored while "Sérvia" was an unknown name kept its null id
+  // for good, so the page drew OneFootball's round flag instead of our crest.
+  it("is false when a team id the resolver now knows differs from the stored one", () => {
+    expect(isUpsertNoOp(row, { ...row, awayTeamId: "servia" })).toBe(false);
+    expect(isUpsertNoOp(row, { ...row, homeTeamId: null })).toBe(false);
   });
 
   it("is false when there is no stored row, which is an insert", () => {

@@ -23,8 +23,10 @@
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "andorra": {
-  "commons": "Coat of arms of Andorra.svg",
+  "commons": null,
+  "enwiki": "Andorran Football Federation logo.svg",
   "nome_ingles": "andorra",
+  "nota": "escudo da federação (a Wikipédia usava bandeira/brasão no artigo da seleção) — arquivo só na Wikipédia em inglês: conferir direitos",
   "page": "Andorra national football team"
  },
  "angola": {
@@ -107,8 +109,10 @@
   "page": "Bangladesh national football team"
  },
  "belarus": {
-  "commons": "Coat of arms of Belarus (2020–present).svg",
+  "commons": null,
+  "enwiki": "Football Federation of Belarus logo.svg",
   "nome_ingles": "belarus",
+  "nota": "escudo da federação (a Wikipédia usava bandeira/brasão no artigo da seleção) — arquivo só na Wikipédia em inglês: conferir direitos",
   "page": "Belarus national football team"
  },
  "belgica": {
@@ -513,8 +517,10 @@
   "page": "Hong Kong national football team"
  },
  "hungria": {
-  "commons": "Coat of arms of Hungary.svg",
+  "commons": null,
+  "enwiki": "Hungarian Football Federation logo.svg",
   "nome_ingles": "hungary",
+  "nota": "escudo da federação (a Wikipédia usava bandeira/brasão no artigo da seleção) — arquivo só na Wikipédia em inglês: conferir direitos",
   "page": "Hungary national football team"
  },
  "iemen": {
@@ -703,8 +709,10 @@
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "macedonia_do_norte": {
-  "commons": "Coat of arms of the President of North Macedonia.svg",
+  "commons": null,
+  "enwiki": "Football Federation of Macedonia logo.svg",
   "nome_ingles": "north-macedonia",
+  "nota": "escudo da federação (a Wikipédia usava bandeira/brasão no artigo da seleção) — arquivo só na Wikipédia em inglês: conferir direitos",
   "page": "North Macedonia national football team"
  },
  "madagascar": {
@@ -961,8 +969,10 @@
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "russia": {
-  "commons": "Coat of Arms of the Russian Federation 2.svg",
+  "commons": null,
+  "enwiki": "Russian Football Union logo.svg",
   "nome_ingles": "russia",
+  "nota": "escudo da federação (a Wikipédia usava bandeira/brasão no artigo da seleção) — arquivo só na Wikipédia em inglês: conferir direitos",
   "page": "Russia national football team"
  },
  "samoa": {
@@ -1137,8 +1147,10 @@
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "turquia": {
-  "commons": "Roundel flag of Turkey.svg",
+  "commons": null,
+  "enwiki": "Turkish_Football_Federation_crest.svg",
   "nome_ingles": "turkey",
+  "nota": "escudo da federação (a Wikipédia usava bandeira/brasão no artigo da seleção) — arquivo só na Wikipédia em inglês: conferir direitos",
   "page": "Turkey national football team"
  },
  "tuvalu": {
@@ -1183,8 +1195,10 @@
   "page": "Venezuela national football team"
  },
  "vietna": {
-  "commons": "Flag of Vietnam.svg",
+  "commons": null,
+  "enwiki": "File:Vietnam Football Federation logo.svg",
   "nome_ingles": "vietnam",
+  "nota": "escudo da federação (a Wikipédia usava bandeira/brasão no artigo da seleção) — arquivo só na Wikipédia em inglês: conferir direitos",
   "page": "Vietnam national football team"
  },
  "zambia": {

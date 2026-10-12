@@ -276,7 +276,9 @@ export async function runFemininoEnrichment(): Promise<void> {
             awayTeamId: nationalAway,
             awayTeamNameRaw: game.away.replace(/\s+F$/, ""),
             kickoffUtc: nationalKickoff,
-            refreshTeams: false,
+            // The resolver grows (an opponent that was unknown yesterday has an id
+            // today), so the stored ids must follow it, as they do for a hand-seeded row.
+            refreshTeams: true,
           });
           for (const [channelId, { watchUrl, regionalDetail }] of channelsOf(game)) {
             resolvedBroadcasts.push({ matchId: nationalMatchId, channelId, watchUrl, regionalDetail });

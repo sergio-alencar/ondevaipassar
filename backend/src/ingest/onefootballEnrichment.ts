@@ -156,19 +156,23 @@ const FETCH_BUDGET_MS = 20_000;
 
 /**
  * True when the stored row already holds everything the upsert below would
- * write. That upsert only ever updates crests, kickoff and round on an
- * existing row — so when all four already match, running it changes nothing
+ * write. That upsert updates team ids, crests, kickoff and round on an
+ * existing row — so when all of them already match, running it changes nothing
  * but `updatedAt`, which nothing reads. Skipping it matters because this step
  * wrote every card one round trip at a time: 245 sequential writes took ~37s
  * of a 60s ingest on a day the database was slow, nearly all of them no-ops,
  * since the same fixtures come back unchanged every run.
  */
 export function isUpsertNoOp(
-  existing: { homeTeamCrestUrl: string; awayTeamCrestUrl: string; kickoffUtc: string; round: number | null } | undefined,
-  incoming: { homeTeamCrestUrl: string; awayTeamCrestUrl: string; kickoffUtc: string; round: number | null },
+  existing:
+    | { homeTeamId: string | null; awayTeamId: string | null; homeTeamCrestUrl: string; awayTeamCrestUrl: string; kickoffUtc: string; round: number | null }
+    | undefined,
+  incoming: { homeTeamId: string | null; awayTeamId: string | null; homeTeamCrestUrl: string; awayTeamCrestUrl: string; kickoffUtc: string; round: number | null },
 ): boolean {
   return (
     existing !== undefined &&
+    existing.homeTeamId === incoming.homeTeamId &&
+    existing.awayTeamId === incoming.awayTeamId &&
     existing.homeTeamCrestUrl === incoming.homeTeamCrestUrl &&
     existing.awayTeamCrestUrl === incoming.awayTeamCrestUrl &&
     existing.kickoffUtc === incoming.kickoffUtc &&
@@ -506,7 +510,14 @@ export async function runOnefootballEnrichment(): Promise<void> {
           continue;
         }
 
+        // The team ids are part of what gets refreshed, not only written on
+        // insert: they are decided by the name resolver, which grows. A row
+        // stored while "Sérvia" was an unknown name kept a null id for good, and
+        // the page then drew the source's own round flag instead of the crest we
+        // ship — until the id was allowed to update.
         const incoming = {
+          homeTeamId: candidate.homeTeamId,
+          awayTeamId: candidate.awayTeamId,
           homeTeamCrestUrl: card.homeTeam.imageObject.path,
           awayTeamCrestUrl: card.awayTeam.imageObject.path,
           kickoffUtc: card.kickoff,
@@ -522,10 +533,10 @@ export async function runOnefootballEnrichment(): Promise<void> {
             .values({
               id,
               competitionId,
-              homeTeamId: candidate.homeTeamId,
+              homeTeamId: incoming.homeTeamId,
               homeTeamNameRaw: card.homeTeam.name,
               homeTeamCrestUrl: incoming.homeTeamCrestUrl,
-              awayTeamId: candidate.awayTeamId,
+              awayTeamId: incoming.awayTeamId,
               awayTeamNameRaw: card.awayTeam.name,
               awayTeamCrestUrl: incoming.awayTeamCrestUrl,
               kickoffUtc: incoming.kickoffUtc,
