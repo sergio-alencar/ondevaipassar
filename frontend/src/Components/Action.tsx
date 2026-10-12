@@ -17,7 +17,7 @@ import { Link } from "react-router-dom";
  * FollowButton shares ACTION_CLASS so all of these read as one family.
  */
 export const ACTION_CLASS =
-  "inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-2 px-3 font-bold uppercase text-gray-800 transition-colors hover:text-gray-500 disabled:cursor-default disabled:opacity-50";
+  "inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-2 px-3 font-bold uppercase text-gray-800 transition-colors hover:text-gray-600 disabled:cursor-default disabled:opacity-50";
 
 type IconName = "back" | "down" | "edit" | "close" | "calendar";
 

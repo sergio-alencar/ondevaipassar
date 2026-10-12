@@ -24,7 +24,7 @@ const MeusCanaisPage = ({ setSelectedTeam }: MeusCanaisPageProps) => {
   return (
     <div className="mx-auto max-w-3xl px-4 pb-12">
       <h1 className="pt-8 text-center text-4xl font-bold uppercase text-gray-800 max-sm:py-4 max-sm:text-2xl">Meus canais</h1>
-      <p className="mx-auto mt-3 max-w-xl text-center text-sm text-gray-500">
+      <p className="mx-auto mt-3 max-w-xl text-center text-sm text-gray-600">
         Marque onde você consegue assistir. Nos jogos, os canais que você não tem ficam esmaecidos, e dá para ver só o que passa nos seus. Os gratuitos valem para todo mundo, então já vêm incluídos.
       </p>
       <p className="mx-auto mt-2 max-w-xl text-center text-xs text-gray-400">
@@ -49,7 +49,7 @@ const MeusCanaisPage = ({ setSelectedTeam }: MeusCanaisPageProps) => {
         if (channels.length === 0) return null;
         return (
           <section key={group} className="mt-8">
-            <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-500">{CHANNEL_GROUP_LABELS[group]}</h2>
+            <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-600">{CHANNEL_GROUP_LABELS[group]}</h2>
             <ul className="divide-y divide-gray-200 rounded-2xl bg-white shadow-sm">
               {channels.map((channel) => {
                 const alwaysOn = channel.free === true;

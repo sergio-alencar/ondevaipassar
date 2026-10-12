@@ -48,7 +48,7 @@ const AccountMenu = forwardRef<HTMLDivElement, AccountMenuProps>(({ isVisible, c
       <div className="w-56 rounded-lg bg-white p-2 shadow">
         {user ? (
           <>
-            <p className="truncate px-4 pt-2 pb-1 text-xs text-gray-500" title={user.email}>
+            <p className="truncate px-4 pt-2 pb-1 text-xs text-gray-600" title={user.email}>
               {user.email}
             </p>
             <Link to="/conta" onClick={close} className={itemClass}>

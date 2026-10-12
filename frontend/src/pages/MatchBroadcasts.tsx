@@ -89,7 +89,7 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
                     regional no canto de cima. */}
                 {broadcast.free && (
                   <span
-                    className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 rounded-full bg-green-600 px-1.5 py-px text-[10px] font-bold uppercase leading-tight tracking-wide text-white shadow"
+                    className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 rounded-full bg-green-700 px-1.5 py-px text-[10px] font-bold uppercase leading-tight tracking-wide text-white shadow"
                     title="Dá pra assistir sem pagar"
                   >
                     Grátis
@@ -118,7 +118,7 @@ const MatchBroadcasts = ({ broadcasts, fallbackColor }: MatchBroadcastsProps) =>
         })}
       </div>
       {hasRegionalCaveat && (
-        <p className="text-xs text-gray-500 mt-3 max-sm:text-center">
+        <p className="text-xs text-gray-600 mt-3 max-sm:text-center">
           <span className="font-bold">*</span> {regionalCaveatCaption}
         </p>
       )}

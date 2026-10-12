@@ -23,7 +23,7 @@ const TEXT_COLOR_CLASSES: Record<string, string> = {
   "green-900": "text-green-900",
   "yellow-500": "text-yellow-500",
   "orange-600": "text-orange-600",
-  "gray-500": "text-gray-500",
+  "gray-500": "text-gray-600",
   "gray-800": "text-gray-800",
 };
 

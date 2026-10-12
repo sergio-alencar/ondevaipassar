@@ -13,14 +13,14 @@ import { ActionLink, InlineLink } from "../../Components/Action";
 const Section = ({ title, children, action }: { title: string; children: ReactNode; action?: ReactNode }) => (
   <section className="mt-6 first:mt-0">
     <div className="mb-2 flex items-baseline justify-between gap-4">
-      <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500">{title}</h2>
+      <h2 className="text-sm font-bold uppercase tracking-wide text-gray-600">{title}</h2>
       {action}
     </div>
     {children}
   </section>
 );
 
-const Empty = ({ children }: { children: ReactNode }) => <p className="rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-500">{children}</p>;
+const Empty = ({ children }: { children: ReactNode }) => <p className="rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-600">{children}</p>;
 
 const rowClass = "flex items-center gap-3 rounded-xl bg-gray-50 px-3 py-2";
 

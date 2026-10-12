@@ -34,7 +34,7 @@ const FollowButton = ({ active, onToggle, name, size = "large" }: FollowButtonPr
       setTapped(true);
       onToggle();
     }}
-    className={`${ACTION_CLASS} ${size === "large" ? "text-base" : "text-sm"} ${active ? "!text-gray-500 hover:!text-gray-700" : ""}`}
+    className={`${ACTION_CLASS} ${size === "large" ? "text-base" : "text-sm"} ${active ? "!text-gray-600 hover:!text-gray-700" : ""}`}
   >
     {/* keyed by state so each change remounts the icon and replays its entrance */}
     <span key={active ? "icon-on" : "icon-off"} className={`flex ${tapped ? "follow-icon-animate" : ""}`}>

@@ -78,7 +78,7 @@ const Digest = ({ setSelectedTeam }: DigestProps) => {
 
       <div className="flex flex-wrap gap-6 mb-8">
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-bold uppercase text-gray-500">Quando</span>
+          <span className="text-sm font-bold uppercase text-gray-600">Quando</span>
           <div className="flex gap-2">
             {DAYS.map((option) => (
               <button
@@ -110,7 +110,7 @@ const Digest = ({ setSelectedTeam }: DigestProps) => {
             {digest.posts.map((post, index) => (
               <li key={index} className="bg-white rounded-lg p-4 shadow-sm">
                 <div className="flex justify-between items-center gap-4 mb-3">
-                  <span className="text-sm font-bold uppercase text-gray-500">
+                  <span className="text-sm font-bold uppercase text-gray-600">
                     {digest.posts.length > 1 ? `Post ${index + 1} de ${digest.posts.length}` : "Mensagem"}
                   </span>
                   <button

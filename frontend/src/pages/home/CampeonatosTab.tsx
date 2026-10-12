@@ -29,7 +29,7 @@ const CampeonatosTab = ({ matches }: CampeonatosTabProps) => {
   ];
 
   if (cards.length === 0) {
-    return <p className="py-8 text-center text-lg text-gray-500">Nenhum jogo nos próximos dias.</p>;
+    return <p className="py-8 text-center text-lg text-gray-600">Nenhum jogo nos próximos dias.</p>;
   }
 
   return (
@@ -45,7 +45,7 @@ const CampeonatosTab = ({ matches }: CampeonatosTabProps) => {
               <CompetitionLogo competitionId={group.id} className="size-12" />
               <span className="flex flex-col">
                 <span className="text-lg font-bold uppercase leading-tight text-gray-800">{group.name}</span>
-                <span className="mt-1 text-sm text-gray-500">
+                <span className="mt-1 text-sm text-gray-600">
                   {group.matches.length === 0
                     ? `Sem jogos nos próximos ${WEEK_DAYS} dias`
                     : `${group.matches.length} ${group.matches.length === 1 ? "jogo" : "jogos"} nos próximos ${WEEK_DAYS} dias`}

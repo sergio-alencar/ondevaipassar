@@ -51,7 +51,7 @@ const CampeonatoContent = ({ id }: { id: string }) => {
             {competitionMatches.length > 0 ? (
               competitionMatches.slice(0, visibleCount).map((match) => <MatchCard key={match.id} match={match} />)
             ) : (
-              <p className="py-8 text-center text-lg text-gray-500">Nenhum jogo agendado para os próximos dias.</p>
+              <p className="py-8 text-center text-lg text-gray-600">Nenhum jogo agendado para os próximos dias.</p>
             )}
           </ul>
 

@@ -25,7 +25,7 @@ const PrivacidadePage = ({ setSelectedTeam }: PrivacidadePageProps) => {
   return (
     <div className="mx-auto max-w-3xl px-4 pb-16 text-gray-800">
       <h1 className="pt-8 text-4xl font-bold uppercase max-sm:py-4 max-sm:text-3xl">Política de privacidade</h1>
-      <p className="mt-2 text-sm text-gray-500">Última atualização: 8 de outubro de 2026</p>
+      <p className="mt-2 text-sm text-gray-600">Última atualização: 8 de outubro de 2026</p>
       <p className="mt-4 text-lg">
         O Onde Vai Passar (ondevaipassar.com) mostra em que canal ou serviço de streaming passa o próximo jogo do seu time. Ele funciona sem conta e sem cadastro. Esta página explica, em detalhe, quais dados tratamos, para quê, onde ficam, por quanto tempo e como você apaga tudo.
       </p>

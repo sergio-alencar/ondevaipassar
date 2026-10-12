@@ -61,7 +61,7 @@ const TeamPage = ({ setSelectedTeam }: TeamPageProps) => {
         {visibleMatches.length > 0 ? (
           visibleMatches.map((match) => <MatchCard key={match.id} match={match} team={team} />)
         ) : (
-          <p className="text-center text-gray-500 py-8 text-lg">Nenhum jogo agendado para os próximos dias.</p>
+          <p className="text-center text-gray-600 py-8 text-lg">Nenhum jogo agendado para os próximos dias.</p>
         )}
       </ul>
 

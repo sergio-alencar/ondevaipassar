@@ -42,14 +42,14 @@ const CanaisTab = ({ matches }: CanaisTabProps) => {
         <InlineLink to="/meus-canais">Meus canais</InlineLink>
       </div>
 
-      {channels.length === 0 && <p className="py-8 text-center text-lg text-gray-500">Nenhum canal com jogo confirmado nos próximos dias.</p>}
+      {channels.length === 0 && <p className="py-8 text-center text-lg text-gray-600">Nenhum canal com jogo confirmado nos próximos dias.</p>}
 
       {CHANNEL_GROUP_ORDER.map((group) => {
         const inGroup = channels.filter((channel) => channelGroupOf(channel) === group);
         if (inGroup.length === 0) return null;
         return (
           <section key={group} className="mb-8">
-            <h3 className="mb-3 text-center text-sm font-bold uppercase tracking-wide text-gray-500">{CHANNEL_GROUP_LABELS[group]}</h3>
+            <h3 className="mb-3 text-center text-sm font-bold uppercase tracking-wide text-gray-600">{CHANNEL_GROUP_LABELS[group]}</h3>
             <ul className="flex flex-wrap justify-center gap-x-6 gap-y-5">
               {inGroup.map((channel) => (
                 <li key={channel.id}>
@@ -59,7 +59,7 @@ const CanaisTab = ({ matches }: CanaisTabProps) => {
                     </span>
                     {/* The logo's own alt text already names it for screen readers. */}
                     {!channel.logoShowsName && <span className="text-sm font-bold text-gray-800">{channel.displayName}</span>}
-                    <span className="text-xs text-gray-500">{counts.get(channel.id)} {counts.get(channel.id) === 1 ? "jogo" : "jogos"}</span>
+                    <span className="text-xs text-gray-600">{counts.get(channel.id)} {counts.get(channel.id) === 1 ? "jogo" : "jogos"}</span>
                   </Link>
                 </li>
               ))}

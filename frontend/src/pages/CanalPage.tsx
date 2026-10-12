@@ -59,7 +59,7 @@ const CanalPage = ({ setSelectedTeam }: CanalPageProps) => {
             <h1 className={channel.logoShowsName ? "sr-only" : "text-center text-4xl font-bold uppercase text-gray-800 max-sm:text-2xl"}>
               {channel.displayName}
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-600">
               {CHANNEL_GROUP_LABELS[channelGroupOf(channel)]}
               {channel.free ? " · grátis" : ""}
             </p>
@@ -74,7 +74,7 @@ const CanalPage = ({ setSelectedTeam }: CanalPageProps) => {
             </p>
           )}
 
-          <p className="mx-auto mt-4 max-w-2xl text-center text-sm text-gray-500">
+          <p className="mx-auto mt-4 max-w-2xl text-center text-sm text-gray-600">
             Jogos dos próximos {WEEK_DAYS} dias com transmissão confirmada neste canal. Pode haver outros que ainda não foram confirmados.
           </p>
 
@@ -82,7 +82,7 @@ const CanalPage = ({ setSelectedTeam }: CanalPageProps) => {
             {channelMatches.length > 0 ? (
               <MatchesByCompetition matches={channelMatches} />
             ) : (
-              <p className="py-8 text-center text-lg text-gray-500">Nenhum jogo confirmado neste canal nos próximos dias.</p>
+              <p className="py-8 text-center text-lg text-gray-600">Nenhum jogo confirmado neste canal nos próximos dias.</p>
             )}
           </div>
 

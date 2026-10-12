@@ -16,7 +16,7 @@ const ConsentBanner = () => {
           </Link>
         </p>
         <div className="flex items-center justify-end gap-2">
-          <button type="button" onClick={() => setConsent("denied")} className="min-h-11 cursor-pointer px-4 text-sm font-bold uppercase text-gray-800 hover:text-gray-500">
+          <button type="button" onClick={() => setConsent("denied")} className="min-h-11 cursor-pointer px-4 text-sm font-bold uppercase text-gray-800 hover:text-gray-600">
             Recusar
           </button>
           <button type="button" onClick={() => setConsent("granted")} className="min-h-11 cursor-pointer rounded-full bg-gray-800 px-6 text-sm font-bold uppercase text-white hover:bg-gray-700">

@@ -70,7 +70,7 @@ const DayFeed = ({ matches }: DayFeedProps) => {
         {visible.length > 0 ? (
           <MatchesByCompetition matches={visible} />
         ) : (
-          <p className="py-8 text-center text-lg text-gray-500">
+          <p className="py-8 text-center text-lg text-gray-600">
             {onlyWatchable && inWindow(active).length > 0 ? "Nenhum desses jogos passa nos seus canais." : EMPTY_TEXT[active]}
           </p>
         )}

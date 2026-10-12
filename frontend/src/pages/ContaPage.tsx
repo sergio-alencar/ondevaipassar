@@ -55,7 +55,7 @@ const ContaPage = ({ setSelectedTeam }: ContaPageProps) => {
         <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-gray-600">Conectado como</p>
           <p className="break-all text-xl font-bold text-gray-800">{user.email}</p>
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-sm text-gray-600">
             Seus times, campeonatos e canais ficam guardados na conta e aparecem em qualquer aparelho em que você entrar.
           </p>
 
@@ -67,7 +67,7 @@ const ContaPage = ({ setSelectedTeam }: ContaPageProps) => {
 
           <div className="mt-10 border-t border-gray-200 pt-6">
             <h2 className="font-bold uppercase text-gray-800">Excluir minha conta</h2>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-gray-600">
               Apaga agora a conta, os times, campeonatos e canais guardados nela e encerra o acesso em todos os aparelhos. Os favoritos que estão neste navegador continuam aqui. Não dá para desfazer.
             </p>
             {confirmingDelete ? (
@@ -92,7 +92,7 @@ const ContaPage = ({ setSelectedTeam }: ContaPageProps) => {
       ) : (
         <div className="mt-8 rounded-2xl bg-white p-6 text-center shadow-sm">
           <p className="text-gray-700">Você não está conectado.</p>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-600">
             O site funciona normalmente sem conta. Entrar serve só para levar seus times, campeonatos e canais favoritos para outros aparelhos.
           </p>
           {loginAvailable && (

@@ -32,7 +32,7 @@ const MeusTimes = ({ matches }: MeusTimesProps) => {
                 </Link>
                 <FollowButton active onToggle={() => toggleTeam(team.id)} name={team.displayName} size="compact" />
               </div>
-              {next ? <MatchCard match={next} team={team} /> : <p className="py-6 text-center text-gray-500">Nenhum jogo agendado para os próximos dias.</p>}
+              {next ? <MatchCard match={next} team={team} /> : <p className="py-6 text-center text-gray-600">Nenhum jogo agendado para os próximos dias.</p>}
             </li>
           );
         })}
