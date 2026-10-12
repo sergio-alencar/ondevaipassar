@@ -405,8 +405,12 @@ export async function runFemininoEnrichment(): Promise<void> {
             // da Colômbia") and a snapshot of the schedule; this live source
             // replaces both the moment it knows better. Anything else keeps
             // its teams and only takes a corrected kickoff, as before.
+            // competitionId rides along with the teams for the same reason: it is a
+            // decision the resolver makes (the qualifiers were one competition until
+            // they were split per confederation), and a row keeps the id it was
+            // first stored under unless the update says otherwise.
             set: refreshTeams
-              ? { kickoffUtc, homeTeamId, homeTeamNameRaw, awayTeamId, awayTeamNameRaw, updatedAt: now }
+              ? { competitionId, kickoffUtc, homeTeamId, homeTeamNameRaw, awayTeamId, awayTeamNameRaw, updatedAt: now }
               : { kickoffUtc, updatedAt: now },
           }),
     );
