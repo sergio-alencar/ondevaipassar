@@ -2,7 +2,7 @@
  * Turns the federation crests downloaded from football-logos.cc into the
  * site's crest files, once, for every national team.
  *
- *   1. Put the SVGs in frontend/public/images/selecoes/ under any name that
+ *   1. Put the SVGs in frontend/assets-src/selecoes/ under any name that
  *      contains the country's English name as football-logos.cc writes it
  *      ("brazil-national-team.svg", "portuguese-football-federation.svg"…).
  *   2. npx tsx scripts/import-national-crests.ts
@@ -17,7 +17,8 @@ import { fileURLToPath } from "node:url";
 import { cropSvg } from "./cropSvg.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const SOURCE_DIR = join(ROOT, "frontend", "public", "images", "selecoes");
+// Outside public/: the whole library (every country) is kept for later, but only the crests a team uses are published.
+const SOURCE_DIR = join(ROOT, "frontend", "assets-src", "selecoes");
 const SITE_CRESTS = join(ROOT, "frontend", "public", "images", "times");
 const INSTAGRAM_CRESTS = join(ROOT, "backend", "src", "instagram", "assets", "crests");
 
