@@ -3,8 +3,7 @@
 <!ENTITY ns_svg "http://www.w3.org/2000/svg">
 <!ENTITY ns_xlink "http://www.w3.org/1999/xlink">
 ]>
-<svg  version="1.1" id="Layer_1" xmlns="&ns_svg;" xmlns:xlink="&ns_xlink;" width="146" height="228"
-viewBox="0.00 0.00 145.64 228.07" overflow="visible" enable-background="new 0 0 145.64 228.056" xml:space="preserve">
+<svg viewBox="0.00 0.00 145.64 228.07" width="146" height="228"  version="1.1" id="Layer_1" xmlns="&ns_svg;" xmlns:xlink="&ns_xlink;" overflow="visible" enable-background="new 0 0 145.64 228.056" xml:space="preserve">
 <path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.5669" stroke-miterlimit="22.9256" d="
 M74.133,111.543l0.492,114.416c-5.84-8.171-13.585-18.586-18.811-27.607l-0.123-87.739L74.133,111.543z"/>
 <path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.5669" stroke-miterlimit="22.9256" d="
