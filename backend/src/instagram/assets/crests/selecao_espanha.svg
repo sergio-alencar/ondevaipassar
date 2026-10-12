@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg viewBox="0.00 0.00 428.00 723.96" width="428" height="724"
+<svg viewBox="0.00 129.81 428.00 594.15" width="428" height="594"
   
   
    overflow="hidden"
@@ -12,7 +12,7 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
+   xmlns:svg="http://www.w3.org/2000/svg"><defs><clipPath id="sem-estrelas"><path clip-rule="evenodd" d="M0 0H428V724H0ZM144.09 -4.97L158.50 39.56L205.12 39.56L167.41 67.08L181.81 111.61L144.09 84.09L106.38 111.61L120.78 67.08L83.07 39.56L129.69 39.56ZM283.91 -4.87L298.31 39.17L344.93 39.18L307.22 66.40L321.62 110.45L283.91 83.22L246.19 110.45L260.59 66.40L222.88 39.18L269.50 39.17Z"/></clipPath></defs><g clip-path="url(#sem-estrelas)"><sodipodi:namedview
      id="namedview83"
      pagecolor="#ffffff"
      bordercolor="#000000"
@@ -379,4 +379,4 @@
            id="path83"
            inkscape:transform-center-x="-73.430539"
            inkscape:transform-center-y="-15.513494"
-           style="stroke-width:1.00098" /></g></g></g></svg>
+           style="stroke-width:1.00098" /></g></g></g></g></svg>

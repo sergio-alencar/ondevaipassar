@@ -108,7 +108,7 @@ const COUNTRIES: [id: string, name: string, color?: string][] = [
   ["guine_bissau", "Guiné-Bissau"],
   ["gambia", "Gâmbia"],
   ["haiti", "Haiti"],
-  ["holanda", "Holanda", "red-800"],
+  ["holanda", "Holanda", "orange-600"],
   ["honduras", "Honduras"],
   ["hong_kong", "Hong Kong"],
   ["hungria", "Hungria"],

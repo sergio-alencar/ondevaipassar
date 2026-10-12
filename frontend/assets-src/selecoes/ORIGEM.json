@@ -19,6 +19,7 @@
   "page": "Albania national football team"
  },
  "alemanha": {
+  "estrelas": "as estrelas de título são retiradas automaticamente ao gerar o escudo do site (scripts/removeStars.ts); este arquivo é o original",
   "nome_ingles": "germany",
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
@@ -56,6 +57,7 @@
   "nota": "SOMENTE PNG: sem SVG disponível; conferir direitos"
  },
  "argentina": {
+  "estrelas": "as estrelas de título são retiradas automaticamente ao gerar o escudo do site (scripts/removeStars.ts); este arquivo é o original",
   "nome_ingles": "argentina",
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
@@ -161,6 +163,7 @@
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "brasil": {
+  "estrelas": "as estrelas de título são retiradas automaticamente ao gerar o escudo do site (scripts/removeStars.ts); este arquivo é o original",
   "nome_ingles": "brazil",
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
@@ -362,6 +365,7 @@
  "espanha": {
   "commons": null,
   "enwiki": "Spain national football team crest.svg",
+  "estrelas": "as estrelas de título são retiradas automaticamente ao gerar o escudo do site (scripts/removeStars.ts); este arquivo é o original",
   "nome_ingles": "spain",
   "nota": "arquivo só na Wikipédia em inglês (uso não-livre lá): conferir direitos",
   "page": "Spain national football team"
@@ -408,6 +412,7 @@
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
  "franca": {
+  "estrelas": "as estrelas de título são retiradas automaticamente ao gerar o escudo do site (scripts/removeStars.ts); este arquivo é o original",
   "nome_ingles": "france",
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
@@ -577,6 +582,7 @@
   "page": "Indonesia national football team"
  },
  "inglaterra": {
+  "estrelas": "as estrelas de título são retiradas automaticamente ao gerar o escudo do site (scripts/removeStars.ts); este arquivo é o original",
   "nome_ingles": "england",
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },
@@ -619,6 +625,7 @@
  },
  "italia": {
   "commons": "Logo Italy National Football Team - 2023.svg",
+  "estrelas": "as estrelas de título são retiradas automaticamente ao gerar o escudo do site (scripts/removeStars.ts); este arquivo é o original",
   "nome_ingles": "italy",
   "page": "Italy national football team"
  },
@@ -1170,6 +1177,7 @@
   "page": "Uganda national football team"
  },
  "uruguai": {
+  "estrelas": "as estrelas de título são retiradas automaticamente ao gerar o escudo do site (scripts/removeStars.ts); este arquivo é o original",
   "nome_ingles": "uruguay",
   "origem": "football-logos.cc (baixado pelo Sérgio, no lugar do da Wikipédia)"
  },

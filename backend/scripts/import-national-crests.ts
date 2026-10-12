@@ -6,7 +6,7 @@
  *      ("brasil.svg", "holanda.svg", "estados_unidos.svg").
  *   2. npx tsx scripts/import-national-crests.ts
  *
- * Each is cropped to its visible area and written as selecao_<id>.svg to the
+ * Each loses its title stars (removeStars.ts), then is cropped to its visible area and written as selecao_<id>.svg to the
  * site's crest folder — and, for the 20+20 featured sides only, to the
  * Instagram renderer's too. A country with no file is listed, not skipped
  * silently.
@@ -16,6 +16,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { NATIONAL_TEAMS, TEAMS } from "@ondevaipassar/shared";
 import { cropSvg } from "./cropSvg.js";
+import { removeStars } from "./removeStars.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 // Outside public/: the whole library (every country) is kept for later, but only the crests a team uses are published.
@@ -34,7 +35,14 @@ const PNG_ONLY = new Set(["argelia", "camaroes", "malawi"]);
 if (!existsSync(SOURCE_DIR)) throw new Error(`no folder ${SOURCE_DIR}`);
 mkdirSync(SITE_CRESTS, { recursive: true });
 
+/**
+ * Crests whose floating stars are part of the drawing, not title stars: the
+ * star over Sudan's emblem, the one in Djibouti's. Everything else loses them.
+ */
+const KEEP_STARS = new Set(["sudao", "djibuti"]);
+
 const missing: string[] = [];
+const withoutStars: string[] = [];
 const featured = new Set(TEAMS.filter((team) => team.division === "SELECOES" || team.division === "SELECOES_FEMININO").map((team) => team.id.replace(/_feminino$/, "")));
 const countries = [...new Set(NATIONAL_TEAMS.map((team) => team.id.replace(/_feminino$/, "")))].sort();
 let written = 0;
@@ -42,7 +50,11 @@ for (const id of countries) {
   if (PNG_ONLY.has(id)) continue;
   const file = join(SOURCE_DIR, `${id}.svg`);
   if (!existsSync(file)) { missing.push(id); continue; }
-  const { svg } = cropSvg(readFileSync(file, "utf-8"));
+  const source = readFileSync(file, "utf-8");
+  // Stars first, so the crop below measures the crest without them.
+  const stripped = KEEP_STARS.has(id) ? { svg: source, removed: 0 } : removeStars(source);
+  if (stripped.removed > 0) withoutStars.push(`${id} (${stripped.removed})`);
+  const { svg } = cropSvg(stripped.svg);
   const target = `selecao_${id}.svg`;
   writeFileSync(join(SITE_CRESTS, target), svg, "utf-8");
   // The Instagram renderer only ever draws the featured sides; the rest would add megabytes to the function for nothing.
@@ -50,4 +62,5 @@ for (const id of countries) {
   written += 1;
 }
 console.log(`${written} escudos gravados em ${SITE_CRESTS}`);
+if (withoutStars.length) console.log(`Estrelas de título retiradas de: ${withoutStars.join(", ")}`);
 console.log(missing.length ? `\nSem arquivo (ficam com o escudo genérico): ${missing.join(", ")}` : `\nTodas as ${countries.length} seleções têm escudo.`);
