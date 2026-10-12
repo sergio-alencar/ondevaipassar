@@ -152,8 +152,22 @@ export const COMPETITIONS: Competition[] = [
   // European ones (see `foreign`).
   { id: "copa-do-mundo", displayName: "Copa do Mundo", type: "national-teams" },
   { id: "copa-do-mundo-feminina", displayName: "Copa do Mundo Feminina", type: "national-teams" },
-  { id: "eliminatorias-copa-do-mundo", displayName: "Eliminatórias da Copa do Mundo", type: "national-teams", shortName: "Eliminatórias" },
-  { id: "eliminatorias-copa-do-mundo-feminina", displayName: "Eliminatórias da Copa do Mundo Feminina", type: "national-teams", shortName: "Eliminatórias Fem." },
+  // World Cup qualifiers, one competition per confederation: each has its own
+  // logo, and a Brazilian reader asks for "as eliminatórias sul-americanas".
+  // World Cup qualifiers, one competition per confederation: each has its own
+  // logo, and a Brazilian reader asks for "as eliminatórias sul-americanas".
+  { id: "eliminatorias-copa-do-mundo-conmebol", displayName: "Eliminatórias Sul-Americanas", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo-uefa", displayName: "Eliminatórias Europeias", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo-concacaf", displayName: "Eliminatórias da Concacaf", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo-caf", displayName: "Eliminatórias Africanas", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo-afc", displayName: "Eliminatórias Asiáticas", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo-ofc", displayName: "Eliminatórias da Oceania", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo-feminina-conmebol", displayName: "Eliminatórias Sul-Americanas Femininas", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo-feminina-uefa", displayName: "Eliminatórias Europeias Femininas", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo-feminina-concacaf", displayName: "Eliminatórias Femininas da Concacaf", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo-feminina-caf", displayName: "Eliminatórias Africanas Femininas", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo-feminina-afc", displayName: "Eliminatórias Asiáticas Femininas", type: "national-teams" },
+  { id: "eliminatorias-copa-do-mundo-feminina-ofc", displayName: "Eliminatórias Femininas da Oceania", type: "national-teams" },
   { id: "copa-america", displayName: "Copa América", type: "national-teams" },
   { id: "copa-america-feminina", displayName: "Copa América Feminina", type: "national-teams" },
   { id: "eurocopa", displayName: "Eurocopa", type: "national-teams", foreign: true },

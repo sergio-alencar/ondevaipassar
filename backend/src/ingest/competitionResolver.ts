@@ -81,6 +81,30 @@ const COMPETITION_ALIASES: Record<string, string> = {
   "uefa euro": "eurocopa",
 };
 
+/** Words that say which confederation runs a qualifying tournament, after normalizeText. Checked in this order: "sul-americana" before "americana"-ish words, and so on. */
+const CONFEDERATION_KEYWORDS: { id: string; pattern: RegExp }[] = [
+  { id: "conmebol", pattern: /\b(conmebol|sul[- ]americ\w*)\b/ },
+  { id: "uefa", pattern: /\b(uefa|europ\w*)\b/ },
+  { id: "concacaf", pattern: /\bconcacaf\b/ },
+  { id: "caf", pattern: /\b(caf|africa\w*)\b/ },
+  { id: "afc", pattern: /\b(afc|asia\w*)\b/ },
+  { id: "ofc", pattern: /\b(ofc|oceania)\b/ },
+];
+
+/**
+ * The World Cup qualifying competition a name stands for, or null when it is
+ * not one — or when it is one but names no confederation (a generic
+ * "Eliminatórias da Copa" can't be filed under the right logo, and a guess
+ * would put a European match under CONMEBOL's). The women's say so in the name.
+ */
+export function resolveQualifiersId(rawName: string): string | null {
+  const normalized = normalizeText(rawName);
+  if (!/\belimin\w*|\bqualif\w*/.test(normalized)) return null;
+  const confederation = CONFEDERATION_KEYWORDS.find(({ pattern }) => pattern.test(normalized));
+  if (!confederation) return null;
+  return `eliminatorias-copa-do-mundo-${/\bfeminin\w*|\bwomen\b/.test(normalized) ? "feminina-" : ""}${confederation.id}`;
+}
+
 /**
  * Names that come in many spellings (a division letter, a confederation, a
  * year), matched by shape rather than listed. Only reached when the exact
@@ -89,13 +113,10 @@ const COMPETITION_ALIASES: Record<string, string> = {
 const COMPETITION_PATTERNS: { pattern: RegExp; id: string }[] = [
   // "UEFA Nations League - A", "Liga das Nações UEFA - B": every division is one competition here.
   { pattern: /\b(uefa nations league|liga das nacoes (da )?uefa)\b/, id: "liga-das-nacoes-uefa" },
-  // World Cup qualifiers, whichever confederation runs them — the women's ones say so ("Eliminatórias da UEFA Feminina").
-  { pattern: /elimin.*(copa do mundo|world cup|fifa).*(feminin|women)|elimin.*(feminin|women)|(world cup|copa do mundo) qualif.*(women|feminin)/, id: "eliminatorias-copa-do-mundo-feminina" },
-  { pattern: /elimin.*(copa do mundo|world cup|fifa|conmebol|uefa|caf|afc|concacaf)|(world cup|copa do mundo)[ ,-]*qualif/, id: "eliminatorias-copa-do-mundo" },
 ];
 
 /** Resolves a raw championship name to our canonical Competition.id. Unrecognized names get a stable slugified stopgap id rather than being dropped — so a new competition shows up immediately, and promoting it to a registry entry (packages/shared/src/competition.ts) is a pure addition, not a rename. */
 export function resolveCompetitionId(rawName: string): string {
   const normalized = normalizeText(rawName);
-  return COMPETITION_ALIASES[normalized] ?? COMPETITION_PATTERNS.find(({ pattern }) => pattern.test(normalized))?.id ?? slugify(rawName);
+  return COMPETITION_ALIASES[normalized] ?? resolveQualifiersId(rawName) ?? COMPETITION_PATTERNS.find(({ pattern }) => pattern.test(normalized))?.id ?? slugify(rawName);
 }

@@ -6,6 +6,7 @@ import { parseBroadcastChannels } from "../sources/futnatv/broadcastText.js";
 import { fetchAllUpcomingGames } from "../sources/futnatv/client.js";
 import type { Game } from "../sources/futnatv/schema.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
+import { resolveQualifiersId } from "./competitionResolver.js";
 import { isTrackedBrazilianFemininoTeam, isTrackedNationalFemininoTeam, resolveFemininoTeamId, resolveNationalFemininoTeamId } from "./femininoTeamResolver.js";
 import { toKickoffUtc } from "./futnatvEnrichment.js";
 import { MANUAL_SOURCE_ID } from "./manualFixtures.js";
@@ -81,7 +82,7 @@ export function resolveNationalFemininoCompetition(competition: string): string 
   const normalized = normalizeText(competition);
   if (!normalized.includes("feminin") || isYouthCompetitionName(competition)) return null;
   if (/\bamistos/.test(normalized)) return "amistosos-internacionais-femininos";
-  if (/\belimin/.test(normalized)) return "eliminatorias-copa-do-mundo-feminina";
+  if (/\belimin/.test(normalized)) return resolveQualifiersId(competition); // null when no confederation is named
   if (/\bcopa do mundo\b/.test(normalized)) return "copa-do-mundo-feminina";
   if (/\beurocopa\b/.test(normalized)) return "eurocopa-feminina";
   if (/\bcopa america\b/.test(normalized)) return "copa-america-feminina";
@@ -109,7 +110,7 @@ export function findStaleNationalRows(
 
 const NATIONAL_FEMININO_COMPETITION_IDS: ReadonlySet<string> = new Set([
   "amistosos-internacionais-femininos",
-  "eliminatorias-copa-do-mundo-feminina",
+  ...["conmebol", "uefa", "concacaf", "caf", "afc", "ofc"].map((confederation) => `eliminatorias-copa-do-mundo-feminina-${confederation}`),
   "copa-do-mundo-feminina",
   "eurocopa-feminina",
   "copa-america-feminina",

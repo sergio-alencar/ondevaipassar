@@ -90,8 +90,15 @@ describe("national teams and the name resolvers", () => {
 
 describe("national-team competitions", () => {
   it("registers the main ones", () => {
-    for (const id of ["copa-do-mundo", "copa-do-mundo-feminina", "eliminatorias-copa-do-mundo", "copa-america", "eurocopa", "liga-das-nacoes-uefa", "amistosos-internacionais"]) {
+    for (const id of ["copa-do-mundo", "copa-do-mundo-feminina", "eliminatorias-copa-do-mundo-conmebol", "eliminatorias-copa-do-mundo-feminina-uefa", "copa-america", "eurocopa", "liga-das-nacoes-uefa", "amistosos-internacionais"]) {
       expect(findCompetitionById(id), id).toBeDefined();
+    }
+  });
+
+  it("has a qualifying competition per confederation, men's and women's, each with its own logo", () => {
+    for (const confederation of ["conmebol", "uefa", "concacaf", "caf", "afc", "ofc"]) {
+      expect(findCompetitionById(`eliminatorias-copa-do-mundo-${confederation}`), confederation).toBeDefined();
+      expect(findCompetitionById(`eliminatorias-copa-do-mundo-feminina-${confederation}`), `${confederation} fem.`).toBeDefined();
     }
   });
 

@@ -14,10 +14,20 @@ describe("national-team competition names", () => {
     ["UEFA Nations League - D", "liga-das-nacoes-uefa"],
     ["Liga das Nações UEFA", "liga-das-nacoes-uefa"],
     ["CONCACAF Nations League", "liga-das-nacoes-concacaf"],
-    ["Eliminatórias da UEFA Feminina", "eliminatorias-copa-do-mundo-feminina"],
+    ["Eliminatórias da UEFA Feminina", "eliminatorias-copa-do-mundo-feminina-uefa"],
+    ["Eliminatórias da Copa do Mundo - CONMEBOL", "eliminatorias-copa-do-mundo-conmebol"],
+    ["Eliminatórias Sul-Americanas", "eliminatorias-copa-do-mundo-conmebol"],
+    ["World Cup Qualification Europe", "eliminatorias-copa-do-mundo-uefa"],
+    ["Eliminatórias da Copa do Mundo, CAF", "eliminatorias-copa-do-mundo-caf"],
+    ["Eliminatórias Asiáticas", "eliminatorias-copa-do-mundo-afc"],
+    ["Eliminatórias da Concacaf Feminina", "eliminatorias-copa-do-mundo-feminina-concacaf"],
     ["Copa do Mundo", "copa-do-mundo"],
   ])("files %s under %s", (raw, id) => {
     expect(resolveCompetitionId(raw)).toBe(id);
+  });
+
+  it("never files a qualifier without a confederation under a guess", () => {
+    expect(resolveCompetitionId("Eliminatórias da Copa do Mundo")).not.toMatch(/^eliminatorias-copa-do-mundo-/);
   });
 
   it("does not turn a club competition into a national one", () => {
@@ -64,7 +74,9 @@ describe("women's national teams in futnatv listings", () => {
 
   it("recognises the women's national competitions, and leaves youth and clubs out", () => {
     expect(resolveNationalFemininoCompetition("Amistoso Feminino")).toBe("amistosos-internacionais-femininos");
-    expect(resolveNationalFemininoCompetition("Eliminatórias da UEFA Feminina")).toBe("eliminatorias-copa-do-mundo-feminina");
+    expect(resolveNationalFemininoCompetition("Eliminatórias da UEFA Feminina")).toBe("eliminatorias-copa-do-mundo-feminina-uefa");
+    // No confederation named: it cannot be filed under the right logo, so it is not filed at all.
+    expect(resolveNationalFemininoCompetition("Eliminatórias Femininas")).toBeNull();
     expect(resolveNationalFemininoCompetition("Copa do Mundo Feminina")).toBe("copa-do-mundo-feminina");
     expect(resolveNationalFemininoCompetition("Copa do Mundo Feminina sub-17")).toBeNull();
     expect(resolveNationalFemininoCompetition("Brasileirão Feminino")).toBeNull();
