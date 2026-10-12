@@ -19,13 +19,14 @@ import { Link } from "react-router-dom";
 export const ACTION_CLASS =
   "inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-2 px-3 font-bold uppercase text-gray-800 transition-colors hover:text-gray-500 disabled:cursor-default disabled:opacity-50";
 
-type IconName = "back" | "down" | "edit" | "close";
+type IconName = "back" | "down" | "edit" | "close" | "calendar";
 
 const ICON_PATHS: Record<IconName, string> = {
   back: "M12 4l-6 6 6 6M6 10h11",
   down: "M4 8l6 6 6-6",
   edit: "M4 16l1-4 8-8 3 3-8 8-4 1zM11 6l3 3",
   close: "M5 5l10 10M15 5L5 15",
+  calendar: "M4 6h12v10H4zM4 9h12M7 4v3M13 4v3",
 };
 
 const Icon = ({ name }: { name: IconName }) => (
