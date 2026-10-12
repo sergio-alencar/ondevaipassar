@@ -64,6 +64,12 @@ const Sobre = ({ setSelectedTeam }: SobreProps) => {
         clubes — e os apresenta em um só lugar, de forma organizada.
       </p>
       <p className="text-xl mt-4">
+        Hoje o site cobre os clubes das Séries A, B e C do Brasileirão, os principais da Europa, o
+        futebol feminino e as seleções (masculinas e femininas), em campeonatos nacionais, estaduais,
+        continentais e de seleções. O canal só aparece quando a fonte já o divulgou — por isso um
+        jogo mais distante pode estar sem transmissão confirmada.
+      </p>
+      <p className="text-xl mt-4">
         Nenhuma informação aqui é de minha autoria: são dados públicos, encontrados na internet, e
         a única intenção deste site é facilitar o acesso a eles. Não há qualquer pretensão de me
         apropriar desse conteúdo ou de lucrar com o trabalho de terceiros. O <i>Onde Vai Passar</i>{" "}
