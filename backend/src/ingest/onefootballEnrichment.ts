@@ -8,7 +8,7 @@ import { resolveCompetitionId } from "./competitionResolver.js";
 import { mapWithinBudget, TIMED_OUT } from "../lib/concurrency.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
 import { resolveTeamId } from "./teamResolver.js";
-import { findCompetitionById, normalizeText } from "@ondevaipassar/shared";
+import { FEATURED_MEN, findCompetitionById, normalizeText } from "@ondevaipassar/shared";
 
 const SOURCE_ID = "onefootball";
 const SOURCE_ID_PREFIX = `${SOURCE_ID}:`;
@@ -138,6 +138,21 @@ const TRACKED_NATIONAL_TEAMS: { teamId: string; onefootballId: string }[] = [
  */
 export function isFollowedNationalCompetition(competitionId: string): boolean {
   return findCompetitionById(competitionId)?.type === "national-teams" || competitionId === "amistosos-internacionais";
+}
+
+/**
+ * A stored national-team row no featured side plays in. Such rows are
+ * orphans, not fixtures: this source only ever creates a national game from a
+ * featured team's own page, so one that names no featured team came from a
+ * page we no longer fetch (a team dropped from the tab) and nothing will
+ * refresh or remove it — left alone it would sit on the site for good.
+ * Decided from the raw names, not the stored ids, which may be the very thing
+ * that is stale.
+ */
+export function isOrphanNationalRow(row: { competitionId: string; homeTeamNameRaw: string; awayTeamNameRaw: string }): boolean {
+  if (!isFollowedNationalCompetition(row.competitionId)) return false;
+  const featured = (rawName: string): boolean => FEATURED_MEN.includes(resolveTeamId(rawName) ?? "");
+  return !featured(row.homeTeamNameRaw) && !featured(row.awayTeamNameRaw);
 }
 
 // Enough to cut the wall-clock cost without hammering onefootball.com with
@@ -560,6 +575,14 @@ export async function runOnefootballEnrichment(): Promise<void> {
           broadcastCount += await attachOnefootballBroadcasts([id], card.matchId);
         }
       }
+    }
+
+    // Rows left behind when a team stopped being fetched (see isOrphanNationalRow).
+    const orphans = (await db.select().from(matches)).filter((row) => row.sourceId === SOURCE_ID && isOrphanNationalRow(row));
+    if (orphans.length > 0) {
+      const [first, ...rest] = orphans.map((row) => db.delete(matches).where(eq(matches.id, row.id)));
+      await db.batch([first, ...rest]);
+      deletedCount += orphans.length;
     }
 
     await db.insert(scrapeRuns).values({

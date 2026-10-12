@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { isYouthCompetitionName, normalizeText, resolveChannelId, slugify } from "@ondevaipassar/shared";
 import { db } from "../db/client.js";
 import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
@@ -86,6 +87,33 @@ export function resolveNationalFemininoCompetition(competition: string): string 
   if (/\bcopa america\b/.test(normalized)) return "copa-america-feminina";
   return null;
 }
+
+/**
+ * Stored women's national rows that the current futnatv window no longer
+ * lists under the same id. A national match's id is built from the resolved
+ * team ids, so when the resolver learns a name (an opponent that was unknown
+ * yesterday has an id today) the same game gets a NEW id, and the old row
+ * would sit beside it as a duplicate. Only rows inside the window are
+ * candidates — one before it is a past game futnatv has simply stopped
+ * listing.
+ */
+export function findStaleNationalRows(
+  known: { id: string; competitionId: string; kickoffUtc: string; sourceId: string }[],
+  currentIds: ReadonlySet<string>,
+  windowStartUtc: string,
+): string[] {
+  return known
+    .filter((row) => row.sourceId === SOURCE_ID && NATIONAL_FEMININO_COMPETITION_IDS.has(row.competitionId) && row.kickoffUtc >= windowStartUtc && !currentIds.has(row.id))
+    .map((row) => row.id);
+}
+
+const NATIONAL_FEMININO_COMPETITION_IDS: ReadonlySet<string> = new Set([
+  "amistosos-internacionais-femininos",
+  "eliminatorias-copa-do-mundo-feminina",
+  "copa-do-mundo-feminina",
+  "eurocopa-feminina",
+  "copa-america-feminina",
+]);
 
 export type ListingDecision = "ingest" | "skip" | "unresolved";
 
@@ -344,6 +372,11 @@ export async function runFemininoEnrichment(): Promise<void> {
 
     const now = new Date().toISOString();
 
+    // The window futnatv covers starts at its earliest listed day.
+    const windowStartUtc = datedGames.length > 0 ? `${datedGames.map(({ dateKey }) => dateKey).sort()[0]}T00:00:00.000Z` : null;
+    const staleIds = windowStartUtc ? findStaleNationalRows(known, new Set(resolvedMatches.map((match) => match.matchId)), windowStartUtc) : [];
+    const staleDeletes = staleIds.flatMap((id) => [db.delete(broadcasts).where(eq(broadcasts.matchId, id)), db.delete(matches).where(eq(matches.id, id))]);
+
     const matchUpserts = resolvedMatches.map(
       ({ matchId, competitionId, homeTeamId, homeTeamNameRaw, awayTeamId, awayTeamNameRaw, kickoffUtc, refreshTeams }) =>
         db
@@ -403,7 +436,7 @@ export async function runFemininoEnrichment(): Promise<void> {
       return insert.onConflictDoUpdate({ target: broadcasts.id, set: updateFields });
     });
 
-    const upserts = [...matchUpserts, ...broadcastUpserts];
+    const upserts = [...staleDeletes, ...matchUpserts, ...broadcastUpserts];
     if (upserts.length > 0) {
       const [first, ...rest] = upserts;
       await db.batch([first, ...rest]);

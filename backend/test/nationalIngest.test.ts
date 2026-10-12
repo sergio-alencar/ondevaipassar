@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { resolveNationalFemininoCompetition } from "../src/ingest/femininoEnrichment.js";
+import { findStaleNationalRows, resolveNationalFemininoCompetition } from "../src/ingest/femininoEnrichment.js";
 import { isTrackedNationalFemininoTeam, resolveFemininoTeamId, resolveNationalFemininoTeamId } from "../src/ingest/femininoTeamResolver.js";
 import { resolveCompetitionId } from "../src/ingest/competitionResolver.js";
-import { isFollowedNationalCompetition } from "../src/ingest/onefootballEnrichment.js";
+import { isFollowedNationalCompetition, isOrphanNationalRow } from "../src/ingest/onefootballEnrichment.js";
 
 describe("national-team competition names", () => {
   // Spellings seen live, from OneFootball and futnatv.
@@ -69,5 +69,35 @@ describe("women's national teams in futnatv listings", () => {
     expect(resolveNationalFemininoCompetition("Copa do Mundo Feminina sub-17")).toBeNull();
     expect(resolveNationalFemininoCompetition("Brasileirão Feminino")).toBeNull();
     expect(resolveNationalFemininoCompetition("Amistoso")).toBeNull(); // the men's friendly
+  });
+});
+
+describe("cleaning up rows the resolver has outgrown", () => {
+  // Real bug: Singapura x Paraguai came from Paraguai's page; once Paraguai left the
+  // tab nothing fetched that page, nothing refreshed the row, and it stayed for good.
+  it("flags a national row with no featured side, from its names", () => {
+    const base = { competitionId: "amistosos-internacionais" };
+    expect(isOrphanNationalRow({ ...base, homeTeamNameRaw: "Singapura", awayTeamNameRaw: "Paraguai" })).toBe(true);
+    expect(isOrphanNationalRow({ ...base, homeTeamNameRaw: "Singapura", awayTeamNameRaw: "Brasil" })).toBe(false);
+    expect(isOrphanNationalRow({ ...base, homeTeamNameRaw: "Países Baixos", awayTeamNameRaw: "Chile" })).toBe(false); // Holanda is featured
+  });
+
+  it("never touches a row from a competition that is not a national-team one", () => {
+    expect(isOrphanNationalRow({ competitionId: "champions-league", homeTeamNameRaw: "Fenerbahçe", awayTeamNameRaw: "Roma" })).toBe(false);
+    expect(isOrphanNationalRow({ competitionId: "brasileirao-serie-a", homeTeamNameRaw: "Paraguai", awayTeamNameRaw: "Chile" })).toBe(false);
+  });
+
+  // The same game, listed under a new id once an opponent got a team id.
+  it("finds a women's national row futnatv now lists under another id, inside its window only", () => {
+    const row = (id: string, kickoffUtc: string, sourceId = "futnatv-feminino", competitionId = "amistosos-internacionais-femininos") => ({ id, competitionId, kickoffUtc, sourceId });
+    const known = [
+      row("futnatv-feminino:canada__dinamarca_feminino__2026-10-12", "2026-10-12T19:30:00.000Z"),
+      row("futnatv-feminino:canada_feminino__dinamarca_feminino__2026-10-12", "2026-10-12T19:30:00.000Z"),
+      row("futnatv-feminino:velho__x__2026-09-01", "2026-09-01T19:30:00.000Z"),
+      row("onefootball:1", "2026-10-12T19:30:00.000Z", "onefootball"),
+      row("futnatv-feminino:a__b__2026-10-12", "2026-10-12T19:30:00.000Z", "futnatv-feminino", "brasileirao-feminino"),
+    ];
+    const current = new Set(["futnatv-feminino:canada_feminino__dinamarca_feminino__2026-10-12"]);
+    expect(findStaleNationalRows(known, current, "2026-10-04T00:00:00.000Z")).toEqual(["futnatv-feminino:canada__dinamarca_feminino__2026-10-12"]);
   });
 });
