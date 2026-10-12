@@ -99,7 +99,14 @@ const CONFEDERATION_KEYWORDS: { id: string; pattern: RegExp }[] = [
  */
 export function resolveQualifiersId(rawName: string): string | null {
   const normalized = normalizeText(rawName);
-  if (!/\belimin\w*|\bqualif\w*/.test(normalized)) return null;
+  const aboutQualifying = /\belimin\w*|\bqualif\w*/.test(normalized);
+  if (!aboutQualifying) return null;
+  // "Taça das Nações Africanas, Qualificação" and "Eliminatórias da Eurocopa" are
+  // qualifiers too — for other tournaments. A name counts as a WORLD CUP qualifier
+  // when it says so, or when it is an "Eliminatórias" that names no other tournament.
+  const saysWorldCup = /copa do mundo|world cup|mundial/.test(normalized);
+  const otherTournament = /eurocopa|\beuro\b|taca|nacoes|nations|copa america|copa asiatica|copa africana/.test(normalized);
+  if (!saysWorldCup && (otherTournament || !/\belimin\w*/.test(normalized))) return null;
   const confederation = CONFEDERATION_KEYWORDS.find(({ pattern }) => pattern.test(normalized));
   if (!confederation) return null;
   return `eliminatorias-copa-do-mundo-${/\bfeminin\w*|\bwomen\b/.test(normalized) ? "feminina-" : ""}${confederation.id}`;

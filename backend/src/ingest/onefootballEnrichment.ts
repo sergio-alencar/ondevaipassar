@@ -203,6 +203,8 @@ interface PageSource {
   competitionIdFor: (card: MatchCard) => string | null;
   /** Take every match on this page, even one where neither club is tracked. */
   fullCoverage: boolean;
+  /** A card of a competition we don't follow also removes the row an earlier run stored for it (see the loop). Only for pages whose filter is strict. */
+  pruneUnfollowed?: boolean;
 }
 
 function buildPageSources(): PageSource[] {
@@ -233,6 +235,7 @@ function buildPageSources(): PageSource[] {
         return competitionId !== null && isFollowedNationalCompetition(competitionId) ? competitionId : null;
       },
       fullCoverage: false,
+      pruneUnfollowed: true,
     })),
   ];
 }
@@ -485,7 +488,18 @@ export async function runOnefootballEnrichment(): Promise<void> {
         if (candidate.homeTeamId === null && candidate.awayTeamId === null && !page.fullCoverage) continue;
 
         const competitionId = page.competitionIdFor(card);
-        if (competitionId === null) continue; // no competition name on the card — never file it under a guess
+        if (competitionId === null) {
+          // Never file it under a guess. On a national team's page, though, "not followed"
+          // is a verdict, not a gap: a row an earlier, looser run stored for this very match
+          // (African Cup qualifiers once filed as World Cup ones) has to go.
+          const earlier = page.pruneUnfollowed ? storedMatches.find((match) => match.id === `${SOURCE_ID}:${card.matchId}`) : undefined;
+          if (earlier) {
+            await db.delete(broadcasts).where(eq(broadcasts.matchId, earlier.id));
+            await db.delete(matches).where(eq(matches.id, earlier.id));
+            deletedCount++;
+          }
+          continue;
+        }
 
         const covering = findCoveringMatches(candidate, allMatches);
         const ownCovering = covering.filter((match) => match.id.startsWith(SOURCE_ID_PREFIX));

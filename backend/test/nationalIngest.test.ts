@@ -26,6 +26,15 @@ describe("national-team competition names", () => {
     expect(resolveCompetitionId(raw)).toBe(id);
   });
 
+  // Real bug: OneFootball's "Taça das Nações Africanas, Qualificação" was filed as the CAF World Cup qualifiers.
+  it("does not take another tournament's qualifiers for the World Cup's", () => {
+    expect(resolveCompetitionId("Taça das Nações Africanas, Qualificação")).not.toMatch(/^eliminatorias-copa-do-mundo/);
+    expect(resolveCompetitionId("Eliminatórias da Eurocopa")).not.toMatch(/^eliminatorias-copa-do-mundo/);
+    expect(resolveCompetitionId("Qualificação para a Taça Asiática")).not.toMatch(/^eliminatorias-copa-do-mundo/);
+    expect(resolveCompetitionId("Eliminatórias da Copa do Mundo - CAF")).toBe("eliminatorias-copa-do-mundo-caf");
+    expect(resolveCompetitionId("Africa Cup of Nations Qualification")).not.toMatch(/^eliminatorias-copa-do-mundo/);
+  });
+
   it("never files a qualifier without a confederation under a guess", () => {
     expect(resolveCompetitionId("Eliminatórias da Copa do Mundo")).not.toMatch(/^eliminatorias-copa-do-mundo-/);
   });
