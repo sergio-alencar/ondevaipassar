@@ -3,8 +3,9 @@ import { db } from "../db/client.js";
 import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
 import { parseBroadcastChannels } from "../sources/futnatv/broadcastText.js";
 import { fetchAllUpcomingGames } from "../sources/futnatv/client.js";
+import type { Game } from "../sources/futnatv/schema.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
-import { isTrackedBrazilianFemininoTeam, resolveFemininoTeamId } from "./femininoTeamResolver.js";
+import { isTrackedBrazilianFemininoTeam, isTrackedNationalFemininoTeam, resolveFemininoTeamId, resolveNationalFemininoTeamId } from "./femininoTeamResolver.js";
 import { toKickoffUtc } from "./futnatvEnrichment.js";
 import { MANUAL_SOURCE_ID } from "./manualFixtures.js";
 
@@ -66,6 +67,24 @@ export function resolveFemininoCompetition(competition: string): FemininoCompeti
   if (isYouthCompetitionName(competition)) return null;
   const known = KNOWN_FEMININO_COMPETITIONS.find(({ pattern }) => pattern.test(normalized));
   return known?.competition ?? { competitionId: slugify(competition), requireBothSides: false };
+}
+
+/**
+ * The women's national-team competition a futnatv listing belongs to, or
+ * null when it is not one (or not a senior one). A friendly is the case that
+ * needs the caller's care: "Amistoso Feminino" also carries club games, so a
+ * match here counts only if one of OUR national teams is playing (see
+ * runFemininoEnrichment).
+ */
+export function resolveNationalFemininoCompetition(competition: string): string | null {
+  const normalized = normalizeText(competition);
+  if (!normalized.includes("feminin") || isYouthCompetitionName(competition)) return null;
+  if (/\bamistos/.test(normalized)) return "amistosos-internacionais-femininos";
+  if (/\belimin/.test(normalized)) return "eliminatorias-copa-do-mundo-feminina";
+  if (/\bcopa do mundo\b/.test(normalized)) return "copa-do-mundo-feminina";
+  if (/\beurocopa\b/.test(normalized)) return "eurocopa-feminina";
+  if (/\bcopa america\b/.test(normalized)) return "copa-america-feminina";
+  return null;
 }
 
 export type ListingDecision = "ingest" | "skip" | "unresolved";
@@ -168,6 +187,24 @@ export function findKnownMatch(
   );
 }
 
+
+/** The channels a futnatv listing names, one entry per channel, keeping whichever mention carries a watch link or a regional detail. */
+function channelsOf(game: Game): Map<string, { watchUrl: string | null; regionalDetail: string | null }> {
+  const byChannelId = new Map<string, { watchUrl: string | null; regionalDetail: string | null }>();
+  for (const { channelNameRaw, watchUrl, regionalDetail } of parseBroadcastChannels(game.broadcast, game.youtubeUrl ?? null)) {
+    const channelId = resolveChannelId(channelNameRaw);
+    if (!channelId) continue;
+    const existing = byChannelId.get(channelId);
+    if (existing === undefined || (!existing.watchUrl && watchUrl) || (!existing.regionalDetail && regionalDetail)) {
+      byChannelId.set(channelId, {
+        watchUrl: watchUrl ?? existing?.watchUrl ?? null,
+        regionalDetail: regionalDetail ?? existing?.regionalDetail ?? null,
+      });
+    }
+  }
+  return byChannelId;
+}
+
 /**
  * Supplementary FIXTURE source for women's football — genuinely different
  * in kind from runFutnatvEnrichment (the men's-only broadcast enrichment in
@@ -213,6 +250,41 @@ export async function runFemininoEnrichment(): Promise<void> {
     let unresolvedCount = 0;
 
     for (const { game, dateKey } of datedGames) {
+      // National teams first. Every futnatv women's listing there is suffixed
+      // " F" ("Alemanha F x Austrália F") — the suffix that marks a DRAFT for a
+      // club fixture (isPlaceholderListing below) is simply the format here, so
+      // this path must not apply that rule. A game counts only when one of our
+      // national sides plays; anything else (Andorra x Ilhas Faroé, or a club
+      // friendly under the same "Amistoso Feminino" name) falls through.
+      const nationalCompetitionId = resolveNationalFemininoCompetition(game.competition);
+      if (nationalCompetitionId) {
+        const nationalHome = resolveNationalFemininoTeamId(game.home);
+        const nationalAway = resolveNationalFemininoTeamId(game.away);
+        if (isTrackedNationalFemininoTeam(nationalHome) || isTrackedNationalFemininoTeam(nationalAway)) {
+          const nationalKickoff = toKickoffUtc(dateKey, game.time);
+          if (!nationalKickoff) {
+            unresolvedCount++;
+            continue;
+          }
+          const part = (teamId: string | null, rawName: string): string => teamId ?? normalizeText(rawName.replace(/\s+F$/, "")).replace(/\s+/g, "-");
+          const nationalMatchId = `${SOURCE_ID}:${part(nationalHome, game.home)}__${part(nationalAway, game.away)}__${dateKey}`;
+          resolvedMatches.push({
+            matchId: nationalMatchId,
+            competitionId: nationalCompetitionId,
+            homeTeamId: nationalHome,
+            homeTeamNameRaw: game.home.replace(/\s+F$/, ""),
+            awayTeamId: nationalAway,
+            awayTeamNameRaw: game.away.replace(/\s+F$/, ""),
+            kickoffUtc: nationalKickoff,
+            refreshTeams: false,
+          });
+          for (const [channelId, { watchUrl, regionalDetail }] of channelsOf(game)) {
+            resolvedBroadcasts.push({ matchId: nationalMatchId, channelId, watchUrl, regionalDetail });
+          }
+          continue;
+        }
+      }
+
       const competition = resolveFemininoCompetition(game.competition);
       if (!competition) continue; // a different competition (or a different sport/league entirely) — not our concern
       if (isPlaceholderListing(game)) continue; // futnatv's own draft listing, real one arrives separately — not counted as unresolved, this is expected
@@ -262,18 +334,7 @@ export async function runFemininoEnrichment(): Promise<void> {
         });
       }
 
-      const byChannelId = new Map<string, { watchUrl: string | null; regionalDetail: string | null }>();
-      for (const { channelNameRaw, watchUrl, regionalDetail } of parseBroadcastChannels(game.broadcast, game.youtubeUrl ?? null)) {
-        const channelId = resolveChannelId(channelNameRaw);
-        if (!channelId) continue;
-        const existing = byChannelId.get(channelId);
-        if (existing === undefined || (!existing.watchUrl && watchUrl) || (!existing.regionalDetail && regionalDetail)) {
-          byChannelId.set(channelId, {
-            watchUrl: watchUrl ?? existing?.watchUrl ?? null,
-            regionalDetail: regionalDetail ?? existing?.regionalDetail ?? null,
-          });
-        }
-      }
+      const byChannelId = channelsOf(game);
       for (const [channelId, { watchUrl, regionalDetail }] of byChannelId) {
         resolvedBroadcasts.push({ matchId, channelId, watchUrl, regionalDetail });
       }

@@ -8,7 +8,7 @@ import { resolveCompetitionId } from "./competitionResolver.js";
 import { mapWithinBudget, TIMED_OUT } from "../lib/concurrency.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
 import { resolveTeamId } from "./teamResolver.js";
-import { normalizeText } from "@ondevaipassar/shared";
+import { findCompetitionById, normalizeText } from "@ondevaipassar/shared";
 
 const SOURCE_ID = "onefootball";
 const SOURCE_ID_PREFIX = `${SOURCE_ID}:`;
@@ -95,6 +95,52 @@ const TRACKED_EUROPEAN_TEAMS: { teamId: string; onefootballId: string }[] = [
   { teamId: "tottenham", onefootballId: "202" },
 ];
 
+/**
+ * OneFootball's own ids for the men's national teams we follow — the same
+ * page type as the clubs above, and the same warning: the name in the URL is
+ * decorative, so each id was checked against the served page's own <title>
+ * ("Jogos do Brasil"). Peru, Venezuela and Bolívia are not here: no id found
+ * yet, and none is needed to see them — a match against a team that IS here
+ * lists the opponent by name, and the name resolver knows all three.
+ *
+ * Women's national teams are not fetched from here: their fixtures come from
+ * futnatv (femininoEnrichment.ts), which carries the broadcast too.
+ */
+const TRACKED_NATIONAL_TEAMS: { teamId: string; onefootballId: string }[] = [
+  { teamId: "brasil", onefootballId: "79" },
+  { teamId: "argentina", onefootballId: "55" },
+  { teamId: "uruguai", onefootballId: "56" },
+  { teamId: "colombia", onefootballId: "118" },
+  { teamId: "equador", onefootballId: "101" },
+  { teamId: "paraguai", onefootballId: "47" },
+  { teamId: "chile", onefootballId: "35" },
+  { teamId: "portugal", onefootballId: "43" },
+  { teamId: "espanha", onefootballId: "34" },
+  { teamId: "franca", onefootballId: "45" },
+  { teamId: "inglaterra", onefootballId: "61" },
+  { teamId: "alemanha", onefootballId: "96" },
+  { teamId: "italia", onefootballId: "37" },
+  { teamId: "holanda", onefootballId: "38" },
+  { teamId: "belgica", onefootballId: "116" },
+  { teamId: "croacia", onefootballId: "99" },
+  { teamId: "dinamarca", onefootballId: "92" },
+  { teamId: "mexico", onefootballId: "69" },
+  { teamId: "estados_unidos", onefootballId: "81" },
+  { teamId: "japao", onefootballId: "52" },
+  { teamId: "marrocos", onefootballId: "108" },
+];
+
+/**
+ * A national team plays in many competitions we do not follow (Asian Cup
+ * qualifiers, African Cup qualifiers…), and an unrecognised competition name
+ * is normally filed under a stopgap id rather than dropped. For a national
+ * team's page that would put every one of those on the site, so only the
+ * registered national-team competitions and the senior friendlies pass.
+ */
+export function isFollowedNationalCompetition(competitionId: string): boolean {
+  return findCompetitionById(competitionId)?.type === "national-teams" || competitionId === "amistosos-internacionais";
+}
+
 // Enough to cut the wall-clock cost without hammering onefootball.com with
 // all 30 pages at once.
 const FETCH_CONCURRENCY = 6;
@@ -159,6 +205,15 @@ function buildPageSources(): PageSource[] {
       // A team page is fetched *because* of the club on it, so a match with
       // no tracked side there would be a resolver failure, not a fixture
       // we want.
+      fullCoverage: false,
+    })),
+    ...TRACKED_NATIONAL_TEAMS.map((team) => ({
+      label: `seleção ${team.teamId}`,
+      fetch: () => fetchTeamMatchCards(team.onefootballId),
+      competitionIdFor: (card: MatchCard) => {
+        const competitionId = card.competitionName ? resolveCompetitionId(card.competitionName) : null;
+        return competitionId !== null && isFollowedNationalCompetition(competitionId) ? competitionId : null;
+      },
       fullCoverage: false,
     })),
   ];

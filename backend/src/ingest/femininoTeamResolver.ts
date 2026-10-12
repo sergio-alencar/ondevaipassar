@@ -28,6 +28,28 @@ export function isTrackedBrazilianFemininoTeam(teamId: string | null): boolean {
 }
 
 /**
+ * The women's NATIONAL teams we follow, by the country's name. futnatv writes
+ * them like every other women's side — "Alemanha F", "Austrália F" — so the
+ * suffix is stripped before the lookup. Kept apart from the club map above on
+ * purpose: a country's name must never resolve inside a club competition (and
+ * "Brasil" is not a club), so callers ask for national teams only after
+ * deciding, from the competition, that the game is between national sides.
+ */
+const NORMALIZED_NAME_TO_NATIONAL_FEMININO_ID = new Map(
+  TEAMS.filter((team) => team.division === "SELECOES_FEMININO").map((team) => [normalizeText(team.displayName.replace(/\s*\(Fem\.\)$/, "")), team.id]),
+);
+
+/** The women's national team a futnatv name stands for ("Alemanha F" -> alemanha_feminino), or null for any other country. */
+export function resolveNationalFemininoTeamId(rawName: string): string | null {
+  return NORMALIZED_NAME_TO_NATIONAL_FEMININO_ID.get(normalizeText(rawName.replace(/\s+(F|Feminino|Fem\.?)$/i, ""))) ?? null;
+}
+
+/** True for one of the women's national teams this site follows. */
+export function isTrackedNationalFemininoTeam(teamId: string | null): boolean {
+  return teamId !== null && teamId.endsWith("_feminino") && [...NORMALIZED_NAME_TO_NATIONAL_FEMININO_ID.values()].includes(teamId);
+}
+
+/**
  * Foreign clubs from the Libertadores Feminina, keyed by punctuation-free
  * lowercase. A separate map with its own squashing, because normalizeText
  * only strips accents and case — "L.D.U. Quito", "Caracas F.C." and
