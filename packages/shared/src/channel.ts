@@ -442,6 +442,7 @@ const CHANNEL_ALIASES: Record<string, string> = {
   // Verified as separate liveWatchSources entries with different
   // description/url/transmissionId, not a naming variant of one another.
   "ge tv": "getv",
+  getv: "getv",
   goat: "goat",
   "canal goat": "goat",
   "nosso futebol": "nossofutebol",

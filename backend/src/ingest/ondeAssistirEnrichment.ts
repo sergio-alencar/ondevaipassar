@@ -3,6 +3,8 @@ import { db } from "../db/client.js";
 import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
 import { getErrorMessage } from "../lib/errors.js";
 import { fetchConfirmedChannelNames, parseArticleCandidate } from "../sources/ge-globo/ondeAssistirArticle.js";
+import { isWomensPreviewCandidate } from "../sources/ge-globo/womensArticle.js";
+import { runGeFemininoEnrichment, type WomensCandidate } from "./geFemininoEnrichment.js";
 import { fetchTeamNewsFeed } from "../sources/ge-globo/newsFeedClient.js";
 import { matchStreamsToBroadcasts, type MatchCandidate } from "./broadcastMatching.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
@@ -27,12 +29,15 @@ function chunk<T>(items: T[], size: number): T[][] {
 async function findArticlesForTeam(
   geGloboSlug: string,
   allMatches: MatchCandidate[],
-): Promise<{ found: Map<string, string>; unresolvedCount: number }> {
+): Promise<{ found: Map<string, string>; unresolvedCount: number; womens: WomensCandidate[] }> {
   const found = new Map<string, string>();
+  const womens: WomensCandidate[] = [];
   let unresolvedCount = 0;
 
   const items = await fetchTeamNewsFeed(geGloboSlug);
   for (const item of items) {
+    // A club's page also carries its women's team's previews; those create games in geFemininoEnrichment.ts.
+    if (isWomensPreviewCandidate(item.content)) womens.push({ title: item.content.title, url: item.content.url });
     const candidate = parseArticleCandidate(item);
     if (!candidate) continue;
 
@@ -52,7 +57,7 @@ async function findArticlesForTeam(
     found.set(matchIds[0], candidate.url);
   }
 
-  return { found, unresolvedCount };
+  return { found, unresolvedCount, womens };
 }
 
 /**
@@ -79,14 +84,16 @@ export async function runOndeAssistirEnrichment(): Promise<void> {
     );
 
     const articleByMatchId = new Map<string, string>();
+    const womensCandidates: WomensCandidate[] = [];
     let unresolvedCount = 0;
 
     for (const batch of chunk(teamsWithSlug, CONCURRENCY)) {
       await Promise.all(
         batch.map(async (team) => {
           try {
-            const { found, unresolvedCount: teamUnresolved } = await findArticlesForTeam(team.aliases.geGlobo, allMatches);
+            const { found, unresolvedCount: teamUnresolved, womens } = await findArticlesForTeam(team.aliases.geGlobo, allMatches);
             unresolvedCount += teamUnresolved;
+            womensCandidates.push(...womens);
             for (const [matchId, url] of found) articleByMatchId.set(matchId, url);
           } catch (error) {
             console.error(`[${SOURCE_ID}] failed to fetch news feed for ${team.id}:`, getErrorMessage(error));
@@ -149,6 +156,9 @@ export async function runOndeAssistirEnrichment(): Promise<void> {
       matchesFound: attachedCount,
       matchesUnresolved: unresolvedCount,
     });
+
+    // Same fetched feeds, no extra requests: creates the women's games these previews announce.
+    await runGeFemininoEnrichment(womensCandidates);
 
     console.log(`[${SOURCE_ID}] attached channels for ${attachedCount} matches (${unresolvedCount} unresolved)`);
   });

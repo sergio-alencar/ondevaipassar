@@ -68,7 +68,7 @@ export async function cronRoutes(app: FastifyInstance): Promise<void> {
       // `?youtube=force` skips the quota guard (see canSkipYoutubeRun): for a deliberate refresh, not for testing.
       { name: "youtube", run: () => runYoutubeEnrichment({ force: (request.query as { youtube?: string }).youtube === "force" }), needsMs: 6_000 },
       { name: "premiere", run: runPremiereEnrichment, needsMs: 3_000 },
-      { name: "onde-assistir", run: runOndeAssistirEnrichment, needsMs: 14_000 },
+      { name: "onde-assistir", run: runOndeAssistirEnrichment, needsMs: 17_000 },
       { name: "futebol-interior", run: runFutebolInteriorEnrichment, needsMs: 4_000 },
       { name: "tudo-sobre-paulista", run: runTudoSobrePaulistaEnrichment, needsMs: 4_000 },
       { name: "meuguia", run: runMeuguiaEnrichment, needsMs: 4_000 },
