@@ -26,6 +26,15 @@ export interface PostGroup {
  * so the account posts the biggest draw first on a busy morning - which is
  * also what survives if the run is cut short.
  */
+/** "Jogos da Europa" while the European post mixes competitions; the competition's own name once every match in it is the same one. */
+function groupDisplayName(competitionId: string, chunk: MatchView[], fallback: string): string {
+  if (competitionId === EUROPE_GROUP_ID) {
+    const ids = new Set(chunk.map((match) => match.competitionId));
+    return ids.size === 1 ? (findCompetitionById(chunk[0].competitionId)?.displayName ?? chunk[0].competitionName) : EUROPE_GROUP_NAME;
+  }
+  return findCompetitionById(competitionId)?.displayName ?? fallback;
+}
+
 export function groupIntoPosts(matches: MatchView[]): PostGroup[] {
   const byCompetition = new Map<string, MatchView[]>();
   for (const match of matches) {
@@ -57,10 +66,7 @@ export function groupIntoPosts(matches: MatchView[]): PostGroup[] {
     chunks.forEach((chunk, index) =>
       groups.push({
         competitionId,
-        competitionName:
-          competitionId === EUROPE_GROUP_ID
-            ? EUROPE_GROUP_NAME
-            : (findCompetitionById(competitionId)?.displayName ?? competitionMatches[0].competitionName),
+        competitionName: groupDisplayName(competitionId, chunk, competitionMatches[0].competitionName),
         matches: chunk,
         part: index + 1,
         totalParts: chunks.length,

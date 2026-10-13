@@ -123,6 +123,18 @@ export function chunkIntoSlides(matches: MatchView[]): MatchView[][] {
   return slides;
 }
 
+/**
+ * The competition a group is really about. The combined European post stays
+ * "Jogos da Europa" while it mixes competitions, but when every match in it
+ * belongs to one (a Champions League night) that competition is what the cover
+ * and header should name, with its own logo.
+ */
+function effectiveCompetitionId(competitionId: string, matches: MatchView[]): string {
+  if (competitionId !== EUROPE_GROUP_ID) return competitionId;
+  const ids = new Set(matches.map((match) => match.competitionId));
+  return ids.size === 1 ? matches[0].competitionId : competitionId;
+}
+
 /** Header/cover name for a group: the competition's short name, or the synthetic one for the combined European post. */
 function groupName(competitionId: string, matches: MatchView[]): string {
   if (competitionId === EUROPE_GROUP_ID) return EUROPE_GROUP_NAME;
@@ -136,7 +148,8 @@ function logoCaptionFor(competitionId: string): string | null {
 }
 
 /** The carousel's first image. `matches` is the whole group, since the cover shows every club playing. */
-export async function renderCoverImage(competitionId: string, matches: MatchView[]): Promise<Buffer> {
+export async function renderCoverImage(groupId: string, matches: MatchView[]): Promise<Buffer> {
+  const competitionId = effectiveCompetitionId(groupId, matches);
   const crests = await Promise.all(
     matches.flatMap((match) => [
       crestArt(match.homeTeamId, match.homeTeamCrestUrl),
@@ -148,7 +161,8 @@ export async function renderCoverImage(competitionId: string, matches: MatchView
       competitionName: groupName(competitionId, matches),
       dateLabel: formatDateLabel(matches[0].kickoffUtc),
       matchCount: matches.length,
-      competitionLogoDataUri: competitionLogoDataUri(competitionId),
+      // A single competition without its own art keeps the generic European one.
+      competitionLogoDataUri: competitionLogoDataUri(competitionId) ?? competitionLogoDataUri(groupId),
       logoCaption: logoCaptionFor(competitionId),
       crests,
       wordmarkDataUri: WORDMARK_WHITE,
@@ -158,11 +172,13 @@ export async function renderCoverImage(competitionId: string, matches: MatchView
 
 /** One slide of matches. `matches` is just that slide's own share of the group. */
 export async function renderSlideImage(
-  competitionId: string,
+  groupId: string,
   matches: MatchView[],
   slideLabel: string | null,
   mixed: boolean,
 ): Promise<Buffer> {
+  // `mixed` is about the whole post: a slide that happens to hold one competition still belongs to a mixed European post.
+  const competitionId = mixed ? groupId : effectiveCompetitionId(groupId, matches);
   const notes = buildRegionalNotes(matches);
   const slideMatches = await Promise.all(matches.map((match) => toSlideMatch(match, mixed, notes)));
   return render(

@@ -59,7 +59,14 @@ function ensureSvgViewBox(svg: Buffer): Buffer {
  * just a safe non-crash) and returns null only when that's not possible
  * either — caller falls back to the generic shield.
  */
-function loadCrestArt(svg: Buffer): CrestArt | null {
+function loadCrestArt(svg: Buffer, fileName = ""): CrestArt | null {
+  // A few national crests are PNG (no usable SVG exists, or the SVG weighs hundreds of KB — see PNG_CRESTS).
+  // Satori draws a raster as-is; the aspect ratio comes from the PNG header (IHDR: width, then height, big-endian).
+  if (fileName.endsWith(".png")) {
+    const width = svg.readUInt32BE(16);
+    const height = svg.readUInt32BE(20);
+    return { dataUri: `data:image/png;base64,${svg.toString("base64")}`, aspectRatio: width / height };
+  }
   const withViewBox = ensureSvgViewBox(svg);
   if (!withViewBox.toString("utf-8").includes("viewBox")) return null;
   const { svg: cropped, aspectRatio } = cropSvgToContent(withViewBox);
@@ -114,7 +121,7 @@ export async function crestArt(teamId: string | null, sourceCrestUrl?: string | 
   const crestFile = teamId ? findTeamById(teamId)?.crestFile : undefined;
   if (crestFile) {
     try {
-      const local = loadCrestArt(readFileSync(`${ASSETS_DIR}crests/${crestFile}`));
+      const local = loadCrestArt(readFileSync(`${ASSETS_DIR}crests/${crestFile}`), crestFile);
       if (local) return local;
     } catch {
       // fall through to the source-hotlink / generic-shield cascade below

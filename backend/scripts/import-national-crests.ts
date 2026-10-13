@@ -7,8 +7,7 @@
  *   2. npx tsx scripts/import-national-crests.ts
  *
  * Each loses its title stars (removeStars.ts), then is cropped to its visible area and written as selecao_<id>.svg to the
- * site's crest folder — and, for the 20+20 featured sides only, to the
- * Instagram renderer's too. A country with no file is listed, not skipped
+ * site's crest folder and to the Instagram renderer's too (an opponent can be any country). A country with no file is listed, not skipped
  * silently.
  */
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -49,7 +48,6 @@ const KEEP_STARS = new Set(["sudao", "djibuti"]);
 const missing: string[] = [];
 const withoutStars: string[] = [];
 const madePng: string[] = [];
-const featured = new Set(TEAMS.filter((team) => team.division === "SELECOES" || team.division === "SELECOES_FEMININO").map((team) => team.id.replace(/_feminino$/, "")));
 const countries = [...new Set(NATIONAL_TEAMS.map((team) => team.id.replace(/_feminino$/, "")))].sort();
 let written = 0;
 for (const id of countries) {
@@ -71,8 +69,9 @@ for (const id of countries) {
     writeFileSync(join(SITE_CRESTS, target), svg, "utf-8");
     rmSync(join(SITE_CRESTS, `selecao_${id}.png`), { force: true });
   }
-  // The Instagram renderer only ever draws the featured sides; the rest would add megabytes to the function for nothing.
-  if (featured.has(id)) copyFileSync(join(SITE_CRESTS, target), join(INSTAGRAM_CRESTS, target));
+  // Every country, not only the featured ones: a featured side's opponent (Lituânia, Grécia) is any country, and a missing file prints the gray shield on the post.
+  rmSync(join(INSTAGRAM_CRESTS, `selecao_${id}.${heavy ? "svg" : "png"}`), { force: true });
+  copyFileSync(join(SITE_CRESTS, target), join(INSTAGRAM_CRESTS, target));
   written += 1;
 }
 console.log(`${written} escudos gravados em ${SITE_CRESTS}`);
