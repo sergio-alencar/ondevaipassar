@@ -4,15 +4,33 @@ import { z } from "zod";
 import { env } from "../../config/env.js";
 import { db } from "../../db/client.js";
 import { instagramPosts } from "../../db/schema.js";
+import { shouldChain } from "../../instagram/chaining.js";
 import { runInstagramPosting } from "../../instagram/poster.js";
 
 const querySchema = z.object({
   // Escape hatch for a controlled single-match test post before trusting
   // the unattended daily run — see poster.ts's RunPostingOptions.
   matchId: z.string().optional(),
+  // How many runs deep this call is in a self-started chain (see chaining.ts); absent on a scheduled call.
+  chain: z.coerce.number().int().min(0).default(0),
 });
 
 const resetQuerySchema = z.object({ matchId: z.string() });
+
+/**
+ * Fires the next run and returns once it has had time to start. The next run
+ * works for ~50 s, so this does not wait for its answer: the request is sent,
+ * then given up on after a few seconds. The platform keeps running a function
+ * whose caller hung up, which is all this relies on.
+ */
+async function startNextRun(url: string, secret: string, log: { warn: (message: string) => void }): Promise<void> {
+  try {
+    await fetch(url, { headers: { Authorization: `Bearer ${secret}` }, signal: AbortSignal.timeout(4_000) });
+  } catch {
+    // Expected: the timeout is how this stops waiting. A request that never started is caught by the workflow's retry loop.
+  }
+  log.warn(`[instagram] chained the next run: ${url.split("?")[1]}`);
+}
 
 /**
  * Triggered from TWO independent places on purpose, both daily, both
@@ -51,6 +69,13 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
     }
 
     const summary = await runInstagramPosting({ onlyMatchId: parsedQuery.data.matchId });
+
+    // Matches still unposted: start the next run now instead of waiting for the
+    // late GitHub schedule. A single-match test post never chains.
+    const depth = parsedQuery.data.chain;
+    if (!parsedQuery.data.matchId && env.CRON_SECRET && env.PUBLIC_BASE_URL && shouldChain(summary, depth)) {
+      await startNextRun(`${env.PUBLIC_BASE_URL}/api/cron-instagram-post?chain=${depth + 1}`, env.CRON_SECRET, request.log);
+    }
     return { status: "ok", ranAt: new Date().toISOString(), ...summary };
   });
 
