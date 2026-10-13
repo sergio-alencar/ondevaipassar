@@ -12,6 +12,7 @@ import GratisPage from "./pages/GratisPage";
 import MeusCanaisPage from "./pages/MeusCanaisPage";
 import ContaPage from "./pages/ContaPage";
 import PrivacidadePage from "./pages/PrivacidadePage";
+import BackToTop from "./Components/BackToTop";
 import ConsentBanner from "./Components/ConsentBanner";
 import LoginNotice from "./Components/LoginNotice";
 import PageViewTracker from "./Components/PageViewTracker";
@@ -51,6 +52,7 @@ const App = () => {
             </main>
 
             <Footer selectedTeam={selectedTeam} />
+            <BackToTop />
             <ConsentBanner />
           </div>
         </MatchesProvider>
