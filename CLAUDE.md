@@ -29,7 +29,7 @@ Não existe API estruturada e gratuita para "que canal transmite esse jogo" no B
 - Adapters de scraping (`backend/src/sources/*`) ficam "burros": só buscam e validam formato (zod). Resolução de nome cruzado nunca é duplicada por adapter.
 - Mudou algo em `packages/shared`? Rode `npm run build --workspace=packages/shared` antes de testar backend ou frontend — eles consomem o `dist/` compilado, não o `.ts` fonte diretamente.
 - Ao mexer no frontend, suba o dev server (`npm run dev`) e confira no navegador antes de dar por concluído.
-- Deploy é via `vercel deploy --prod` a partir da raiz do repo (precisa estar linkado ao projeto certo — `vercel link --project ondevaipassar-api` pro backend, `--project ondevaipassar` pro front; só um projeto fica linkado por vez em `.vercel/`). Nunca commitar `.env`/tokens — variáveis de produção ficam só no painel da Vercel (`vercel env`).
+- Deploy é via `vercel deploy --prod` a partir da raiz do repo (precisa estar linkado ao projeto certo — `vercel link --project ondevaipassar-api` pro backend, `--project ondevaipassar` pro front; só um projeto fica linkado por vez em `.vercel/`). **`CRON_SECRET` vive em dois lugares**: na Vercel (projeto `ondevaipassar-api`) e no segredo `CRON_SECRET` do GitHub (`gh secret set CRON_SECRET`), que o workflow do Instagram usa. Trocar um sem o outro faz o workflow tomar 401 todo dia e o Instagram parar na metade (aconteceu em 12–13/10/2026). Trocou a da Vercel? Atualize o GitHub na mesma hora e faça redeploy. Nunca commitar `.env`/tokens — variáveis de produção ficam só no painel da Vercel (`vercel env`).
 
 ## Contas opcionais ("Entrar com Google")
 
