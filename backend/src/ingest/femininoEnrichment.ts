@@ -61,7 +61,8 @@ const KNOWN_FEMININO_COMPETITIONS: { pattern: RegExp; competition: FemininoCompe
  */
 export function resolveFemininoCompetition(competition: string): FemininoCompetition | null {
   const normalized = competition.toLowerCase();
-  if (!normalized.includes("feminin")) return null;
+  // futnatv spells the same women's cup both ways: "Copa do Brasil Feminina" and "Copa do Brasil Women".
+  if (!normalized.includes("feminin") && !/\bwomen\b/.test(normalized)) return null;
   // The age-group editions share the senior tournament's name — "Copa
   // Libertadores Feminina Sub-20" contains "libertadores" and "feminina"
   // alike. Without this, an under-20 tie would be ingested as a senior one
@@ -149,8 +150,19 @@ export function decideListing(requireBothSides: boolean, homeTeamId: string | nu
 // kept the wrong one; checking for the " F" suffix directly is exact.
 const PLACEHOLDER_SUFFIX_PATTERN = /\sF$/;
 
-function isPlaceholderListing(game: { home: string; away: string }): boolean {
-  return PLACEHOLDER_SUFFIX_PATTERN.test(game.home) || PLACEHOLDER_SUFFIX_PATTERN.test(game.away);
+/**
+ * A placeholder is a suffixed listing WITHOUT a broadcast — that is what the
+ * Brasileirão Feminino drafts looked like. Copa do Brasil Feminina is listed
+ * with the suffix throughout ("Flamengo F x Fluminense F") and, once the
+ * channel is known, WITH it ("SporTV"): that one is the real listing, and
+ * dropping it for its suffix hid the whole competition from the site. The
+ * Brasileirão keeps the strict rule: its real listing exists under bare names.
+ */
+export function isPlaceholderListing(game: { home: string; away: string; broadcast?: string | null }, requireBothSides: boolean): boolean {
+  const suffixed = PLACEHOLDER_SUFFIX_PATTERN.test(game.home) || PLACEHOLDER_SUFFIX_PATTERN.test(game.away);
+  if (!suffixed) return false;
+  if (requireBothSides) return true;
+  return !(game.broadcast ?? "").trim();
 }
 
 interface ResolvedMatch {
@@ -319,7 +331,7 @@ export async function runFemininoEnrichment(): Promise<void> {
 
       const competition = resolveFemininoCompetition(game.competition);
       if (!competition) continue; // a different competition (or a different sport/league entirely) — not our concern
-      if (isPlaceholderListing(game)) continue; // futnatv's own draft listing, real one arrives separately — not counted as unresolved, this is expected
+      if (isPlaceholderListing(game, competition.requireBothSides)) continue; // futnatv's own draft listing, real one arrives separately — not counted as unresolved, this is expected
 
       const kickoffUtc = toKickoffUtc(dateKey, game.time);
       if (!kickoffUtc) {
@@ -329,6 +341,9 @@ export async function runFemininoEnrichment(): Promise<void> {
 
       const homeTeamId = resolveFemininoTeamId(game.home);
       const awayTeamId = resolveFemininoTeamId(game.away);
+      // A real listing can still carry the suffix (Copa do Brasil Feminina): drop it from the name the site shows.
+      const homeName = game.home.replace(/\s+F$/, "");
+      const awayName = game.away.replace(/\s+F$/, "");
 
       const decision = decideListing(competition.requireBothSides, homeTeamId, awayTeamId);
       if (decision === "unresolved") unresolvedCount++;
@@ -343,15 +358,15 @@ export async function runFemininoEnrichment(): Promise<void> {
       const idPart = (teamId: string | null, rawName: string): string =>
         teamId ?? normalizeText(rawName).replace(/\s+/g, "-");
       const matchId =
-        covering?.id ?? `${SOURCE_ID}:${idPart(homeTeamId, game.home)}__${idPart(awayTeamId, game.away)}__${dateKey}`;
+        covering?.id ?? `${SOURCE_ID}:${idPart(homeTeamId, homeName)}__${idPart(awayTeamId, awayName)}__${dateKey}`;
 
       resolvedMatches.push({
         matchId,
         competitionId: competition.competitionId,
         homeTeamId,
-        homeTeamNameRaw: game.home,
+        homeTeamNameRaw: homeName,
         awayTeamId,
-        awayTeamNameRaw: game.away,
+        awayTeamNameRaw: awayName,
         kickoffUtc,
         refreshTeams: covering?.sourceId === MANUAL_SOURCE_ID,
       });

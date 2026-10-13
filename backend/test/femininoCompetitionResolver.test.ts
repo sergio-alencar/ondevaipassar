@@ -205,3 +205,24 @@ describe("decideListing", () => {
     expect(decideListing(false, "colo_colo_feminino", "caracas_feminino")).toBe("skip");
   });
 });
+
+describe("Copa do Brasil Feminina listings", () => {
+  it("recognises the cup under both of futnatv's spellings", async () => {
+    const { resolveFemininoCompetition } = await import("../src/ingest/femininoEnrichment.js");
+    expect(resolveFemininoCompetition("Copa do Brasil Feminina")?.competitionId).toBe("copa-do-brasil-feminina");
+    expect(resolveFemininoCompetition("Copa do Brasil Women")?.competitionId).toBe("copa-do-brasil-feminina");
+    expect(resolveFemininoCompetition("Copa do Brasil")).toBeNull();
+  });
+
+  it("keeps a suffixed listing that has a channel, and drops one that does not", async () => {
+    const { isPlaceholderListing } = await import("../src/ingest/femininoEnrichment.js");
+    const withChannel = { home: "Flamengo F", away: "Fluminense F", broadcast: "SporTV" };
+    expect(isPlaceholderListing(withChannel, false)).toBe(false);
+    expect(isPlaceholderListing({ ...withChannel, broadcast: "" }, false)).toBe(true);
+  });
+
+  it("stays strict for the Brasileirão Feminino, whose real listing has bare names", async () => {
+    const { isPlaceholderListing } = await import("../src/ingest/femininoEnrichment.js");
+    expect(isPlaceholderListing({ home: "Corinthians F", away: "Palmeiras F", broadcast: "SporTV" }, true)).toBe(true);
+  });
+});
