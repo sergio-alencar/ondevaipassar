@@ -422,6 +422,8 @@ export interface CoverInput {
    * Null prints nothing.
    */
   logoCaption: string | null;
+  /** Prints the competition's name under a smaller logo — for a logo that is only the organiser's (UEFA's badge on a qualifiers post), which doesn't say which tournament this is. */
+  titleUnderLogo?: boolean;
   /** Crests of the clubs playing that day: the cover's artwork when there's no competition logo, and a supporting strip under it when there is. */
   crests: TemplateCrest[];
   wordmarkDataUri: string;
@@ -473,8 +475,29 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
               // height of a cover whose logo says its own name.
               h("img", {
                 src: input.competitionLogoDataUri as string,
-                style: { height: input.logoCaption ? 420 : 520, objectFit: "contain" },
+                style: { height: input.titleUnderLogo ? 190 : input.logoCaption ? 420 : 520, objectFit: "contain" },
               }),
+              ...(input.titleUnderLogo
+                ? [
+                    h(
+                      "div",
+                      {
+                        style: {
+                          display: "flex",
+                          justifyContent: "center",
+                          width: CONTENT_WIDTH,
+                          color: "#ffffff",
+                          fontSize: input.competitionName.length > 22 ? 76 : 96,
+                          fontWeight: 700,
+                          textAlign: "center",
+                          lineHeight: 1.05,
+                          letterSpacing: 1,
+                        },
+                      },
+                      input.competitionName.toUpperCase(),
+                    ),
+                  ]
+                : []),
               ...(input.logoCaption
                 ? [
                     h(

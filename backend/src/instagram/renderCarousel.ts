@@ -147,6 +147,9 @@ function logoCaptionFor(competitionId: string): string | null {
   return findCompetitionById(competitionId)?.logoCaption ?? null;
 }
 
+/** Competitions whose cover logo is just the organiser's badge (UEFA), so the tournament's name is printed under it. */
+const ORGANISER_LOGO_COMPETITIONS: ReadonlySet<string> = new Set(["eliminatorias-copa-do-mundo-feminina-uefa"]);
+
 /** The carousel's first image. `matches` is the whole group, since the cover shows every club playing. */
 export async function renderCoverImage(groupId: string, matches: MatchView[]): Promise<Buffer> {
   const competitionId = effectiveCompetitionId(groupId, matches);
@@ -164,6 +167,7 @@ export async function renderCoverImage(groupId: string, matches: MatchView[]): P
       // A single competition without its own art keeps the generic European one.
       competitionLogoDataUri: competitionLogoDataUri(competitionId) ?? competitionLogoDataUri(groupId),
       logoCaption: logoCaptionFor(competitionId),
+      titleUnderLogo: ORGANISER_LOGO_COMPETITIONS.has(competitionId),
       crests,
       wordmarkDataUri: WORDMARK_WHITE,
     }),
