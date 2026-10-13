@@ -268,6 +268,33 @@ export interface SlideInput {
   regionalNotes: string[];
 }
 
+// Characters of the 44px bold header that fit one line across the slide, measured against the cut-off header
+// of "ELIMINATÓRIAS EUROPEIAS FEMININAS | TERÇA, 13/OUT" (49 characters, did not fit).
+const HEADER_ONE_LINE_CHARS = 36;
+const HEADER_NAME_FULL_SIZE_CHARS = 30;
+
+function headerLines(name: string, date: string): SatoriElement[] {
+  const text = (value: string, color: string, fontSize: number): SatoriElement =>
+    h("div", { style: { display: "flex", color, fontSize, fontWeight: 700 } }, value);
+
+  if (name.length + date.length + 3 <= HEADER_ONE_LINE_CHARS) {
+    // Same size and centre-aligned: at two different sizes on a baseline they read as one sitting higher than the other.
+    return [
+      h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 18 } }, [
+        text(name, PURPLE, 44),
+        text("|", GRAY_200, 44),
+        text(date, GRAY_600, 44),
+      ]),
+    ];
+  }
+  return [
+    h("div", { style: { display: "flex", justifyContent: "center", textAlign: "center" } }, [
+      text(name, PURPLE, name.length > HEADER_NAME_FULL_SIZE_CHARS ? 38 : 44),
+    ]),
+    h("div", { style: { display: "flex", justifyContent: "center", marginTop: 6 } }, [text(date, GRAY_600, 34)]),
+  ];
+}
+
 /** A slide carrying 2-3 matches. */
 export function buildSlideTree(input: SlideInput): SatoriElement {
   const headerHeight = 150;
@@ -312,23 +339,11 @@ export function buildSlideTree(input: SlideInput): SatoriElement {
           },
         },
         [
-          // One line, now that the competition name is the short form
-          // ("SÉRIE A", not "CAMPEONATO BRASILEIRO SÉRIE A").
-          // Same size and centre-aligned: at two different sizes on a
-          // baseline they read as one sitting higher than the other.
-          h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 18 } }, [
-            h(
-              "div",
-              { style: { display: "flex", color: PURPLE, fontSize: 44, fontWeight: 700 } },
-              input.competitionName.toUpperCase(),
-            ),
-            h("div", { style: { display: "flex", color: GRAY_200, fontSize: 44, fontWeight: 700 } }, "|"),
-            h(
-              "div",
-              { style: { display: "flex", color: GRAY_600, fontSize: 44, fontWeight: 700 } },
-              input.dateLabel.toUpperCase(),
-            ),
-          ]),
+          // One line while name and date fit side by side; a long name
+          // ("ELIMINATÓRIAS EUROPEIAS FEMININAS") plus the date ran past the
+          // slide's edge and was cut off, so then the date drops to a second
+          // line and the name shrinks only if it alone is still too wide.
+          ...headerLines(input.competitionName.toUpperCase(), input.dateLabel.toUpperCase()),
         ],
       ),
       h(
