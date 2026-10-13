@@ -1,21 +1,9 @@
 import type { MatchView, Team } from "@ondevaipassar/shared";
-import { buildMatchIcs, canAddToCalendar, findTeamById, formatKickoffLabel, matchIcsFileName } from "@ondevaipassar/shared";
-import { ActionButton } from "../Components/Action";
+import { canAddToCalendar, findTeamById, formatKickoffLabel } from "@ondevaipassar/shared";
+import AddToCalendar from "../Components/AddToCalendar";
 import TeamCrest from "../Components/TeamCrest";
 import versus from "../assets/images/icones/versus.svg";
 import MatchBroadcasts from "./MatchBroadcasts";
-
-/** Hands the match to the visitor's calendar app as an .ics file; nothing is sent anywhere. */
-function downloadCalendarEvent(match: MatchView): void {
-  const url = URL.createObjectURL(new Blob([buildMatchIcs(match)], { type: "text/calendar;charset=utf-8" }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = matchIcsFileName(match);
-  document.body.append(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-}
 
 interface MatchCardProps {
   match: MatchView;
@@ -75,11 +63,7 @@ const MatchCard = ({ match, team }: MatchCardProps) => {
           </p>
           <p>{match.competitionName}</p>
           <p>{formatKickoffLabel(match.kickoffUtc, match.kickoffTimeConfirmed)}</p>
-          {canAddToCalendar(match) && (
-            <ActionButton icon="calendar" className="self-center" onClick={() => downloadCalendarEvent(match)}>
-              Adicionar ao calendário
-            </ActionButton>
-          )}
+          {canAddToCalendar(match) && <AddToCalendar match={match} />}
         </div>
 
         <div className="flex items-center justify-start max-sm:justify-center">

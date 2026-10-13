@@ -40,6 +40,28 @@ function foldLine(line: string): string {
   return parts.join("\r\n ");
 }
 
+function eventDescription(match: MatchView): string {
+  const channels = match.broadcasts.map((broadcast) => broadcast.displayName);
+  const where = channels.length > 0 ? `Onde assistir: ${channels.join(", ")}.` : "Canal ainda não confirmado.";
+  return `${match.competitionName}. ${where} Confira a transmissão atualizada em ${SITE_URL}`;
+}
+
+/**
+ * A link that opens Google Calendar's "new event" page already filled in (the
+ * visitor only presses Save), so no sign-in or permission is ever asked of us.
+ */
+export function buildGoogleCalendarUrl(match: MatchView): string {
+  const start = new Date(match.kickoffUtc);
+  const end = new Date(start.getTime() + EVENT_DURATION_MS);
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: `${match.homeTeamName} x ${match.awayTeamName}`,
+    dates: `${formatUtc(start)}/${formatUtc(end)}`,
+    details: eventDescription(match),
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 /**
  * An iCalendar (.ics) file with one event for the match — opens in Google,
  * Apple and Outlook calendars alike, with no account involved. The event is a
@@ -49,9 +71,7 @@ function foldLine(line: string): string {
 export function buildMatchIcs(match: MatchView, now: Date = new Date()): string {
   const start = new Date(match.kickoffUtc);
   const end = new Date(start.getTime() + EVENT_DURATION_MS);
-  const channels = match.broadcasts.map((broadcast) => broadcast.displayName);
-  const where = channels.length > 0 ? `Onde assistir: ${channels.join(", ")}.` : "Canal ainda não confirmado.";
-  const description = `${match.competitionName}. ${where} Confira a transmissão atualizada em ${SITE_URL}`;
+  const description = eventDescription(match);
 
   const lines = [
     "BEGIN:VCALENDAR",

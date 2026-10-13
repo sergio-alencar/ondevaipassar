@@ -1,5 +1,5 @@
 import type { MatchView } from "@ondevaipassar/shared";
-import { buildMatchIcs, canAddToCalendar, matchIcsFileName } from "@ondevaipassar/shared";
+import { buildGoogleCalendarUrl, buildMatchIcs, canAddToCalendar, matchIcsFileName } from "@ondevaipassar/shared";
 import { describe, expect, it } from "vitest";
 
 const match = {
@@ -54,5 +54,16 @@ describe("canAddToCalendar / matchIcsFileName", () => {
 
   it("makes an ascii file name", () => {
     expect(matchIcsFileName({ homeTeamName: "São Paulo", awayTeamName: "Grêmio" })).toBe("sao-paulo-x-gremio.ics");
+  });
+});
+
+describe("buildGoogleCalendarUrl", () => {
+  it("opens a pre-filled Google Calendar event with the UTC times, title and channels", () => {
+    const url = new URL(buildGoogleCalendarUrl(match));
+    expect(url.origin + url.pathname).toBe("https://calendar.google.com/calendar/render");
+    expect(url.searchParams.get("action")).toBe("TEMPLATE");
+    expect(url.searchParams.get("text")).toBe("Flamengo x São Paulo, SP; \\ teste");
+    expect(url.searchParams.get("dates")).toBe("20261015T223000Z/20261016T003000Z");
+    expect(url.searchParams.get("details")).toContain("Onde assistir: Globo, Premiere.");
   });
 });
