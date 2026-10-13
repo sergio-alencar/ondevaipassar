@@ -19,6 +19,15 @@ import { Link } from "react-router-dom";
 export const ACTION_CLASS =
   "inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-2 px-3 font-bold uppercase text-gray-800 transition-colors hover:text-gray-600 disabled:cursor-default disabled:opacity-50";
 
+/**
+ * A quieter action for something that sits beside content and shouldn't compete
+ * with it (the card's "Adicionar ao calendário"): smaller, lighter, same touch
+ * height. Grey-600 on the page's light grey keeps the contrast the accessibility
+ * check asks for.
+ */
+export const ACTION_QUIET_CLASS =
+  "inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-1.5 px-3 text-xs font-semibold uppercase text-gray-600 transition-colors hover:text-gray-900";
+
 type IconName = "back" | "down" | "edit" | "close" | "calendar";
 
 const ICON_PATHS: Record<IconName, string> = {
@@ -29,8 +38,8 @@ const ICON_PATHS: Record<IconName, string> = {
   calendar: "M4 6h12v10H4zM4 9h12M7 4v3M13 4v3",
 };
 
-const Icon = ({ name }: { name: IconName }) => (
-  <svg viewBox="0 0 20 20" className="size-5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+const Icon = ({ name, small = false }: { name: IconName; small?: boolean }) => (
+  <svg viewBox="0 0 20 20" className={small ? "size-4" : "size-5"} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d={ICON_PATHS[name]} />
   </svg>
 );
@@ -40,9 +49,9 @@ interface ActionProps {
   children: ReactNode;
 }
 
-export const ActionButton = ({ icon, children, className = "", ...rest }: ActionProps & Omit<ComponentProps<"button">, "children">) => (
-  <button type="button" className={`${ACTION_CLASS} ${className}`} {...rest}>
-    {icon && <Icon name={icon} />}
+export const ActionButton = ({ icon, quiet = false, children, className = "", ...rest }: ActionProps & { quiet?: boolean } & Omit<ComponentProps<"button">, "children">) => (
+  <button type="button" className={`${quiet ? ACTION_QUIET_CLASS : ACTION_CLASS} ${className}`} {...rest}>
+    {icon && <Icon name={icon} small={quiet} />}
     {children}
   </button>
 );

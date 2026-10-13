@@ -1,7 +1,7 @@
 import type { MatchView } from "@ondevaipassar/shared";
 import { buildGoogleCalendarUrl, buildMatchIcs, matchIcsFileName } from "@ondevaipassar/shared";
 import { useState } from "react";
-import { ACTION_CLASS, ActionButton } from "./Action";
+import { ACTION_QUIET_CLASS, ActionButton } from "./Action";
 
 /** Hands the match to the visitor's calendar app as an .ics file; nothing is sent anywhere. */
 function downloadCalendarEvent(match: MatchView): void {
@@ -25,7 +25,7 @@ const AddToCalendar = ({ match }: { match: MatchView }) => {
 
   if (!open) {
     return (
-      <ActionButton icon="calendar" className="self-center" onClick={() => setOpen(true)}>
+      <ActionButton icon="calendar" quiet className="self-center" onClick={() => setOpen(true)}>
         Adicionar ao calendário
       </ActionButton>
     );
@@ -33,10 +33,10 @@ const AddToCalendar = ({ match }: { match: MatchView }) => {
 
   return (
     <div className="flex flex-wrap items-center justify-center self-center">
-      <a className={ACTION_CLASS} href={buildGoogleCalendarUrl(match)} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
+      <a className={ACTION_QUIET_CLASS} href={buildGoogleCalendarUrl(match)} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
         Google Agenda
       </a>
-      <button type="button" className={ACTION_CLASS} onClick={() => { downloadCalendarEvent(match); setOpen(false); }}>
+      <button type="button" className={ACTION_QUIET_CLASS} onClick={() => { downloadCalendarEvent(match); setOpen(false); }}>
         Outro (.ics)
       </button>
     </div>
