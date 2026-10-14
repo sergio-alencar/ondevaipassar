@@ -47,6 +47,7 @@ export async function instagramSlideRoutes(app: FastifyInstance): Promise<void> 
       kind === "cover"
         ? await renderCoverImage(competitionId, matches)
         : await renderSlideImage(competitionId, matches, slideLabel ?? null, mixed);
-    return reply.type("image/png").send(png);
+    // The url carries everything the image depends on (matches, label, and the poster's own `v` stamp), so a copy kept for an hour is never stale for it. It also lets the daily e-mail's images (fetched by GitHub through its image proxy, which gives up quickly) arrive from the cache once warmed.
+    return reply.type("image/png").header("Cache-Control", "public, max-age=3600, s-maxage=3600").send(png);
   });
 }

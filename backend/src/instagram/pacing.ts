@@ -17,7 +17,7 @@ export const MIN_GAP_BETWEEN_POSTS_MS = 15 * 60 * 1000;
 /** Carousels in any rolling 24 hours. A busy day's lowest-priority groups are simply not posted. */
 export const MAX_CAROUSELS_PER_DAY = 6;
 
-export type PacingBlock = "too-soon" | "daily-cap";
+export type PacingBlock = "too-soon" | "daily-cap" | "paused";
 
 export interface RecentPost {
   igMediaId: string | null;

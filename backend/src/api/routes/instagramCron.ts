@@ -4,7 +4,7 @@ import { z } from "zod";
 import { env } from "../../config/env.js";
 import { db } from "../../db/client.js";
 import { instagramPosts } from "../../db/schema.js";
-import { runInstagramPosting } from "../../instagram/poster.js";
+import { getTodaysPostPlans, runInstagramPosting } from "../../instagram/poster.js";
 
 const querySchema = z.object({
   // Escape hatch for a controlled single-match test post before trusting
@@ -53,6 +53,14 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
     const summary = await runInstagramPosting({ onlyMatchId: parsedQuery.data.matchId });
 
     return { status: "ok", ranAt: new Date().toISOString(), ...summary };
+  });
+
+  // Today's posts as the poster would make them (captions and image URLs), for the daily e-mail that replaces automatic posting while the account recovers. Read-only.
+  app.get("/api/instagram-digest", async (request, reply) => {
+    if (env.CRON_SECRET && request.headers.authorization !== `Bearer ${env.CRON_SECRET}`) {
+      return reply.status(401).send({ error: "unauthorized" });
+    }
+    return { generatedAt: new Date().toISOString(), posts: await getTodaysPostPlans() };
   });
 
   // Operator-only escape hatch, not part of the daily flow: clears a

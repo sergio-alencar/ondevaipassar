@@ -8,7 +8,7 @@ import { getErrorMessage } from "../lib/errors.js";
 import { getMatchViews } from "../matches/getMatchViews.js";
 import { buildCarouselCaption } from "./caption.js";
 import { realGraphApiClient, type GraphApiClient } from "./graphApiClient.js";
-import { groupIntoPosts } from "./postGroups.js";
+import { groupIntoPosts, type PostGroup } from "./postGroups.js";
 import { chunkIntoSlides, renderCarouselImages } from "./renderCarousel.js";
 
 
@@ -89,6 +89,46 @@ async function getCandidateMatches(): Promise<MatchView[]> {
   return excludeAlreadyPublished(todaysMatches);
 }
 
+/**
+ * What one post is made of: its caption and the URL of each image (cover, then
+ * the slides). Instagram fetches those URLs itself; the daily e-mail shows the
+ * very same ones, so what is reviewed is exactly what would be posted.
+ */
+export function buildPostPlan(group: PostGroup): { caption: string; imageUrls: string[] } {
+  const caption = buildCarouselCaption(group.competitionName, group.matches, group.part, group.totalParts);
+  const slides = chunkIntoSlides(group.matches);
+  // Every match on the slide is passed explicitly rather than the route
+  // working the grouping out again — an ingest landing between this read
+  // and Instagram's fetch would otherwise hand it a different slide than
+  // the caption describes.
+  //
+  // The cache-busting `v` param isn't read by the route: a *re*-post of
+  // the same matches (after fixing a rendering bug, say) needs a URL
+  // Instagram has never fetched before. Confirmed live: a same-day repost
+  // still went out with the old broken art, from Instagram's own cache of
+  // the identical previous URL.
+  const version = Date.now();
+  const slideUrl = (params: Record<string, string>): string => {
+    const query = new URLSearchParams({ ...params, competitionId: group.competitionId, v: String(version) });
+    return `${env.PUBLIC_BASE_URL}/api/instagram-slide?${query.toString()}`;
+  };
+  const mixed = new Set(group.matches.map((match) => match.competitionId)).size > 1;
+
+  const imageUrls = [
+    slideUrl({ kind: "cover", matchIds: group.matches.map((match) => match.id).join(",") }),
+    ...slides.map((slideMatches, index) =>
+      slideUrl({
+        kind: "slide",
+        matchIds: slideMatches.map((match) => match.id).join(","),
+        mixed: String(mixed),
+        ...(slides.length > 1 ? { slideLabel: `${index + 1}/${slides.length}` } : {}),
+      }),
+    ),
+  ];
+
+  return { caption, imageUrls };
+}
+
 export interface RunPostingOptions {
   graphApi?: GraphApiClient;
   /** Restrict to exactly one match, bypassing the "today" + "has a broadcast" filter — for a controlled, single real test post before trusting the unattended daily run against every match. Still respects the already-published guard. */
@@ -113,6 +153,14 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
     paced: null,
   };
   const runStartedAt = Date.now();
+
+  if (env.INSTAGRAM_PAUSED) {
+    summary.paced = "paused";
+    summary.skipped = groups.reduce((total, group) => total + group.matches.length, 0);
+    summary.pending = summary.skipped;
+    console.log(`[instagram] paused (INSTAGRAM_PAUSED): nothing is posted, ${summary.skipped} match(es) wait`);
+    return summary;
+  }
 
   // Pacing (pacing.ts): a real publication is never started too soon after the
   // last one, nor past the day's cap. A dry run writes nothing, so it is exempt.
@@ -156,36 +204,7 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
     }
     summary.attempted++;
 
-    const caption = buildCarouselCaption(group.competitionName, group.matches, group.part, group.totalParts);
-    const slides = chunkIntoSlides(group.matches);
-    // Every match on the slide is passed explicitly rather than the route
-    // working the grouping out again — an ingest landing between this read
-    // and Instagram's fetch would otherwise hand it a different slide than
-    // the caption describes.
-    //
-    // The cache-busting `v` param isn't read by the route: a *re*-post of
-    // the same matches (after fixing a rendering bug, say) needs a URL
-    // Instagram has never fetched before. Confirmed live: a same-day repost
-    // still went out with the old broken art, from Instagram's own cache of
-    // the identical previous URL.
-    const version = Date.now();
-    const slideUrl = (params: Record<string, string>): string => {
-      const query = new URLSearchParams({ ...params, competitionId: group.competitionId, v: String(version) });
-      return `${env.PUBLIC_BASE_URL}/api/instagram-slide?${query.toString()}`;
-    };
-    const mixed = new Set(group.matches.map((match) => match.competitionId)).size > 1;
-
-    const imageUrls = [
-      slideUrl({ kind: "cover", matchIds: group.matches.map((match) => match.id).join(",") }),
-      ...slides.map((slideMatches, index) =>
-        slideUrl({
-          kind: "slide",
-          matchIds: slideMatches.map((match) => match.id).join(","),
-          mixed: String(mixed),
-          ...(slides.length > 1 ? { slideLabel: `${index + 1}/${slides.length}` } : {}),
-        }),
-      ),
-    ];
+    const { caption, imageUrls } = buildPostPlan(group);
 
     if (env.INSTAGRAM_DRY_RUN) {
       // Exercises the real rendering path (catches template/asset errors)
@@ -285,4 +304,13 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
   summary.pending = summary.skipped + failedMatches;
   console.log(`[instagram] run summary: ${JSON.stringify(summary)}`);
   return summary;
+}
+
+/** Today's posts exactly as the poster would make them, whether or not anything is being posted: the daily e-mail's content. */
+export async function getTodaysPostPlans(): Promise<{ title: string; matchCount: number; caption: string; imageUrls: string[] }[]> {
+  return (await groupIntoPosts(await getCandidateMatches())).map((group) => ({
+    title: group.totalParts > 1 ? `${group.competitionName} (${group.part}/${group.totalParts})` : group.competitionName,
+    matchCount: group.matches.length,
+    ...buildPostPlan(group),
+  }));
 }

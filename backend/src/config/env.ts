@@ -42,6 +42,12 @@ const envSchema = z.object({
   // selection, image render, caption) but logs instead of calling the real
   // Graph API or writing a "published" row — safe to run locally or against
   // real data without ever posting for real.
+  // Switch for the Instagram poster: while "true" it publishes nothing at all (the daily e-mail of texts and images still
+  // works). Set while the account recovers from an "automated behavior" flag (14/10/2026).
+  INSTAGRAM_PAUSED: z
+    .string()
+    .optional()
+    .transform((value) => value === "true"),
   INSTAGRAM_DRY_RUN: z
     .string()
     .optional()
