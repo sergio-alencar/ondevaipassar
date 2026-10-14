@@ -60,7 +60,7 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
     if (env.CRON_SECRET && request.headers.authorization !== `Bearer ${env.CRON_SECRET}`) {
       return reply.status(401).send({ error: "unauthorized" });
     }
-    return { generatedAt: new Date().toISOString(), posts: await getTodaysPostPlans() };
+    return { generatedAt: new Date().toISOString(), posts: await getTodaysPostPlans({ includePosted: (request.query as { includePosted?: string }).includePosted === "true" }) };
   });
 
   // Operator-only escape hatch, not part of the daily flow: clears a

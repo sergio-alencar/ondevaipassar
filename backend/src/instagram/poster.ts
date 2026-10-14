@@ -307,8 +307,14 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
 }
 
 /** Today's posts exactly as the poster would make them, whether or not anything is being posted: the daily e-mail's content. */
-export async function getTodaysPostPlans(): Promise<{ title: string; matchCount: number; caption: string; imageUrls: string[] }[]> {
-  return (await groupIntoPosts(await getCandidateMatches())).map((group) => ({
+export async function getTodaysPostPlans(
+  options: { includePosted?: boolean } = {},
+): Promise<{ title: string; matchCount: number; caption: string; imageUrls: string[] }[]> {
+  // includePosted: today's matches that already went out too — for testing the e-mail on a day with nothing left to post.
+  const matches = options.includePosted
+    ? (await getMatchViews({})).filter((match) => isTodayInBrasilia(match.kickoffUtc) && match.broadcasts.length > 0)
+    : await getCandidateMatches();
+  return groupIntoPosts(matches).map((group) => ({
     title: group.totalParts > 1 ? `${group.competitionName} (${group.part}/${group.totalParts})` : group.competitionName,
     matchCount: group.matches.length,
     ...buildPostPlan(group),

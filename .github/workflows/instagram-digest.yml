@@ -12,7 +12,12 @@ on:
   schedule:
     # 10:35 UTC: after the 10:00 ingest and its follow-ups, early in the morning in Brasília (07:35).
     - cron: "35 10 * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      include_posted:
+        description: "Include matches already posted (to test the e-mail on a day with nothing left)"
+        type: boolean
+        default: false
 
 permissions:
   issues: write
@@ -30,7 +35,7 @@ jobs:
           set -euo pipefail
           http_code=$(curl -s -o /tmp/digest.json -w "%{http_code}" \
             -H "Authorization: Bearer $CRON_SECRET" \
-            "https://api.ondevaipassar.com/api/instagram-digest")
+            "https://api.ondevaipassar.com/api/instagram-digest?includePosted=${{ inputs.include_posted || false }}")
           if [ "$http_code" != "200" ]; then
             echo "::error::instagram-digest returned HTTP $http_code"
             exit 1
