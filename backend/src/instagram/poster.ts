@@ -1,3 +1,5 @@
+import { eq } from "drizzle-orm";
+import { MAX_CAROUSELS_PER_RUN, pacingBlock, type PacingBlock } from "./pacing.js";
 import { isTodayInBrasilia, type MatchView } from "@ondevaipassar/shared";
 import { env } from "../config/env.js";
 import { db } from "../db/client.js";
@@ -37,6 +39,8 @@ export interface PostingSummary {
   pending: number;
   /** True when Meta rate-limited/blocked the account mid-run. The run stops immediately: every further attempt would fail the same way, and each one risks another ambiguous "did that publish or not?" state. */
   blocked: boolean;
+  /** Why nothing was posted this run when the account's own pacing said wait (see pacing.ts); null otherwise. */
+  paced: PacingBlock | null;
 }
 
 // Vercel kills the whole function invocation mid-flight once its own
@@ -106,8 +110,26 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
     skipped: 0,
     pending: 0,
     blocked: false,
+    paced: null,
   };
   const runStartedAt = Date.now();
+
+  // Pacing (pacing.ts): a real publication is never started too soon after the
+  // last one, nor past the day's cap. A dry run writes nothing, so it is exempt.
+  if (!env.INSTAGRAM_DRY_RUN && groups.length > 0) {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const recent = (await db.select().from(instagramPosts).where(eq(instagramPosts.status, "published")))
+      .filter((post) => post.postedAt !== null && post.postedAt >= since)
+      .map((post) => ({ igMediaId: post.igMediaId, postedAt: post.postedAt as string }));
+    const block = pacingBlock(recent);
+    if (block) {
+      summary.paced = block;
+      summary.skipped = groups.reduce((total, group) => total + group.matches.length, 0);
+      summary.pending = summary.skipped;
+      console.log(`[instagram] pacing (${block}): not posting now, ${summary.skipped} match(es) wait`);
+      return summary;
+    }
+  }
 
   const remainingMatches = (postsDone: number): number =>
     groups.slice(postsDone).reduce((total, group) => total + group.matches.length, 0);
@@ -117,6 +139,11 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
   let failedMatches = 0;
 
   for (const group of groups) {
+    // One carousel per run; the next trigger takes the next one.
+    if (!env.INSTAGRAM_DRY_RUN && summary.attempted >= MAX_CAROUSELS_PER_RUN) {
+      summary.skipped = remainingMatches(summary.attempted);
+      break;
+    }
     // Stop BEFORE starting a post we may not be able to finish - a
     // half-built carousel leaves orphan containers and, worse, an
     // ambiguous publish. The next run picks these up: every match still

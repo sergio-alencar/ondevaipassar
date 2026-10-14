@@ -1,101 +1,58 @@
-name: Instagram daily post
+name: Instagram post
 
-# GitHub Actions is the orchestrator, not a replacement for Vercel — the
-# actual posting logic still lives in the backend (/api/cron-instagram-post),
-# still runs as a normal Vercel serverless function. This workflow exists
-# because that function has a real, unavoidable duration ceiling on Vercel's
-# free Hobby plan (60s, see backend/vercel.json), and a single busy day can
-# need several calls to get through every match — this loops until the
-# endpoint itself reports nothing's left (`skipped: 0`), so no one has to
-# notice and re-trigger it by hand. Real bug this fixes: 2026-08-30, 15
-# tracked matches in one day, only 7 posted from a single Vercel Cron firing.
+# Posts at most ONE carousel per call, with at least 15 minutes between two
+# publications and at most 6 a day — all enforced by the backend itself (see
+# backend/src/instagram/pacing.ts), so any trigger (this schedule, the Vercel
+# Cron at 10:05 UTC, a manual run) can fire without ever adding up to a burst.
 #
-# Deliberately NOT the only trigger for this endpoint — Vercel Cron also
-# hits it once daily, 10:05 UTC (see backend/vercel.json), 12 minutes
-# before this workflow's own schedule below. Real bug found live
-# 2026-08-31: THIS workflow's own schedule trigger silently didn't fire at
-# all one morning (GitHub's own docs call scheduled runs best-effort, can
-# be delayed or dropped under load) — with only one scheduler, that's a
-# fully missed day; with two independent ones, either firing is enough to
-# make progress, and calling the endpoint twice in one morning is always
-# safe (see instagramCron.ts's own doc comment).
+# Why: on 2026-10-13/14 the Instagram account was flagged for "automated
+# behavior" after days when a dozen carousels went out within a minute or two
+# (plus deletions and re-posts in between). This used to be a retry loop that
+# drained everything at once; now it is one call per run, and the schedule
+# spreads the day's posts out.
+#
+# GitHub's own scheduler is best-effort and often hours late; that only delays
+# a post, it never bunches them, because the gap is checked on the server.
 on:
   schedule:
-    # 10:17 UTC — not :00/:05/:10/:15 (all popular round numbers GitHub's
-    # own docs specifically warn cluster load onto), and 17 minutes after
-    # /api/cron-ingest (10:00 UTC) so the day's matches are fresh even if
-    # ingest itself runs a bit long.
-    - cron: "17 10 * * *"
-  # Manual "run now" button in the Actions tab — also the replacement for
-  # manually curling the endpoint with a rotated CRON_SECRET, which is how
-  # this got triggered by hand all through this project's early sessions.
+    # Every 15 minutes between 10:00 and 16:59 UTC (07:00-13:59 in Brasília):
+    # enough slots for the day's cap, early enough that morning posts are not
+    # left for the afternoon. Most runs find nothing to do and end at once.
+    - cron: "*/15 10-16 * * *"
   workflow_dispatch: {}
 
 jobs:
   post:
     runs-on: ubuntu-latest
     steps:
-      - name: Post today's matches, retrying until nothing's left
+      - name: Post the next carousel, if the pacing allows one
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           set -euo pipefail
-          MAX_ATTEMPTS=15
-          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
-            http_code=$(curl -s -o /tmp/response.json -w "%{http_code}" \
-              -H "Authorization: Bearer $CRON_SECRET" \
-              "https://api.ondevaipassar.com/api/cron-instagram-post")
-            body=$(cat /tmp/response.json)
-            echo "attempt $attempt/$MAX_ATTEMPTS: HTTP $http_code -> $body"
+          http_code=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "https://api.ondevaipassar.com/api/cron-instagram-post")
+          body=$(cat /tmp/response.json)
+          echo "HTTP $http_code -> $body"
 
-            if [ "$http_code" != "200" ]; then
-              echo "::error::cron-instagram-post returned HTTP $http_code"
-              exit 1
-            fi
+          if [ "$http_code" != "200" ]; then
+            echo "::error::cron-instagram-post returned HTTP $http_code"
+            exit 1
+          fi
 
-            skipped=$(echo "$body" | jq -r '.skipped // 0')
-            published=$(echo "$body" | jq -r '.published // 0')
-            blocked=$(echo "$body" | jq -r '.blocked // false')
-            unknown=$(echo "$body" | jq -r '.unknown // 0')
-            pending=$(echo "$body" | jq -r '.pending // 0')
+          # Meta blocked the account: stop and say so (this fails the run, which e-mails).
+          if [ "$(echo "$body" | jq -r '.blocked // false')" = "true" ]; then
+            echo "::error::Meta rate-limited the account. Nothing more will be posted until it is looked at."
+            exit 1
+          fi
 
-            # Meta blocked the account — every further attempt fails the same
-            # way, and each one risks publishing a duplicate we can't detect.
-            # Real incident (2026-09-05) this guard exists for: this loop ran
-            # all 15 attempts against a blocked account, each reporting
-            # published:0, while duplicate posts piled up on the profile.
-            # Checked BEFORE the done check, because a blocked run can report
-            # nothing pending and still have left the day half-posted.
-            if [ "$blocked" = "true" ]; then
-              echo "::error::Meta rate-limited the account — stopping instead of retrying. $skipped match(es) left unposted."
-              exit 1
-            fi
+          # A publish whose outcome is unknown may be live on the account: never retried automatically.
+          if [ "$(echo "$body" | jq -r '.unknown // 0')" != "0" ]; then
+            echo "::error::A post may or may not be live — check the Instagram account before anything is reset."
+            exit 1
+          fi
 
-            # `pending`, not `skipped`. `skipped` counts only what the run
-            # never got to, so it is 0 whenever the run worked through its
-            # whole list — including when every group in it FAILED. That is
-            # the bug this loop shipped with: a failed group made it print
-            # "all of today's matches posted" and exit 0, leaving Sérgio to
-            # re-run it by hand every day. `pending` counts failures too.
-            if [ "$pending" = "0" ]; then
-              echo "All of today's matches posted (or none were pending)."
-              exit 0
-            fi
-
-            # No progress: nothing published this attempt, but something was
-            # attempted. Retrying a failure that never publishes is pointless,
-            # and retrying one that silently did publish is how duplicates
-            # happen — either way, stop and let a human look. This is what
-            # now terminates a permanently-failing group: once everything
-            # else is out, the attempt that only retries it publishes
-            # nothing, and the loop stops here with a real error instead of
-            # a false success.
-            if [ "$published" = "0" ]; then
-              echo "::error::Attempt $attempt published nothing ($unknown ambiguous, $pending match(es) still pending). Stopping to avoid duplicate posts — check the account and the logs."
-              exit 1
-            fi
-
-            sleep 5
-          done
-
-          echo "::warning::Instagram posting still had matches pending after $MAX_ATTEMPTS attempts — check manually."
+          if [ "$(echo "$body" | jq -r '.failed // 0')" != "0" ]; then
+            echo "::warning::A carousel failed this run; the next run will try it again."
+          fi
