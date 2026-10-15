@@ -5,6 +5,8 @@ import { getErrorMessage } from "../lib/errors.js";
 import { fetchText } from "../http/client.js";
 import { parseWomensArticle } from "../sources/ge-globo/womensArticle.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
+import { MANUAL_SOURCE_ID } from "./manualFixtures.js";
+import { staleBroadcastDeletes } from "./staleOwnedBroadcasts.js";
 import { decideListing, findKnownMatch, resolveFemininoCompetition, resolveNationalFemininoCompetition } from "./femininoEnrichment.js";
 import { resolveFemininoTeamId } from "./femininoTeamResolver.js";
 import { normalizeText } from "@ondevaipassar/shared";
@@ -63,6 +65,9 @@ export async function runGeFemininoEnrichment(candidates: WomensCandidate[], now
     let unresolvedCount = 0;
     const newMatches: { id: string; competitionId: string; homeTeamId: string | null; homeName: string; awayTeamId: string | null; awayName: string; kickoffUtc: string }[] = [];
     const attached: { matchId: string; channelIds: string[] }[] = [];
+    // Hand-seeded games whose article lists the channels: the article is the truth for them (see below).
+    const seededClaims: { matchId: string; channelId: string }[] = [];
+    const kickoffByMatchId = new Map<string, string>();
 
     for (let i = 0; i < recent.length; i += CONCURRENCY) {
       const batch = recent.slice(i, i + CONCURRENCY);
@@ -100,11 +105,20 @@ export async function runGeFemininoEnrichment(candidates: WomensCandidate[], now
           known.push({ id: matchId, competitionId: competition.competitionId, homeTeamId, awayTeamId, kickoffUtc: game.kickoffUtc, sourceId: SOURCE_ID });
         }
         if (game.channelIds.length > 0) attached.push({ matchId, channelIds: game.channelIds });
+        // A seeded fixture (manualFixtures.ts) carries channels announced weeks ahead for "every game"
+        // ("Todos os jogos serão no Canal GOAT"). The day-of article names what is really airing, so a
+        // seeded channel it leaves out goes: that is how GOAT stayed on a game it was not showing.
+        if (covering?.sourceId === MANUAL_SOURCE_ID && game.channelIds.length > 0) {
+          kickoffByMatchId.set(covering.id, covering.kickoffUtc);
+          for (const channelId of game.channelIds) seededClaims.push({ matchId: covering.id, channelId });
+        }
       }
     }
 
     const nowIso = new Date().toISOString();
+    const seededDeletes = await staleBroadcastDeletes(MANUAL_SOURCE_ID, seededClaims, kickoffByMatchId);
     const writes = [
+      ...seededDeletes,
       ...newMatches.map((match) =>
         db
           .insert(matches)

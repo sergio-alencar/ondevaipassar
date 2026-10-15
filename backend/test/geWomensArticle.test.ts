@@ -48,3 +48,14 @@ describe("pieces", () => {
     expect(isWomensPreviewCandidate({ title: "A x B: onde assistir", url: "https://ge.globo.com/futebol/times/a/noticia/2026/10/12/a.ghtml" })).toBe(false);
   });
 });
+
+describe("the Corinthians x Colo-Colo article (a bolded start in the Transmissão line)", () => {
+  const url = "https://ge.globo.com/sp/campinas-e-regiao/futebol/futebol-feminino/libertadores-feminina/noticia/2026/10/15/corinthians-x-colo-colo-pela-libertadores-feminina-onde-assistir-ao-vivo-e-horario.ghtml";
+
+  it("reads every channel, not none", () => {
+    const game = parseWomensArticle(fixture("corinthians-colo-colo"), url);
+    expect(game?.kickoffUtc).toBe("2026-10-15T20:00:00.000Z");
+    expect(game?.channelIds).toEqual(expect.arrayContaining(["sportv", "nsports", "cazetv", "xsports", "uol", "meutimao", "golbrasil", "pluto"]));
+    expect(game?.channelIds).not.toContain("goat");
+  });
+});

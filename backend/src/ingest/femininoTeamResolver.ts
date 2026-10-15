@@ -179,7 +179,8 @@ const TRAILING_SUFFIX_PATTERN = /\s*[([]?\b(f|fem|feminino)\b[)\]]?\s*$/i;
  * teamResolver.ts's resolveTeamId.
  */
 export function resolveFemininoTeamId(rawName: string): string | null {
-  const stripped = rawName.replace(TRAILING_SUFFIX_PATTERN, "");
+  // "CORINTHIANS (BRA)": some channels tag the country in brackets, club or not.
+  const stripped = stripCountryTag(rawName.replace(TRAILING_SUFFIX_PATTERN, ""));
   const normalized = normalizeText(stripped);
   return (
     NORMALIZED_NAME_TO_FEMININO_ID.get(normalized) ??

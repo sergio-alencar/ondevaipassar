@@ -44,7 +44,10 @@ export function parseArticleCandidate(item: NewsFeedItem): ArticleCandidate | nu
   };
 }
 
-const TRANSMISSAO_PATTERN = /<strong>\s*Transmiss[ãa]o:?\s*<\/strong>\s*([^<]+)/i;
+// The whole line, up to the end of its list item/paragraph, with tags inside it
+// removed: ge sometimes bolds part of it ("<strong>sportv, </strong>NSports, Cazé
+// TV…"), and stopping at the first "<" read that as no channels at all.
+const TRANSMISSAO_PATTERN = /<strong>\s*Transmiss[ãa]o:?\s*<\/strong>([\s\S]*?)(?:<\/li>|<\/p>|<br)/i;
 
 /**
  * Extracts the channel names from an "onde assistir" article's
@@ -60,7 +63,12 @@ export function extractConfirmedChannelNames(html: string): string[] {
   const match = html.match(TRANSMISSAO_PATTERN);
   if (!match) return [];
 
-  const raw = match[1].replace(/\.\s*$/, "").trim();
+  const raw = match[1]
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\.\s*$/, "")
+    .trim();
   return raw
     .split(/,| e /i)
     .map((name) => name.trim())

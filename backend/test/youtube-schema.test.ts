@@ -191,3 +191,16 @@ describe("parseMatchTitle: Meu Timão's format", () => {
     expect(parseMatchTitle("AO VIVO: BOTAFOGO X PALMEIRAS | BRASILEIRÃO 2026")).toEqual({ homeTeamNameRaw: "BOTAFOGO", awayTeamNameRaw: "PALMEIRAS" });
   });
 });
+
+describe("parseMatchTitle: the other Libertadores Feminina titles of 15/10/2026", () => {
+  const cases: [string, string, string][] = [
+    ["🔴 AO VIVO E COM IMAGENS | CORINTHIANS X COLO-COLO | LIBERTADORES FEMININA 2026", "CORINTHIANS", "COLO-COLO"], // N Sports
+    ["CORINTHIANS X COLO-COLO| LIBERTADORES FEMININA | AO VIVO E COM IMAGENS", "CORINTHIANS", "COLO-COLO"], // Xsports
+    ["AO VIVO: CORINTHIANS (BRA) X COLO COLO (CHI) I LIBERTADORES FEMININA I CANAL GOL BRASIL", "CORINTHIANS (BRA)", "COLO COLO (CHI)"], // Gol Brasil
+    ["CORINTHIANS X COLO-COLO: AO VIVO | LIBERTADORES FEMININA | FASE DE GRUPOS | COM IMAGENS E", "CORINTHIANS", "COLO-COLO"], // UOL Esporte
+    ["AO VIVO: CORINTHIANS X COLO-COLO | LIBERTADORES FEMININA 2026 | 1ª RODADA", "CORINTHIANS", "COLO-COLO"], // CazéTV
+  ];
+  it.each(cases)("%s", (title, home, away) => {
+    expect(parseMatchTitle(title)).toEqual({ homeTeamNameRaw: home, awayTeamNameRaw: away });
+  });
+});

@@ -99,6 +99,12 @@ const TRACKED_CHANNELS: {
   // the match itself. Worth watching what it actually attaches.
   { channelId: "tvpalmeiras", youtubeChannelId: "UCBKc-rPDivvwFiWdG-81wxw", sourceId: "youtube-tvpalmeiras", division: "feminino", womensTitlesOnly: true },
   { channelId: "meutimao", youtubeChannelId: "UCwpyuvmJ_mOrebYbUPXtaBQ", sourceId: "youtube-meutimao", division: "feminino", womensTitlesOnly: true },
+  // Found by checking the Corinthians x Colo-Colo Libertadores Feminina game by
+  // hand (15/10/2026): ge's own "Transmissão" line names both, each with its
+  // own stream of that game. Channel ids read from each channel's page. Both
+  // also carry men's football, hence womensTitlesOnly.
+  { channelId: "golbrasil", youtubeChannelId: "UCfi9IhipFGSa0eD_EA8JHrA", sourceId: "youtube-golbrasil", division: "feminino", womensTitlesOnly: true },
+  { channelId: "xsports", youtubeChannelId: "UCH-BU-Os3JSo2L8lBQxE8KA", sourceId: "youtube-xsports", division: "feminino", womensTitlesOnly: true },
   // Sérgio: the Libertadores Feminina games may air on UOL Esporte's channel
   // instead of Canal UOL's (@uol) — UOL's own piece only says "Canal UOL".
   // Read on 2026-10-06 its streams tab held talk shows ("BLOCO DE ESPORTE",

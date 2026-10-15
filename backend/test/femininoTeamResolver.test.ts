@@ -31,3 +31,11 @@ describe("resolveFemininoTeamId", () => {
     expect(resolveFemininoTeamId("")).toBeNull();
   });
 });
+
+describe("country tags", () => {
+  it("resolves a club written with its country in brackets", async () => {
+    const { resolveFemininoTeamId } = await import("../src/ingest/femininoTeamResolver.js");
+    expect(resolveFemininoTeamId("CORINTHIANS (BRA)")).toBe("corinthians_feminino");
+    expect(resolveFemininoTeamId("COLO COLO (CHI)")).toBe("colo_colo_feminino");
+  });
+});

@@ -35,7 +35,8 @@ const TITLE_PATTERNS = [
   // SportyNet: "ITABAIANA X BOTAFOGO-PB: AO VIVO, COM IMAGENS..."
   /^(.+?)\s+X\s+(.+?)\s*:\s*AO VIVO/i,
   // Canal GOAT, ge tv (some titles): "CRB X CRICIÚMA | AO VIVO E COM IMAGENS..."
-  /^(.+?)\s+X\s+(.+?)\s*\|\s*AO VIVO/i,
+  // Team names never contain a pipe: without that, a title whose "AO VIVO" sits in a later segment read the segments between as part of the away team.
+  /^([^|]+?)\s+X\s+([^|]+?)\s*\|\s*AO VIVO/i,
   // TV Palmeiras: "AO VIVO | GRÊMIO X PALMEIRAS | PRÉ-JOGO E NARRAÇÃO" — a
   // pipe, not a colon, after "AO VIVO". Confirmed live against the channel's
   // real titles, but every one of them was a pre-game/narration show (which
@@ -58,6 +59,12 @@ const TITLE_PATTERNS = [
   // comment for why resolving THIS channel's team names needs the
   // dedicated Feminino resolver, never the shared one.
   /AO VIVO E COM IMAGENS\s+I\s+(.+?)\s+X\s+(.+?)\s+I\s+/i,
+  // The same N Sports shape with a real pipe: "🔴 AO VIVO E COM IMAGENS | CORINTHIANS X COLO-COLO | LIBERTADORES FEMININA 2026".
+  /AO VIVO E COM IMAGENS\s*\|\s*(.+?)\s+X\s+(.+?)\s*\|/i,
+  // Canal Gol Brasil: "AO VIVO: CORINTHIANS (BRA) X COLO COLO (CHI) I LIBERTADORES FEMININA I CANAL GOL BRASIL" — "I" as the separator, after "AO VIVO:".
+  /^AO VIVO:\s*(.+?)\s+X\s+(.+?)\s+I\s+/i,
+  // Xsports: "CORINTHIANS X COLO-COLO| LIBERTADORES FEMININA | AO VIVO E COM IMAGENS" — the pair first, "AO VIVO" in a later segment.
+  /^(.+?)\s+X\s+(.+?)\s*\|(?:[^|]*\|)+\s*AO VIVO/i,
 ];
 
 // Programming *about* a match, not the match itself — these carry the team

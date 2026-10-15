@@ -200,6 +200,15 @@ const CHANNELS: Channel[] = [
     officialUrl: "https://www.youtube.com/@meutimao/streams",
     instagramHandle: "meutimao",
   },
+  // Canal de esporte no YouTube que transmite a Libertadores Feminina (listado
+  // pelo ge na linha "Transmissão" do jogo do Corinthians, 15/10/2026).
+  {
+    id: "golbrasil",
+    displayName: "Gol Brasil",
+    kind: "youtube",
+    free: true,
+    officialUrl: "https://www.youtube.com/@canalgolbrasil/streams",
+  },
   {
     id: "nsports",
     displayName: "N Sports",
@@ -476,6 +485,9 @@ const CHANNEL_ALIASES: Record<string, string> = {
   "canal uol": "uol",
   uol: "uol",
   "meu timao": "meutimao",
+  "gol brasil": "golbrasil",
+  "canal gol brasil": "golbrasil",
+  golbrasil: "golbrasil",
   pluto: "pluto",
   "pluto tv": "pluto",
   "uol esporte": "uolesporte",
