@@ -30,7 +30,8 @@ export const channelResponseSchema = z.object({ items: z.array(channelItemSchema
 // reel, a different sport) and is skipped, same as before.
 const TITLE_PATTERNS = [
   // ge tv, CazéTV: "AO VIVO: BOTAFOGO X PALMEIRAS | BRASILEIRÃO..."
-  /^AO VIVO:\s*(.+?)\s+X\s+(.+?)\s*\|/i,
+  // Meu Timão: "AO VIVO E COM IMAGENS: CORINTHIANS X COLO-COLO | 1ª RODADA | LIBERTADORES FEMININA 2026"
+  /^AO VIVO(?:\s+E\s+COM\s+IMAGENS)?:\s*(.+?)\s+X\s+(.+?)\s*\|/i,
   // SportyNet: "ITABAIANA X BOTAFOGO-PB: AO VIVO, COM IMAGENS..."
   /^(.+?)\s+X\s+(.+?)\s*:\s*AO VIVO/i,
   // Canal GOAT, ge tv (some titles): "CRB X CRICIÚMA | AO VIVO E COM IMAGENS..."

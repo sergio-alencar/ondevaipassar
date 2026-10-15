@@ -178,3 +178,16 @@ describe("isYouthCompetitionTitle", () => {
     expect(isYouthCompetitionTitle("CRB X CRICIÚMA | AO VIVO E COM IMAGENS | SÉRIE B")).toBe(false);
   });
 });
+
+describe("parseMatchTitle: Meu Timão's format", () => {
+  it("reads the real Libertadores Feminina title", () => {
+    expect(parseMatchTitle("AO VIVO E COM IMAGENS: CORINTHIANS X COLO-COLO | 1ª RODADA | LIBERTADORES FEMININA 2026")).toEqual({
+      homeTeamNameRaw: "CORINTHIANS",
+      awayTeamNameRaw: "COLO-COLO",
+    });
+  });
+
+  it("still reads the plain 'AO VIVO:' shape", () => {
+    expect(parseMatchTitle("AO VIVO: BOTAFOGO X PALMEIRAS | BRASILEIRÃO 2026")).toEqual({ homeTeamNameRaw: "BOTAFOGO", awayTeamNameRaw: "PALMEIRAS" });
+  });
+});
