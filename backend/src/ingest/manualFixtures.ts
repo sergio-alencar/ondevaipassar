@@ -1,6 +1,7 @@
 import { db } from "../db/client.js";
 import { broadcasts, matches, scrapeRuns } from "../db/schema.js";
 import { runBroadcastSource } from "./attachBroadcasts.js";
+import { staleBroadcastDeletes } from "./staleOwnedBroadcasts.js";
 
 export const MANUAL_SOURCE_ID = "manual-fixtures";
 
@@ -50,8 +51,10 @@ function brasiliaToUtc(date: string, time: string): string {
  * Channels, each with what actually backs it:
  * - "pluto": the Pluto TV announcement lists all nine of these games as free
  *   on the platform.
- * - "goat": Amstel's official-sponsor page — "Todos os jogos serão
- *   transmitidos no canal da GOAT na Twitch e YouTube".
+ * - "goat" was here ("Todos os jogos serão transmitidos no canal da GOAT",
+ *   Amstel's sponsor page) and is gone: Sérgio checked the Corinthians x
+ *   Colo-Colo and Universitario x Palmeiras games by hand on 15/10/2026 and
+ *   GOAT carried neither, and ge's own channel list for the first one omits it.
  * - "uol": UOL — the competition "terá transmissão do Canal UOL".
  * - "tvpalmeiras": Lance, 07/03/2026 — the club's YouTube channel "transmitirá
  *   ao vivo todos os jogos do Verdão". Palmeiras' games ONLY.
@@ -90,7 +93,7 @@ const LIBERTADORES_FEMININA_FIRST_PHASE: ManualFixture[] = [
   awayTeamNameRaw: away[1],
   date,
   time,
-  channelIds: ["uol", "goat", "pluto", ...(palmeiras ? ["tvpalmeiras"] : [])],
+  channelIds: ["uol", "pluto", ...(palmeiras ? ["tvpalmeiras"] : [])],
 }));
 
 export const MANUAL_FIXTURES: ManualFixture[] = [...LIBERTADORES_FEMININA_FIRST_PHASE];
@@ -155,7 +158,15 @@ export async function runManualFixtures(): Promise<void> {
     const now = new Date().toISOString();
     const { matchRows, broadcastRows } = expandManualFixtures(MANUAL_FIXTURES, now);
 
+    // A channel taken out of a fixture (GOAT) must leave the rows already stored too: this step only ever inserts.
+    const staleDeletes = await staleBroadcastDeletes(
+      MANUAL_SOURCE_ID,
+      broadcastRows.map((row) => ({ matchId: row.matchId, channelId: row.channelId })),
+      new Map(matchRows.map((row) => [row.id, row.kickoffUtc])),
+    );
+
     const writes = [
+      ...staleDeletes,
       ...matchRows.map((row) => db.insert(matches).values(row).onConflictDoNothing({ target: matches.id })),
       ...broadcastRows.map((row) => db.insert(broadcasts).values(row).onConflictDoNothing({ target: broadcasts.id })),
     ];

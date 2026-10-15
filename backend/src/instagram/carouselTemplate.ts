@@ -180,11 +180,48 @@ function channelTile(channel: SlideChannel, tileSize: number): SatoriElement {
   ]);
 }
 
-function channelStrip(channels: SlideChannel[], tileSize: number): SatoriElement {
+const CHANNEL_TILE = 132;
+/** Tile size once the channels need two rows: smaller, so both rows and the crests still fit the block. */
+const CHANNEL_TILE_TWO_ROWS = 112;
+const CHANNEL_GAP = 18;
+
+/**
+ * Channels in the fewest, most EQUAL rows: 8 go 4 + 4, never 6 + 2. A greedy
+ * wrap left a stranded pair under a full row, and Sérgio's rule is that rows
+ * are always balanced. How many fit one row is decided at the full tile size,
+ * so the split doesn't change with the smaller one.
+ */
+export function channelRows<T>(channels: T[]): T[][] {
+  const perRow = Math.max(1, Math.floor((CONTENT_WIDTH + CHANNEL_GAP) / (CHANNEL_TILE + CHANNEL_GAP)));
+  return balancedRows(channels, perRow);
+}
+
+/**
+ * The strip's measurements for a number of channels. The "GRÁTIS" badge hangs
+ * below its tile (~0.27 of the tile), so there is room for it between two rows
+ * and under the last one — without that the badge landed on the next row's
+ * tiles and on the next match's crest.
+ */
+function channelStripLayout(channelCount: number): { rows: number; tile: number; rowGap: number; overhang: number; height: number } {
+  const rows = channelRows(new Array<number>(channelCount).fill(0)).length;
+  const tile = rows > 1 ? CHANNEL_TILE_TWO_ROWS : CHANNEL_TILE;
+  const overhang = Math.round(tile * 0.3);
+  const rowGap = overhang + 14;
+  return { rows, tile, rowGap, overhang, height: rows * tile + Math.max(0, rows - 1) * rowGap + overhang };
+}
+
+function channelStrip(channels: SlideChannel[]): SatoriElement {
+  const { tile, rowGap, overhang } = channelStripLayout(channels.length);
   return h(
     "div",
-    { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 18, flexWrap: "wrap" } },
-    channels.map((channel) => channelTile(channel, tileSize)),
+    { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: rowGap, paddingBottom: overhang } },
+    channelRows(channels).map((row) =>
+      h(
+        "div",
+        { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: CHANNEL_GAP } },
+        row.map((channel) => channelTile(channel, tile)),
+      ),
+    ),
   );
 }
 
@@ -203,11 +240,11 @@ const MAX_CREST = 180;
 // strip, the optional competition label and the gaps between them. The
 // crest gets whatever is left, which is what keeps a block inside its box
 // no matter how the surrounding sizes are tuned.
-const BLOCK_FIXED_HEIGHT = 60 + 132 + 34;
+const BLOCK_FIXED_NON_STRIP = 60 + 34;
 
 function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
   const labelHeight = match.competitionLabel ? 44 : 0;
-  const crestBudget = blockHeight - BLOCK_FIXED_HEIGHT - labelHeight;
+  const crestBudget = blockHeight - BLOCK_FIXED_NON_STRIP - channelStripLayout(match.channels.length).height - labelHeight;
   const crestSize = Math.min(MAX_CREST, Math.max(MIN_CREST, crestBudget));
 
   return h(
@@ -252,7 +289,7 @@ function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
       ]),
       // The channel art is the answer the whole project exists to give, so
       // it gets the largest tile the block can carry.
-      channelStrip(match.channels, 132),
+      channelStrip(match.channels),
     ],
   );
 }

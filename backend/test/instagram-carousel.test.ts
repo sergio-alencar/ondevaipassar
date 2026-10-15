@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { buildCarouselCaption } from "../src/instagram/caption.js";
 import { MAX_CAROUSEL_ITEMS } from "../src/instagram/graphApiClient.js";
 import { EUROPE_GROUP_ID, groupIntoPosts } from "../src/instagram/postGroups.js";
+import { channelRows } from "../src/instagram/carouselTemplate.js";
 
 function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
   return {
@@ -100,5 +101,18 @@ describe("buildCarouselCaption", () => {
       } as Partial<MatchView>),
     ]);
     expect(caption).toContain("Globo em: MG e PR (pode variar por praça dentro do estado)");
+  });
+});
+
+describe("channelRows: balanced rows, never a stranded pair", () => {
+  const sizes = (count: number): number[] => channelRows(new Array<number>(count).fill(0)).map((row) => row.length);
+  it("keeps up to six on one row", () => {
+    expect(sizes(1)).toEqual([1]);
+    expect(sizes(6)).toEqual([6]);
+  });
+  it("splits the rest as evenly as it can", () => {
+    expect(sizes(7)).toEqual([4, 3]);
+    expect(sizes(8)).toEqual([4, 4]);
+    expect(sizes(9)).toEqual([5, 4]);
   });
 });
