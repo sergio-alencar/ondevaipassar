@@ -10,8 +10,16 @@ name: Instagram daily digest
 # or the issue page and the caption copied from the code block.
 on:
   schedule:
-    # 10:35 UTC: after the 10:00 ingest and its follow-ups, early in the morning in Brasília (07:35).
+    # 10:35 UTC (07:35 in Brasília), after the 10:00 ingest and its follow-ups.
+    # GitHub's scheduler is best-effort: on 2026-10-15 the 10:35 run had not
+    # started by 12:27 UTC. So there are several slots, and a run that finds
+    # today's issue already open does nothing (see "Skip if today's issue exists").
     - cron: "35 10 * * *"
+    - cron: "5 11 * * *"
+    - cron: "35 11 * * *"
+    - cron: "5 12 * * *"
+    - cron: "35 12 * * *"
+    - cron: "5 13 * * *"
   workflow_dispatch:
     inputs:
       include_posted:
@@ -22,11 +30,30 @@ on:
 permissions:
   issues: write
 
+# One run at a time, so two late slots that start together can't both open today's issue.
+concurrency:
+  group: instagram-digest
+  cancel-in-progress: false
+
 jobs:
   digest:
     runs-on: ubuntu-latest
     steps:
+      - name: Skip if today's issue exists
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          today=$(TZ=America/Sao_Paulo date +"%d/%m/%Y")
+          found=$(gh issue list --label instagram --state all --search "\"posts de $today\" in:title" --json number -q 'length')
+          if [ "$found" != "0" ]; then
+            echo "Today's issue already exists; nothing to do."
+            echo "SKIP=true" >> "$GITHUB_ENV"
+          fi
+
       - name: Build today's posts and open the issue
+        if: env.SKIP != 'true'
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           GH_TOKEN: ${{ github.token }}
