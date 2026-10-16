@@ -1,4 +1,5 @@
 import {
+  findCompetitionById,
   formatDateLabel,
   groupMatchesByCompetition,
   formatKickoffLabel,
@@ -82,11 +83,26 @@ export function buildCarouselCaption(
 /** Instagram's caption limit is 2,200 characters; a little under it, to leave room. */
 const CAPTION_LIMIT = 2150;
 
+/** The caption's own wording has no dashes (Sérgio's format): the shared note's " — " becomes a comma. */
+const withoutDash = (text: string): string => text.replace(/\s+—\s+/g, ", ");
+
 /**
- * Caption of the day's feed post: the day, then each competition with its
- * matches (time — pairing — channels), then every broadcaster's handle once.
- * A day of 20 matches can run past Instagram's 2,200 characters, so the extras go first
- * (the regional notes' detail, then the handles) and, as a last resort, the tail is cut.
+ * Caption of the day's feed post, in Sérgio's format:
+ *
+ *   Jogos de sexta, 16/out
+ *
+ *   Brasileirão Série A
+ *   20h Mirassol x Internacional | Premiere
+ *
+ *   Brasileirão Série B
+ *   19h30 Ponte Preta x Atlético-GO | Disney+
+ *
+ *   @premiere @disneyplusbr
+ *
+ * No dashes anywhere: the competition's registry name on its own line, then
+ * "time home x away | channels". A day of 20 matches can run past Instagram's
+ * 2,200 characters, so the extras go first (the regional notes' detail, then
+ * the handles) and, as a last resort, the tail is cut.
  */
 export function buildDailyCaption(matches: MatchView[], part = 1, totalParts = 1): string {
   const dateLabel = formatDateLabel(matches[0].kickoffUtc);
@@ -97,19 +113,19 @@ export function buildDailyCaption(matches: MatchView[], part = 1, totalParts = 1
     let anyRegionalCaveat = false;
 
     for (const group of groupMatchesByCompetition(matches)) {
-      lines.push("", group.name);
+      lines.push("", findCompetitionById(group.id)?.displayName ?? group.name);
       for (const match of group.matches) {
         const time = formatTimeLabel(match.kickoffUtc, match.kickoffTimeConfirmed);
         const channels = match.broadcasts.map((broadcast) => broadcast.displayName).join(", ");
-        lines.push(`${time} — ${match.homeTeamName} x ${match.awayTeamName} — ${channels}`);
+        lines.push(`${time} ${match.homeTeamName} x ${match.awayTeamName} | ${channels}`);
 
         const detail = match.broadcasts.find((broadcast) => broadcast.regionalDetail);
-        if (detail && withRegionalDetail) lines.push(`   ${detail.displayName} em: ${detail.regionalDetail} (${REGIONAL_PRACA_CAVEAT})`);
+        if (detail && withRegionalDetail) lines.push(`${detail.displayName} em ${detail.regionalDetail} (${REGIONAL_PRACA_CAVEAT})`);
         else if (match.broadcasts.some((broadcast) => broadcast.regionalCaveat || broadcast.regionalDetail)) anyRegionalCaveat = true;
       }
     }
 
-    if (anyRegionalCaveat) lines.push("", REGIONAL_CAVEAT_TEXT);
+    if (anyRegionalCaveat) lines.push("", withoutDash(REGIONAL_CAVEAT_TEXT));
 
     const handles = [
       ...new Set(matches.flatMap((match) => match.broadcasts.flatMap((b) => (b.instagramHandle ? [`@${b.instagramHandle}`] : [])))),

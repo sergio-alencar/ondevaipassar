@@ -163,6 +163,22 @@ export function competitionLogoDataUri(competitionId: string): string | null {
 }
 
 /**
+ * A competition's logo as a small badge for light backgrounds (the slides' competition label), or null when
+ * there is none. Prepared by scripts/prepare-competition-badges.ts from the site's own logos — not the cover
+ * logos above, which are white-on-purple.
+ */
+export function competitionBadgeDataUri(competitionId: string): string | null {
+  for (const [ext, mime] of [["svg", "image/svg+xml"], ["png", "image/png"]] as const) {
+    try {
+      return readRasterDataUri(`${ASSETS_DIR}competition-badges/${competitionId}.${ext}`, mime);
+    } catch {
+      // try the next format
+    }
+  }
+  return null;
+}
+
+/**
  * Local channel logo, or null when we don't ship art for this channel yet
  * — caller decides how to handle a channel with no renderable logo. Satori
  * renders a raster `<img>` fine, but not one nested inside an SVG's own

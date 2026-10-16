@@ -54,6 +54,8 @@ export interface SlideMatch {
   channels: SlideChannel[];
   /** Which competition this match belongs to — set only on a slide whose matches come from more than one (the combined "Jogos da Europa" post), where the header can't say it for them. */
   competitionLabel: string | null;
+  /** The competition's logo, shown beside its name; null when there is none. */
+  competitionBadge?: string | null;
 }
 
 /** Crest box: height fixed, width narrowed for a shield-shaped crest so its own ink — not its invisible square canvas — sits flush against the layout. Same rule as template.ts's teamCrest, at this layout's smaller size. */
@@ -180,6 +182,9 @@ function channelTile(channel: SlideChannel, tileSize: number): SatoriElement {
   ]);
 }
 
+/** Side of the competition logo beside its name: about the height of the label's own line. */
+const COMPETITION_BADGE_SIZE = 34;
+
 const CHANNEL_TILE = 132;
 /** Tile size once the channels need two rows: smaller, so both rows and the crests still fit the block. */
 const CHANNEL_TILE_TWO_ROWS = 112;
@@ -263,11 +268,15 @@ function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
     [
       ...(match.competitionLabel
         ? [
-            h(
-              "div",
-              { style: { display: "flex", color: GRAY_600, fontSize: 28, fontWeight: 700, letterSpacing: 2 } },
-              match.competitionLabel.toUpperCase(),
-            ),
+            // The badge is no taller than the label's own line (28px type, ~34px line), so the block keeps its height.
+            h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 12 } }, [
+              ...(match.competitionBadge ? [h("img", { src: match.competitionBadge, style: { width: COMPETITION_BADGE_SIZE, height: COMPETITION_BADGE_SIZE, objectFit: "contain" } })] : []),
+              h(
+                "div",
+                { style: { display: "flex", color: GRAY_600, fontSize: 28, fontWeight: 700, letterSpacing: 2 } },
+                match.competitionLabel.toUpperCase(),
+              ),
+            ]),
           ]
         : []),
       h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 26 } }, [

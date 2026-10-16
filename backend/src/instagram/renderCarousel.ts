@@ -10,7 +10,7 @@ import {
 import { Resvg } from "@resvg/resvg-js";
 import satori from "satori";
 import type { ReactNode } from "react";
-import { channelLogoDataUri, competitionLogoDataUri, crestArt, loadFonts, WORDMARK, WORDMARK_WHITE } from "./assets.js";
+import { channelLogoDataUri, competitionBadgeDataUri, competitionLogoDataUri, crestArt, loadFonts, WORDMARK, WORDMARK_WHITE } from "./assets.js";
 import { DAILY_GROUP_ID, DAILY_GROUP_NAME, EUROPE_GROUP_ID, EUROPE_GROUP_NAME } from "./postGroups.js";
 import {
   buildCoverTree,
@@ -59,6 +59,7 @@ async function toSlideMatch(match: MatchView, showCompetition: boolean, notes: S
           ? "*"
           : "",
     })),
+    competitionBadge: showCompetition ? competitionBadgeDataUri(match.competitionId) : null,
     competitionLabel: showCompetition
       ? (findCompetitionById(match.competitionId)?.shortName ?? match.competitionName)
       : null,

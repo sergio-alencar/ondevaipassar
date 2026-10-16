@@ -156,10 +156,34 @@ describe("buildDailyCaption", () => {
     buildMatch({ id: "b", competitionId: "brasileirao-serie-b", competitionName: "Campeonato Brasileiro Série B" }),
   ];
 
+  it("follows Sérgio's format, with no dashes", () => {
+    const caption = buildDailyCaption([
+      buildMatch({ id: "a", homeTeamName: "Mirassol", awayTeamName: "Internacional", kickoffUtc: "2026-10-16T23:00:00.000Z" }),
+      buildMatch({
+        id: "b",
+        competitionId: "brasileirao-serie-b",
+        competitionName: "Campeonato Brasileiro Série B",
+        homeTeamName: "Ponte Preta",
+        awayTeamName: "Atlético-GO",
+        kickoffUtc: "2026-10-16T22:30:00.000Z",
+        broadcasts: [{ channelId: "disneyplus", displayName: "Disney+", kind: "streaming", url: "", logoUrl: "", regionalCaveat: false, instagramHandle: "disneyplusbr" } as MatchView["broadcasts"][number]],
+      }),
+    ]);
+    expect(caption).toBe(
+      ["Jogos de sexta, 16/out", "", "Brasileirão Série A", "20h Mirassol x Internacional | Premiere", "", "Brasileirão Série B", "19h30 Ponte Preta x Atlético-GO | Disney+", "", "@premiere @disneyplusbr"].join("\n"),
+    );
+    expect(caption).not.toMatch(/[—–]/);
+  });
+
+  it("writes the regional note without a dash", () => {
+    const globo = { channelId: "globo", displayName: "Globo", kind: "tv", url: "", logoUrl: "", regionalCaveat: true } as MatchView["broadcasts"][number];
+    expect(buildDailyCaption([buildMatch({ broadcasts: [globo] })])).not.toMatch(/[—–]/);
+  });
+
   it("lists each competition with its matches, and each handle once", () => {
     const caption = buildDailyCaption(day);
-    expect(caption).toContain("Campeonato Brasileiro Série A");
-    expect(caption).toContain("Campeonato Brasileiro Série B");
+    expect(caption).toContain("Brasileirão Série A");
+    expect(caption).toContain("Brasileirão Série B");
     expect(caption.split("@premiere")).toHaveLength(2);
   });
 
