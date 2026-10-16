@@ -208,6 +208,7 @@ const CHANNELS: Channel[] = [
     kind: "youtube",
     free: true,
     officialUrl: "https://www.youtube.com/@canalgolbrasil/streams",
+    instagramHandle: "canalgolbr",
   },
   {
     id: "nsports",

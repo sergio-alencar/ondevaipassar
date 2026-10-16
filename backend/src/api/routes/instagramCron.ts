@@ -72,7 +72,8 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
       return reply.status(401).send({ error: "unauthorized" });
     }
     const children = Math.min(20, Math.max(2, Number((request.query as { children?: string }).children ?? 11)));
-    const imageUrl = `${env.PUBLIC_SITE_URL}/og-image.png`;
+    // The live site's own image, not PUBLIC_SITE_URL (which is localhost wherever it is not set).
+    const imageUrl = "https://ondevaipassar.com/images/og-image.png";
     const childIds: string[] = [];
     try {
       for (let i = 0; i < children; i++) childIds.push(await realGraphApiClient.createCarouselItem(imageUrl));
