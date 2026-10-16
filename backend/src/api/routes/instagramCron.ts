@@ -13,6 +13,8 @@ const querySchema = z.object({
   // Escape hatch for a controlled single-match test post before trusting
   // the unattended daily run — see poster.ts's RunPostingOptions.
   matchId: z.string().optional(),
+  // "stories": run only the stories, leaving the feed post for later.
+  only: z.enum(["stories"]).optional(),
 });
 
 const resetQuerySchema = z.object({ matchId: z.string(), story: z.enum(["true", "false"]).optional() });
@@ -53,7 +55,7 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
       return reply.status(400).send({ error: "invalid query params", details: parsedQuery.error.flatten() });
     }
 
-    const summary = await runInstagramPosting({ onlyMatchId: parsedQuery.data.matchId });
+    const summary = await runInstagramPosting({ onlyMatchId: parsedQuery.data.matchId, storiesOnly: parsedQuery.data.only === "stories" });
 
     return { status: "ok", ranAt: new Date().toISOString(), ...summary };
   });

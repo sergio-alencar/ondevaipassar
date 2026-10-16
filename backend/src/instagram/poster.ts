@@ -177,11 +177,15 @@ export interface RunPostingOptions {
   graphApi?: GraphApiClient;
   /** Restrict to exactly one match, bypassing the "today" + "has a broadcast" filter — for a controlled, single real test post before trusting the unattended daily run against every match. Still respects the already-published guard. */
   onlyMatchId?: string;
+  /** Skip the feed post and run only the day's stories — for finishing the stories before a feed post is redone. */
+  storiesOnly?: boolean;
 }
 
 export async function runInstagramPosting(options: RunPostingOptions = {}): Promise<PostingSummary> {
-  const { graphApi = realGraphApiClient, onlyMatchId } = options;
-  const candidates = onlyMatchId
+  const { graphApi = realGraphApiClient, onlyMatchId, storiesOnly = false } = options;
+  const candidates = storiesOnly
+    ? []
+    : onlyMatchId
     ? await excludeAlreadyPublished(await getMatchViews({ id: onlyMatchId }))
     : await getCandidateMatches();
   const groups = groupIntoDailyPosts(candidates);
