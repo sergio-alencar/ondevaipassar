@@ -15,18 +15,21 @@ import { DAILY_GROUP_ID, DAILY_GROUP_NAME, EUROPE_GROUP_ID, EUROPE_GROUP_NAME } 
 import {
   buildCoverTree,
   buildSlideTree,
+  buildStoryTree,
   MATCHES_PER_SLIDE,
   PORTRAIT_HEIGHT,
   PORTRAIT_WIDTH,
+  STORY_HEIGHT,
+  STORY_WIDTH,
   type SlideMatch,
 } from "./carouselTemplate.js";
 import type { SatoriElement } from "./template.js";
 
 const fonts = loadFonts();
 
-async function render(tree: SatoriElement): Promise<Buffer> {
-  const svg = await satori(tree as ReactNode, { width: PORTRAIT_WIDTH, height: PORTRAIT_HEIGHT, fonts });
-  return new Resvg(svg, { fitTo: { mode: "width", value: PORTRAIT_WIDTH } }).render().asPng();
+async function render(tree: SatoriElement, width = PORTRAIT_WIDTH, height = PORTRAIT_HEIGHT): Promise<Buffer> {
+  const svg = await satori(tree as ReactNode, { width, height, fonts });
+  return new Resvg(svg, { fitTo: { mode: "width", value: width } }).render().asPng();
 }
 
 /**
@@ -217,4 +220,22 @@ export async function renderCarouselImages(competitionId: string, matches: Match
     );
   }
   return images;
+}
+
+/** One story image (9:16): a competition's matches, its name and logo on top. */
+export async function renderStoryImage(competitionId: string, matches: MatchView[]): Promise<Buffer> {
+  const notes = buildRegionalNotes(matches);
+  const storyMatches = await Promise.all(matches.map((match) => toSlideMatch(match, false, notes)));
+  const competition = findCompetitionById(competitionId);
+  return render(
+    buildStoryTree({
+      competitionName: competition?.displayName ?? matches[0].competitionName,
+      competitionBadge: competitionBadgeDataUri(competitionId),
+      dateLabel: formatDateLabel(matches[0].kickoffUtc),
+      matches: storyMatches,
+      wordmarkDataUri: WORDMARK,
+    }),
+    STORY_WIDTH,
+    STORY_HEIGHT,
+  );
 }

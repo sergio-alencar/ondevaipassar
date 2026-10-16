@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
-import { MAX_CAROUSELS_PER_RUN, pacingBlock, type PacingBlock } from "./pacing.js";
+import { MAX_CAROUSELS_PER_RUN, MAX_STORIES_PER_DAY, pacingBlock, type PacingBlock, type RecentPost } from "./pacing.js";
+import { groupIntoStories, type StoryGroup } from "./storyGroups.js";
 import { isTodayInBrasilia, type MatchView } from "@ondevaipassar/shared";
 import { env } from "../config/env.js";
 import { db } from "../db/client.js";
@@ -9,7 +10,7 @@ import { getMatchViews } from "../matches/getMatchViews.js";
 import { buildCarouselCaption, buildDailyCaption } from "./caption.js";
 import { realGraphApiClient, type GraphApiClient } from "./graphApiClient.js";
 import { DAILY_GROUP_ID, groupIntoDailyPosts, type PostGroup } from "./postGroups.js";
-import { chunkIntoSlides, renderCarouselImages } from "./renderCarousel.js";
+import { chunkIntoSlides, renderCarouselImages, renderStoryImage } from "./renderCarousel.js";
 
 
 export interface PostingSummary {
@@ -80,6 +81,46 @@ async function excludeAlreadyPublished(matches: MatchView[]): Promise<MatchView[
       .map((row) => row.matchId),
   );
   return matches.filter((match) => !settled.has(match.id));
+}
+
+/** Rows of stories live under their own ids ("story:<matchId>", in matchId too), so a story never counts as the match's feed post. */
+export const STORY_ID_PREFIX = "story:";
+
+/** Published rows of the last 24 hours, feed posts and stories apart (the gap between publications holds across both). */
+async function recentPublications(): Promise<{ all: RecentPost[]; feed: RecentPost[]; stories: RecentPost[] }> {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const rows = (await db.select().from(instagramPosts).where(eq(instagramPosts.status, "published"))).filter(
+    (post) => post.postedAt !== null && post.postedAt >= since,
+  );
+  const toRecent = (post: (typeof rows)[number]): RecentPost => ({ igMediaId: post.igMediaId, postedAt: post.postedAt as string });
+  return {
+    all: rows.map(toRecent),
+    feed: rows.filter((post) => !post.id.startsWith(STORY_ID_PREFIX)).map(toRecent),
+    stories: rows.filter((post) => post.id.startsWith(STORY_ID_PREFIX)).map(toRecent),
+  };
+}
+
+/** Today's matches with a confirmed broadcast that have no story yet (published or unknown), whatever happened to their feed post. */
+async function getStoryCandidates(): Promise<MatchView[]> {
+  const todays = (await getMatchViews({})).filter((match) => isTodayInBrasilia(match.kickoffUtc) && match.broadcasts.length > 0);
+  if (todays.length === 0) return [];
+  const settled = new Set(
+    (await db.select().from(instagramPosts))
+      .filter((row) => row.id.startsWith(STORY_ID_PREFIX) && (row.status === "published" || row.status === "unknown"))
+      .map((row) => row.id),
+  );
+  return todays.filter((match) => !settled.has(`${STORY_ID_PREFIX}${match.id}`));
+}
+
+/** The image of one story: the same render route Instagram fetches for slides. */
+export function buildStoryPlan(story: StoryGroup): { imageUrl: string } {
+  const query = new URLSearchParams({
+    kind: "story",
+    matchIds: story.matches.map((match) => match.id).join(","),
+    competitionId: story.competitionId,
+    v: String(Date.now()),
+  });
+  return { imageUrl: `${env.PUBLIC_BASE_URL}/api/instagram-slide?${query.toString()}` };
 }
 
 /** Every match today (BRT) that has at least one confirmed broadcast and hasn't already been posted — a match with no broadcast yet is skipped for the day, per product decision, no retry in v1. */
@@ -168,11 +209,8 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
   // Pacing (pacing.ts): a real publication is never started too soon after the
   // last one, nor past the day's cap. A dry run writes nothing, so it is exempt.
   if (!env.INSTAGRAM_DRY_RUN && groups.length > 0) {
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const recent = (await db.select().from(instagramPosts).where(eq(instagramPosts.status, "published")))
-      .filter((post) => post.postedAt !== null && post.postedAt >= since)
-      .map((post) => ({ igMediaId: post.igMediaId, postedAt: post.postedAt as string }));
-    const block = pacingBlock(recent);
+    const recent = await recentPublications();
+    const block = pacingBlock(recent.feed, Date.now(), recent.all);
     if (block) {
       summary.paced = block;
       summary.skipped = groups.reduce((total, group) => total + group.matches.length, 0);
@@ -181,6 +219,9 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
       return summary;
     }
   }
+
+  // No feed post pending: the day's stories, one per run.
+  if (groups.length === 0 && !onlyMatchId) return runNextStory(summary, graphApi);
 
   const remainingMatches = (postsDone: number): number =>
     groups.slice(postsDone).reduce((total, group) => total + group.matches.length, 0);
@@ -309,17 +350,115 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
   return summary;
 }
 
-/** Today's posts exactly as the poster would make them, whether or not anything is being posted: the daily e-mail's content. */
+/**
+ * Publishes the next story, if one is due and the pacing allows it. One story
+ * per run, with the same 15-minute gap as the feed posts (counted across both),
+ * so a morning of stories is spread out like a person's, not fired in a burst.
+ * A story is a single image published on its own, so there is no carousel step:
+ * container, wait until processed, publish, record. The same ambiguity rule as
+ * the feed applies: an error at or after the publish call may mean it is live,
+ * and that story is never retried until a human looks.
+ */
+async function runNextStory(summary: PostingSummary, graphApi: GraphApiClient): Promise<PostingSummary> {
+  const stories = groupIntoStories(await getStoryCandidates());
+  if (stories.length === 0) return summary;
+  const storyMatches = (list: StoryGroup[]): number => list.reduce((total, story) => total + story.matches.length, 0);
+
+  if (!env.INSTAGRAM_DRY_RUN) {
+    const recent = await recentPublications();
+    const block = pacingBlock(recent.stories, Date.now(), recent.all, MAX_STORIES_PER_DAY);
+    if (block) {
+      summary.paced = block;
+      summary.skipped = storyMatches(stories);
+      summary.pending = summary.skipped;
+      console.log(`[instagram] story pacing (${block}): not posting now, ${stories.length} story(ies) wait`);
+      return summary;
+    }
+  }
+
+  const [story, ...rest] = stories;
+  summary.attempted++;
+  const { imageUrl } = buildStoryPlan(story);
+
+  if (env.INSTAGRAM_DRY_RUN) {
+    const rendered = await renderStoryImage(story.competitionId, story.matches);
+    console.log(`[instagram dry-run] story ${story.competitionId}: ${rendered.length} bytes`);
+    summary.published++;
+    summary.matchesPublished += story.matches.length;
+    summary.pending = storyMatches(rest);
+    summary.skipped = summary.pending;
+    return summary;
+  }
+
+  let phase: "create" | "poll" | "publish" | "record" = "create";
+  try {
+    const containerId = await graphApi.createStory(imageUrl);
+    phase = "poll";
+    await graphApi.pollUntilFinished(containerId);
+    phase = "publish";
+    const igMediaId = await graphApi.publishContainer(containerId);
+    phase = "record";
+    const now = new Date().toISOString();
+    const rows = story.matches.map((match) =>
+      db
+        .insert(instagramPosts)
+        .values({ id: `${STORY_ID_PREFIX}${match.id}`, matchId: `${STORY_ID_PREFIX}${match.id}`, status: "published", igMediaId, postedAt: now, createdAt: now })
+        .onConflictDoUpdate({ target: instagramPosts.id, set: { status: "published", igMediaId, postedAt: now, errorMessage: null } }),
+    );
+    const [first, ...others] = rows;
+    await db.batch([first, ...others]);
+    summary.published++;
+    summary.matchesPublished += story.matches.length;
+  } catch (error) {
+    const ambiguous = phase === "publish" || phase === "record";
+    const status = ambiguous ? "unknown" : "failed";
+    const now = new Date().toISOString();
+    const rows = story.matches.map((match) =>
+      db
+        .insert(instagramPosts)
+        .values({ id: `${STORY_ID_PREFIX}${match.id}`, matchId: `${STORY_ID_PREFIX}${match.id}`, status, errorMessage: getErrorMessage(error), createdAt: now })
+        .onConflictDoUpdate({ target: instagramPosts.id, set: { status, errorMessage: getErrorMessage(error) } }),
+    );
+    const [first, ...others] = rows;
+    await db.batch([first, ...others]);
+    console.error(`[instagram] story ${status} (${story.competitionId}, phase ${phase}):`, error);
+    if (ambiguous) summary.unknown++;
+    else summary.failed++;
+    if (isRateLimited(error)) summary.blocked = true;
+  }
+
+  // Everything not published this run waits for the next: the failed story is pending work, the rest not yet reached.
+  summary.skipped = storyMatches(rest);
+  summary.pending = summary.skipped + (summary.failed > 0 ? story.matches.length : 0);
+  return summary;
+}
+
+/** Today's posts exactly as the poster would make them, whether or not anything is being posted: the daily e-mail's content (the feed post first, then the stories). */
 export async function getTodaysPostPlans(
   options: { includePosted?: boolean } = {},
-): Promise<{ title: string; matchCount: number; caption: string; imageUrls: string[] }[]> {
+): Promise<{ kind: "feed" | "story"; title: string; matchCount: number; caption: string; imageUrls: string[] }[]> {
   // includePosted: today's matches that already went out too — for testing the e-mail on a day with nothing left to post.
-  const matches = options.includePosted
-    ? (await getMatchViews({})).filter((match) => isTodayInBrasilia(match.kickoffUtc) && match.broadcasts.length > 0)
-    : await getCandidateMatches();
-  return groupIntoDailyPosts(matches).map((group) => ({
-    title: group.totalParts > 1 ? `${group.competitionName} (${group.part}/${group.totalParts})` : group.competitionName,
-    matchCount: group.matches.length,
-    ...buildPostPlan(group),
-  }));
+  const todays = async (): Promise<MatchView[]> =>
+    (await getMatchViews({})).filter((match) => isTodayInBrasilia(match.kickoffUtc) && match.broadcasts.length > 0);
+
+  const feedMatches = options.includePosted ? await todays() : await getCandidateMatches();
+  const storyMatches = options.includePosted ? await todays() : await getStoryCandidates();
+
+  return [
+    ...groupIntoDailyPosts(feedMatches).map((group) => ({
+      kind: "feed" as const,
+      title: group.totalParts > 1 ? `${group.competitionName} (${group.part}/${group.totalParts})` : group.competitionName,
+      matchCount: group.matches.length,
+      ...buildPostPlan(group),
+    })),
+    ...groupIntoStories(storyMatches).map((story) => ({
+      kind: "story" as const,
+      title: `Story: ${story.competitionName}`,
+      matchCount: story.matches.length,
+      caption: "",
+      imageUrls: [buildStoryPlan(story).imageUrl],
+    })),
+  ];
 }
+
+export { groupIntoStories };

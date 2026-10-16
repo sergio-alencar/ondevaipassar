@@ -247,7 +247,12 @@ const MAX_CREST = 180;
 // no matter how the surrounding sizes are tuned.
 const BLOCK_FIXED_NON_STRIP = 60 + 34;
 
-function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
+/** The least height a match block needs without overflowing: its fixed lines, its channel strip and the smallest crest. Stories pack matches by this. */
+export function matchBlockMinHeight(match: Pick<SlideMatch, "channels">): number {
+  return BLOCK_FIXED_NON_STRIP + channelStripLayout(match.channels.length).height + MIN_CREST;
+}
+
+export function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
   const labelHeight = match.competitionLabel ? 44 : 0;
   const crestBudget = blockHeight - BLOCK_FIXED_NON_STRIP - channelStripLayout(match.channels.length).height - labelHeight;
   const crestSize = Math.min(MAX_CREST, Math.max(MIN_CREST, crestBudget));
@@ -606,6 +611,91 @@ export function buildCoverTree(input: CoverInput): SatoriElement {
           { style: { display: "flex", color: "#ffffff", fontSize: 50, fontWeight: 700 } },
           `${input.matchCount} ${input.matchCount === 1 ? "JOGO" : "JOGOS"}`,
         ),
+        h("img", { src: input.wordmarkDataUri, style: { height: 78 } }),
+      ]),
+    ],
+  );
+}
+
+// ---- Stories: the same blocks on a 9:16 canvas ------------------------------------------------------------
+
+export const STORY_WIDTH = 1080;
+export const STORY_HEIGHT = 1920;
+// Instagram draws its own controls over the top and bottom of a story (profile row, reply bar): content stays out of them.
+const STORY_SAFE_TOP = 250;
+const STORY_SAFE_BOTTOM = 250;
+const STORY_HEADER_HEIGHT = 170;
+const STORY_FOOTER_HEIGHT = 100;
+/** Vertical room the match blocks of one story share. */
+export const STORY_BLOCKS_HEIGHT = STORY_HEIGHT - STORY_SAFE_TOP - STORY_SAFE_BOTTOM - STORY_HEADER_HEIGHT - STORY_FOOTER_HEIGHT;
+/** At most this many matches in one story, even when they would fit more. */
+export const MAX_MATCHES_PER_STORY = 3;
+
+export interface StoryInput {
+  competitionName: string;
+  /** The competition's logo, shown beside its name; null when there is none. */
+  competitionBadge: string | null;
+  dateLabel: string;
+  matches: SlideMatch[];
+  wordmarkDataUri: string;
+}
+
+/** One story: one competition's matches (up to three), its name and logo on top. */
+export function buildStoryTree(input: StoryInput): SatoriElement {
+  const dividers = Math.max(0, input.matches.length - 1) * 2;
+  const blockHeight = Math.floor((STORY_BLOCKS_HEIGHT - dividers) / Math.max(input.matches.length, 1));
+
+  return h(
+    "div",
+    {
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        width: STORY_WIDTH,
+        height: STORY_HEIGHT,
+        backgroundColor: "#ffffff",
+        padding: `${STORY_SAFE_TOP}px ${SIDE_PADDING}px ${STORY_SAFE_BOTTOM}px`,
+      },
+    },
+    [
+      h(
+        "div",
+        {
+          style: {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: STORY_HEADER_HEIGHT,
+            borderBottom: `4px solid ${GRAY_200}`,
+            gap: 8,
+          },
+        },
+        [
+          h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 18 } }, [
+            ...(input.competitionBadge ? [h("img", { src: input.competitionBadge, style: { width: 64, height: 64, objectFit: "contain" } })] : []),
+            h(
+              "div",
+              { style: { display: "flex", color: PURPLE, fontSize: input.competitionName.length > 24 ? 40 : 52, fontWeight: 700, textAlign: "center" } },
+              input.competitionName.toUpperCase(),
+            ),
+          ]),
+          h("div", { style: { display: "flex", color: GRAY_600, fontSize: 36, fontWeight: 700 } }, input.dateLabel.toUpperCase()),
+        ],
+      ),
+      h(
+        "div",
+        { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: STORY_BLOCKS_HEIGHT } },
+        input.matches.flatMap((match, index) =>
+          index === 0
+            ? [matchBlock({ ...match, competitionLabel: null }, blockHeight)]
+            : [
+                h("div", { style: { display: "flex", width: CONTENT_WIDTH * 0.55, height: 2, backgroundColor: GRAY_200 } }),
+                matchBlock({ ...match, competitionLabel: null }, blockHeight),
+              ],
+        ),
+      ),
+      h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", height: STORY_FOOTER_HEIGHT } }, [
         h("img", { src: input.wordmarkDataUri, style: { height: 78 } }),
       ]),
     ],

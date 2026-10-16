@@ -5,7 +5,9 @@ import { env } from "../../config/env.js";
 import { db } from "../../db/client.js";
 import { instagramPosts } from "../../db/schema.js";
 import { realGraphApiClient } from "../../instagram/graphApiClient.js";
-import { getTodaysPostPlans, runInstagramPosting } from "../../instagram/poster.js";
+import { buildStoryPlan, getTodaysPostPlans, groupIntoStories, runInstagramPosting, STORY_ID_PREFIX } from "../../instagram/poster.js";
+import { getMatchViews } from "../../matches/getMatchViews.js";
+import { isTodayInBrasilia } from "@ondevaipassar/shared";
 
 const querySchema = z.object({
   // Escape hatch for a controlled single-match test post before trusting
@@ -13,7 +15,7 @@ const querySchema = z.object({
   matchId: z.string().optional(),
 });
 
-const resetQuerySchema = z.object({ matchId: z.string() });
+const resetQuerySchema = z.object({ matchId: z.string(), story: z.enum(["true", "false"]).optional() });
 
 /**
  * Triggered from TWO independent places on purpose, both daily, both
@@ -71,6 +73,21 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
     if (env.CRON_SECRET && request.headers.authorization !== `Bearer ${env.CRON_SECRET}`) {
       return reply.status(401).send({ error: "unauthorized" });
     }
+    // ?story=true: does the API take a STORY from this account? Builds today's first story image, creates its container and waits for Instagram to process it. Never publishes.
+    if ((request.query as { story?: string }).story === "true") {
+      const matches = (await getMatchViews({})).filter((match) => isTodayInBrasilia(match.kickoffUtc) && match.broadcasts.length > 0);
+      const [story] = groupIntoStories(matches);
+      if (!story) return { accepted: false, error: "no match with a broadcast today to build a story from" };
+      const { imageUrl } = buildStoryPlan(story);
+      try {
+        const containerId = await realGraphApiClient.createStory(imageUrl);
+        await realGraphApiClient.pollUntilFinished(containerId);
+        return { accepted: true, containerId, imageUrl };
+      } catch (error) {
+        return { accepted: false, imageUrl, error: error instanceof Error ? error.message : String(error) };
+      }
+    }
+
     const children = Math.min(20, Math.max(2, Number((request.query as { children?: string }).children ?? 11)));
     // The live site's own image, not PUBLIC_SITE_URL (which is localhost wherever it is not set).
     const imageUrl = "https://ondevaipassar.com/images/og-image.png";
@@ -109,7 +126,8 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
       return reply.status(400).send({ error: "invalid query params", details: parsedQuery.error.flatten() });
     }
 
-    await db.delete(instagramPosts).where(eq(instagramPosts.id, parsedQuery.data.matchId));
-    return { status: "ok", reset: parsedQuery.data.matchId };
+    const id = parsedQuery.data.story === "true" ? `${STORY_ID_PREFIX}${parsedQuery.data.matchId}` : parsedQuery.data.matchId;
+    await db.delete(instagramPosts).where(eq(instagramPosts.id, id));
+    return { status: "ok", reset: id };
   });
 }

@@ -79,11 +79,14 @@ jobs:
 
           today=$(TZ=America/Sao_Paulo date +"%d/%m/%Y")
           {
-            echo "@sergio-alencar — posts de hoje ($today), ${count} carrossel(éis). Salve as imagens (toque e segure no celular) e copie a legenda do bloco."
+            echo "@sergio-alencar — posts e stories de hoje ($today): ${count} item(ns). Salve as imagens (toque e segure no celular) e copie a legenda do bloco."
             echo
             jq -r '
               .posts | to_entries[] |
-              "## \(.key + 1). \(.value.title) — \(.value.matchCount) jogo(s)\n\n**Legenda**\n\n```\n\(.value.caption)\n```\n\n**Imagens** (na ordem do carrossel)\n\n" +
+              (if .value.kind == "story"
+                then "## \(.key + 1). \(.value.title) — \(.value.matchCount) jogo(s)\n\n**Imagem do story** (9:16)\n\n"
+                else "## \(.key + 1). \(.value.title) — \(.value.matchCount) jogo(s)\n\n**Legenda**\n\n```\n\(.value.caption)\n```\n\n**Imagens** (na ordem do carrossel)\n\n"
+              end) +
               ([.value.imageUrls | to_entries[] | "![imagem \(.key + 1)](\(.value))"] | join("\n\n")) + "\n"
             ' /tmp/digest.json
           } > /tmp/body.md

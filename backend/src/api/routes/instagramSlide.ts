@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { renderCoverImage, renderSlideImage } from "../../instagram/renderCarousel.js";
+import { renderCoverImage, renderSlideImage, renderStoryImage } from "../../instagram/renderCarousel.js";
 import { getMatchViews } from "../../matches/getMatchViews.js";
 
 const querySchema = z.object({
@@ -8,7 +8,7 @@ const querySchema = z.object({
   competitionId: z.string().min(1),
   /** The matches on this image, comma-separated, in the order the poster grouped them. */
   matchIds: z.string().min(1),
-  kind: z.enum(["cover", "slide"]),
+  kind: z.enum(["cover", "slide", "story"]),
   /** "2/3" in the slide's corner; omitted when the competition fits one slide. */
   slideLabel: z.string().optional(),
   /** Whether to name each match's own competition — true only for the mixed European post. */
@@ -44,9 +44,11 @@ export async function instagramSlideRoutes(app: FastifyInstance): Promise<void> 
     }
 
     const png =
-      kind === "cover"
-        ? await renderCoverImage(competitionId, matches)
-        : await renderSlideImage(competitionId, matches, slideLabel ?? null, mixed);
+      kind === "story"
+        ? await renderStoryImage(competitionId, matches)
+        : kind === "cover"
+          ? await renderCoverImage(competitionId, matches)
+          : await renderSlideImage(competitionId, matches, slideLabel ?? null, mixed);
     // The url carries everything the image depends on (matches, label, and the poster's own `v` stamp), so a copy kept for an hour is never stale for it. It also lets the daily e-mail's images (fetched by GitHub through its image proxy, which gives up quickly) arrive from the cache once warmed.
     return reply.type("image/png").header("Cache-Control", "public, max-age=3600, s-maxage=3600").send(png);
   });

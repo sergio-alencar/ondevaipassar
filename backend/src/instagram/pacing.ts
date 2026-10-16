@@ -17,6 +17,9 @@ export const MIN_GAP_BETWEEN_POSTS_MS = 15 * 60 * 1000;
 /** Carousels in any rolling 24 hours. A busy day's lowest-priority groups are simply not posted. */
 export const MAX_CAROUSELS_PER_DAY = 6;
 
+/** Stories in any rolling 24 hours (one per competition, so a busy day has many). Their gap is the same 15 minutes as the posts'. */
+export const MAX_STORIES_PER_DAY = 12;
+
 export type PacingBlock = "too-soon" | "daily-cap" | "paused";
 
 export interface RecentPost {
@@ -25,11 +28,20 @@ export interface RecentPost {
   postedAt: string;
 }
 
-/** Null when posting is allowed now; otherwise why not. `recent` is what was published in the last 24 hours (one row per match, so several rows can share one carousel). */
-export function pacingBlock(recent: RecentPost[], now: number = Date.now()): PacingBlock | null {
-  const carousels = new Set(recent.map((post) => post.igMediaId ?? post.postedAt));
-  if (carousels.size >= MAX_CAROUSELS_PER_DAY) return "daily-cap";
-  const latest = recent.reduce((most, post) => Math.max(most, Date.parse(post.postedAt)), 0);
+/**
+ * Null when posting is allowed now; otherwise why not. `recent` is what counts against the cap (published in the
+ * last 24 hours: one row per match, so several rows can share one carousel or story); `all` is everything
+ * published, feed posts AND stories, because the gap between two publications holds across both.
+ */
+export function pacingBlock(
+  recent: RecentPost[],
+  now: number = Date.now(),
+  all: RecentPost[] = recent,
+  cap: number = MAX_CAROUSELS_PER_DAY,
+): PacingBlock | null {
+  const publications = new Set(recent.map((post) => post.igMediaId ?? post.postedAt));
+  if (publications.size >= cap) return "daily-cap";
+  const latest = all.reduce((most, post) => Math.max(most, Date.parse(post.postedAt)), 0);
   if (latest > 0 && now - latest < MIN_GAP_BETWEEN_POSTS_MS) return "too-soon";
   return null;
 }
