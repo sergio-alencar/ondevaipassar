@@ -76,8 +76,12 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
     const imageUrl = "https://ondevaipassar.com/images/og-image.png";
     const childIds: string[] = [];
     try {
-      for (let i = 0; i < children; i++) childIds.push(await realGraphApiClient.createCarouselItem(imageUrl));
-      for (const id of childIds) await realGraphApiClient.pollUntilFinished(id);
+      // In batches of 5 so 20 images fit the function's 60 seconds.
+      for (let i = 0; i < children; i += 5) {
+        const batch = Array.from({ length: Math.min(5, children - i) }, () => realGraphApiClient.createCarouselItem(imageUrl));
+        childIds.push(...(await Promise.all(batch)));
+      }
+      for (let i = 0; i < childIds.length; i += 5) await Promise.all(childIds.slice(i, i + 5).map((id) => realGraphApiClient.pollUntilFinished(id)));
       // The client itself refuses more than INSTAGRAM_MAX_CAROUSEL_ITEMS; the probe asks the API directly instead.
       const params = new URLSearchParams({ media_type: "CAROUSEL", children: childIds.join(","), caption: "probe", access_token: env.INSTAGRAM_ACCESS_TOKEN ?? "" });
       const response = await fetch(`https://graph.instagram.com/v25.0/${env.INSTAGRAM_USER_ID}/media`, { method: "POST", body: params });
