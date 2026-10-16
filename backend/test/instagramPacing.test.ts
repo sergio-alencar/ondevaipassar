@@ -23,3 +23,16 @@ describe("pacingBlock", () => {
     expect(pacingBlock(rows.slice(1), NOW)).toBeNull();
   });
 });
+
+import { isMediaNotFound } from "../src/instagram/graphApiClient.js";
+
+describe("isMediaNotFound", () => {
+  it("recognises Instagram's 'Media Not Found' answer at publish time", () => {
+    const error = new Error('Instagram Graph API error (HTTP 400): {"error":{"message":"The requested resource does not exist","code":24,"error_subcode":2207006,"error_user_title":"Media Not Found"}}');
+    expect(isMediaNotFound(error)).toBe(true);
+  });
+  it("is false for any other failure, which may well have published", () => {
+    expect(isMediaNotFound(new Error('Instagram Graph API error (HTTP 500): {"error":{"code":2}}'))).toBe(false);
+    expect(isMediaNotFound("not an error")).toBe(false);
+  });
+});

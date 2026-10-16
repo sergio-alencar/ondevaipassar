@@ -24,6 +24,14 @@ const POLL_TIMEOUT_MS = 5 * 60000;
 /** How many images one carousel gets: 10 by default, 20 where the API takes it (see INSTAGRAM_MAX_CAROUSEL_ITEMS in config/env.ts). More matches than fit are split across posts rather than risking a rejected container. */
 export const MAX_CAROUSEL_ITEMS = env.INSTAGRAM_MAX_CAROUSEL_ITEMS;
 
+const PUBLISH_ATTEMPTS = 3;
+const PUBLISH_RETRY_DELAY_MS = 4000;
+
+/** Instagram's "Media Not Found" (subcode 2207006): the container does not exist, so nothing was published by the call. */
+export function isMediaNotFound(error: unknown): boolean {
+  return error instanceof Error && error.message.includes('"error_subcode":2207006');
+}
+
 export interface GraphApiClient {
   /** One slide of a future carousel: same media container, but flagged so it can't be published on its own and carries no caption of its own. */
   createCarouselItem(imageUrl: string): Promise<string>;
@@ -116,7 +124,18 @@ export const realGraphApiClient: GraphApiClient = {
     if (!accountId || !token) throw new Error("INSTAGRAM_USER_ID/INSTAGRAM_ACCESS_TOKEN not configured");
 
     const params = new URLSearchParams({ creation_id: containerId, access_token: token });
-    const body = await fetchJson(`${GRAPH_API_BASE}/${accountId}/media_publish`, { method: "POST", body: params });
+    // A freshly processed container is sometimes "not found" for a moment (a story's did on 2026-10-16, right after
+    // the status check said FINISHED). That error means nothing was published, so waiting and asking again is safe.
+    let body: Record<string, unknown> | undefined;
+    for (let attempt = 1; ; attempt++) {
+      try {
+        body = await fetchJson(`${GRAPH_API_BASE}/${accountId}/media_publish`, { method: "POST", body: params });
+        break;
+      } catch (error) {
+        if (!isMediaNotFound(error) || attempt >= PUBLISH_ATTEMPTS) throw error;
+        await new Promise((resolve) => setTimeout(resolve, PUBLISH_RETRY_DELAY_MS));
+      }
+    }
     const mediaId = body.id;
     if (typeof mediaId !== "string") throw new Error(`Unexpected publish response: ${JSON.stringify(body)}`);
     return mediaId;

@@ -8,7 +8,7 @@ import { instagramPosts } from "../db/schema.js";
 import { getErrorMessage } from "../lib/errors.js";
 import { getMatchViews } from "../matches/getMatchViews.js";
 import { buildCarouselCaption, buildDailyCaption } from "./caption.js";
-import { realGraphApiClient, type GraphApiClient } from "./graphApiClient.js";
+import { isMediaNotFound, realGraphApiClient, type GraphApiClient } from "./graphApiClient.js";
 import { DAILY_GROUP_ID, groupIntoDailyPosts, type PostGroup } from "./postGroups.js";
 import { chunkIntoSlides, renderCarouselImages, renderStoryImage } from "./renderCarousel.js";
 
@@ -312,7 +312,8 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
       summary.matchesPublished += group.matches.length;
     } catch (error) {
       const errorMessage = getErrorMessage(error);
-      const ambiguous = phase === "publish" || phase === "record";
+      // "Media Not Found" at publish means the container never existed: nothing is live, so it is a plain failure to retry, not "unknown".
+    const ambiguous = (phase === "publish" || phase === "record") && !isMediaNotFound(error);
       const status = ambiguous ? "unknown" : "failed";
 
       const now = new Date().toISOString();
@@ -410,7 +411,8 @@ async function runNextStory(summary: PostingSummary, graphApi: GraphApiClient): 
     summary.published++;
     summary.matchesPublished += story.matches.length;
   } catch (error) {
-    const ambiguous = phase === "publish" || phase === "record";
+    // "Media Not Found" at publish means the container never existed: nothing is live, so it is a plain failure to retry, not "unknown".
+    const ambiguous = (phase === "publish" || phase === "record") && !isMediaNotFound(error);
     const status = ambiguous ? "unknown" : "failed";
     const now = new Date().toISOString();
     const rows = story.matches.map((match) =>
