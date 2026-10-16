@@ -48,6 +48,10 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform((value) => value === "true"),
+  // Most images in one feed carousel. Instagram's own app allows 20, but Meta's API documentation still
+  // says 10, and the 20 is being rolled out account by account: stays at 10 until a test on the real
+  // account shows the API takes more (GET /api/instagram-probe). Never above 20.
+  INSTAGRAM_MAX_CAROUSEL_ITEMS: z.coerce.number().int().min(2).max(20).default(10),
   INSTAGRAM_DRY_RUN: z
     .string()
     .optional()

@@ -21,8 +21,8 @@ const GRAPH_API_BASE = "https://graph.instagram.com/v25.0";
 const POLL_INTERVAL_MS = 3000;
 const POLL_TIMEOUT_MS = 5 * 60000;
 
-/** Instagram's own ceiling for a carousel. Meta is rolling out 20 gradually, but it isn't guaranteed per account, so a competition with more matches than this is split across posts rather than risking a rejected container. */
-export const MAX_CAROUSEL_ITEMS = 10;
+/** How many images one carousel gets: 10 by default, 20 where the API takes it (see INSTAGRAM_MAX_CAROUSEL_ITEMS in config/env.ts). More matches than fit are split across posts rather than risking a rejected container. */
+export const MAX_CAROUSEL_ITEMS = env.INSTAGRAM_MAX_CAROUSEL_ITEMS;
 
 export interface GraphApiClient {
   /** One slide of a future carousel: same media container, but flagged so it can't be published on its own and carries no caption of its own. */

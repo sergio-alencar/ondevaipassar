@@ -11,7 +11,7 @@ import { Resvg } from "@resvg/resvg-js";
 import satori from "satori";
 import type { ReactNode } from "react";
 import { channelLogoDataUri, competitionLogoDataUri, crestArt, loadFonts, WORDMARK, WORDMARK_WHITE } from "./assets.js";
-import { EUROPE_GROUP_ID, EUROPE_GROUP_NAME } from "./postGroups.js";
+import { DAILY_GROUP_ID, DAILY_GROUP_NAME, EUROPE_GROUP_ID, EUROPE_GROUP_NAME } from "./postGroups.js";
 import {
   buildCoverTree,
   buildSlideTree,
@@ -138,6 +138,7 @@ function effectiveCompetitionId(competitionId: string, matches: MatchView[]): st
 /** Header/cover name for a group: the competition's short name, or the synthetic one for the combined European post. */
 function groupName(competitionId: string, matches: MatchView[]): string {
   if (competitionId === EUROPE_GROUP_ID) return EUROPE_GROUP_NAME;
+  if (competitionId === DAILY_GROUP_ID) return DAILY_GROUP_NAME;
   const competition = findCompetitionById(competitionId);
   return competition?.shortName ?? competition?.displayName ?? matches[0].competitionName;
 }
@@ -205,7 +206,8 @@ export async function renderSlideImage(
  */
 export async function renderCarouselImages(competitionId: string, matches: MatchView[]): Promise<Buffer[]> {
   const slides = chunkIntoSlides(matches);
-  const mixed = new Set(matches.map((match) => match.competitionId)).size > 1;
+  // The day's post names each match's competition even on a one-competition day.
+  const mixed = competitionId === DAILY_GROUP_ID || new Set(matches.map((match) => match.competitionId)).size > 1;
 
   const images = [await renderCoverImage(competitionId, matches)];
   for (const [index, slideMatches] of slides.entries()) {

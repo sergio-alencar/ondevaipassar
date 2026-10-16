@@ -1,5 +1,6 @@
 import {
   formatDateLabel,
+  groupMatchesByCompetition,
   formatKickoffLabel,
   formatTimeLabel,
   REGIONAL_CAVEAT_TEXT,
@@ -76,4 +77,51 @@ export function buildCarouselCaption(
   if (handles.length > 0) lines.push("", handles.join(" "));
 
   return lines.join("\n");
+}
+
+/** Instagram's caption limit is 2,200 characters; a little under it, to leave room. */
+const CAPTION_LIMIT = 2150;
+
+/**
+ * Caption of the day's feed post: the day, then each competition with its
+ * matches (time — pairing — channels), then every broadcaster's handle once.
+ * A day of 20 matches can run past Instagram's 2,200 characters, so the extras go first
+ * (the regional notes' detail, then the handles) and, as a last resort, the tail is cut.
+ */
+export function buildDailyCaption(matches: MatchView[], part = 1, totalParts = 1): string {
+  const dateLabel = formatDateLabel(matches[0].kickoffUtc);
+  const heading = totalParts > 1 ? `Jogos de ${dateLabel} (${part}/${totalParts})` : `Jogos de ${dateLabel}`;
+
+  const build = (withHandles: boolean, withRegionalDetail: boolean): string => {
+    const lines = [heading];
+    let anyRegionalCaveat = false;
+
+    for (const group of groupMatchesByCompetition(matches)) {
+      lines.push("", group.name);
+      for (const match of group.matches) {
+        const time = formatTimeLabel(match.kickoffUtc, match.kickoffTimeConfirmed);
+        const channels = match.broadcasts.map((broadcast) => broadcast.displayName).join(", ");
+        lines.push(`${time} — ${match.homeTeamName} x ${match.awayTeamName} — ${channels}`);
+
+        const detail = match.broadcasts.find((broadcast) => broadcast.regionalDetail);
+        if (detail && withRegionalDetail) lines.push(`   ${detail.displayName} em: ${detail.regionalDetail} (${REGIONAL_PRACA_CAVEAT})`);
+        else if (match.broadcasts.some((broadcast) => broadcast.regionalCaveat || broadcast.regionalDetail)) anyRegionalCaveat = true;
+      }
+    }
+
+    if (anyRegionalCaveat) lines.push("", REGIONAL_CAVEAT_TEXT);
+
+    const handles = [
+      ...new Set(matches.flatMap((match) => match.broadcasts.flatMap((b) => (b.instagramHandle ? [`@${b.instagramHandle}`] : [])))),
+    ];
+    if (withHandles && handles.length > 0) lines.push("", handles.join(" "));
+    return lines.join("\n");
+  };
+
+  for (const [handles, detail] of [[true, true], [true, false], [false, false]] as const) {
+    const caption = build(handles, detail);
+    if (caption.length <= CAPTION_LIMIT) return caption;
+  }
+  const cut = build(false, false).slice(0, CAPTION_LIMIT);
+  return `${cut.slice(0, cut.lastIndexOf("\n"))}\n…`;
 }

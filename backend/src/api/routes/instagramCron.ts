@@ -4,6 +4,7 @@ import { z } from "zod";
 import { env } from "../../config/env.js";
 import { db } from "../../db/client.js";
 import { instagramPosts } from "../../db/schema.js";
+import { realGraphApiClient } from "../../instagram/graphApiClient.js";
 import { getTodaysPostPlans, runInstagramPosting } from "../../instagram/poster.js";
 
 const querySchema = z.object({
@@ -61,6 +62,29 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
       return reply.status(401).send({ error: "unauthorized" });
     }
     return { generatedAt: new Date().toISOString(), posts: await getTodaysPostPlans({ includePosted: (request.query as { includePosted?: string }).includePosted === "true" }) };
+  });
+
+  // Does the API take a carousel of N images on THIS account? Creates N media containers and a carousel container
+  // from the site's own image, and reports what Instagram answered. It NEVER publishes: the containers expire
+  // by themselves and nothing appears on the profile. Operator-only (CRON_SECRET).
+  app.get("/api/instagram-probe", async (request, reply) => {
+    if (env.CRON_SECRET && request.headers.authorization !== `Bearer ${env.CRON_SECRET}`) {
+      return reply.status(401).send({ error: "unauthorized" });
+    }
+    const children = Math.min(20, Math.max(2, Number((request.query as { children?: string }).children ?? 11)));
+    const imageUrl = `${env.PUBLIC_SITE_URL}/og-image.png`;
+    const childIds: string[] = [];
+    try {
+      for (let i = 0; i < children; i++) childIds.push(await realGraphApiClient.createCarouselItem(imageUrl));
+      for (const id of childIds) await realGraphApiClient.pollUntilFinished(id);
+      // The client itself refuses more than INSTAGRAM_MAX_CAROUSEL_ITEMS; the probe asks the API directly instead.
+      const params = new URLSearchParams({ media_type: "CAROUSEL", children: childIds.join(","), caption: "probe", access_token: env.INSTAGRAM_ACCESS_TOKEN ?? "" });
+      const response = await fetch(`https://graph.instagram.com/v25.0/${env.INSTAGRAM_USER_ID}/media`, { method: "POST", body: params });
+      const body = (await response.json()) as Record<string, unknown>;
+      return { children, childrenCreated: childIds.length, accepted: response.ok, response: response.ok ? { id: body.id } : body };
+    } catch (error) {
+      return { children, childrenCreated: childIds.length, accepted: false, error: error instanceof Error ? error.message : String(error) };
+    }
   });
 
   // Operator-only escape hatch, not part of the daily flow: clears a

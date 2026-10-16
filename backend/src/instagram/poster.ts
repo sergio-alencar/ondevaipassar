@@ -6,9 +6,9 @@ import { db } from "../db/client.js";
 import { instagramPosts } from "../db/schema.js";
 import { getErrorMessage } from "../lib/errors.js";
 import { getMatchViews } from "../matches/getMatchViews.js";
-import { buildCarouselCaption } from "./caption.js";
+import { buildCarouselCaption, buildDailyCaption } from "./caption.js";
 import { realGraphApiClient, type GraphApiClient } from "./graphApiClient.js";
-import { groupIntoPosts, type PostGroup } from "./postGroups.js";
+import { DAILY_GROUP_ID, groupIntoDailyPosts, type PostGroup } from "./postGroups.js";
 import { chunkIntoSlides, renderCarouselImages } from "./renderCarousel.js";
 
 
@@ -95,7 +95,10 @@ async function getCandidateMatches(): Promise<MatchView[]> {
  * very same ones, so what is reviewed is exactly what would be posted.
  */
 export function buildPostPlan(group: PostGroup): { caption: string; imageUrls: string[] } {
-  const caption = buildCarouselCaption(group.competitionName, group.matches, group.part, group.totalParts);
+  const caption =
+    group.competitionId === DAILY_GROUP_ID
+      ? buildDailyCaption(group.matches, group.part, group.totalParts)
+      : buildCarouselCaption(group.competitionName, group.matches, group.part, group.totalParts);
   const slides = chunkIntoSlides(group.matches);
   // Every match on the slide is passed explicitly rather than the route
   // working the grouping out again — an ingest landing between this read
@@ -112,7 +115,7 @@ export function buildPostPlan(group: PostGroup): { caption: string; imageUrls: s
     const query = new URLSearchParams({ ...params, competitionId: group.competitionId, v: String(version) });
     return `${env.PUBLIC_BASE_URL}/api/instagram-slide?${query.toString()}`;
   };
-  const mixed = new Set(group.matches.map((match) => match.competitionId)).size > 1;
+  const mixed = group.competitionId === DAILY_GROUP_ID || new Set(group.matches.map((match) => match.competitionId)).size > 1;
 
   const imageUrls = [
     slideUrl({ kind: "cover", matchIds: group.matches.map((match) => match.id).join(",") }),
@@ -140,7 +143,7 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
   const candidates = onlyMatchId
     ? await excludeAlreadyPublished(await getMatchViews({ id: onlyMatchId }))
     : await getCandidateMatches();
-  const groups = groupIntoPosts(candidates);
+  const groups = groupIntoDailyPosts(candidates);
   const summary: PostingSummary = {
     attempted: 0,
     published: 0,
@@ -314,7 +317,7 @@ export async function getTodaysPostPlans(
   const matches = options.includePosted
     ? (await getMatchViews({})).filter((match) => isTodayInBrasilia(match.kickoffUtc) && match.broadcasts.length > 0)
     : await getCandidateMatches();
-  return groupIntoPosts(matches).map((group) => ({
+  return groupIntoDailyPosts(matches).map((group) => ({
     title: group.totalParts > 1 ? `${group.competitionName} (${group.part}/${group.totalParts})` : group.competitionName,
     matchCount: group.matches.length,
     ...buildPostPlan(group),

@@ -1,4 +1,5 @@
-import { findCompetitionById, type MatchView } from "@ondevaipassar/shared";
+import { findCompetitionById, groupMatchesByCompetition, type MatchView } from "@ondevaipassar/shared";
+import { MATCHES_PER_SLIDE } from "./carouselTemplate.js";
 import { MAX_CAROUSEL_ITEMS } from "./graphApiClient.js";
 
 /** Synthetic competition id for the combined European post — also the filename of its logo (see assets.ts's competitionLogoDataUri). */
@@ -74,4 +75,35 @@ export function groupIntoPosts(matches: MatchView[]): PostGroup[] {
     );
   }
   return groups;
+}
+
+/** Synthetic competition id of the day's single feed post — also what the slide route is told, so the header names the day, not a competition. */
+export const DAILY_GROUP_ID = "hoje";
+export const DAILY_GROUP_NAME = "Jogos de hoje";
+
+/**
+ * The feed post of the day: EVERY match in one carousel (cover, then the
+ * matches two to a slide), ordered the way the digest orders them — Brazilian
+ * competitions first, Série A before B, then the rest. Each match names its own
+ * competition on the slide.
+ *
+ * A day with more matches than one carousel holds (cover + (max - 1) slides of
+ * two) is split into the fewest posts, EVENLY, so the second is never a lone
+ * match. No match is ever left out.
+ */
+export function groupIntoDailyPosts(matches: MatchView[], maxItems: number = MAX_CAROUSEL_ITEMS): PostGroup[] {
+  const ordered = groupMatchesByCompetition(matches).flatMap((group) => group.matches);
+  if (ordered.length === 0) return [];
+
+  const capacity = (maxItems - 1) * MATCHES_PER_SLIDE;
+  const totalParts = Math.ceil(ordered.length / capacity);
+  const perPart = Math.ceil(ordered.length / totalParts);
+
+  return Array.from({ length: totalParts }, (_, index) => ({
+    competitionId: DAILY_GROUP_ID,
+    competitionName: DAILY_GROUP_NAME,
+    matches: ordered.slice(index * perPart, (index + 1) * perPart),
+    part: index + 1,
+    totalParts,
+  }));
 }

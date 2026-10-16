@@ -1,8 +1,8 @@
 import type { MatchView } from "@ondevaipassar/shared";
 import { describe, expect, it } from "vitest";
-import { buildCarouselCaption } from "../src/instagram/caption.js";
+import { buildCarouselCaption, buildDailyCaption } from "../src/instagram/caption.js";
 import { MAX_CAROUSEL_ITEMS } from "../src/instagram/graphApiClient.js";
-import { EUROPE_GROUP_ID, groupIntoPosts } from "../src/instagram/postGroups.js";
+import { DAILY_GROUP_ID, EUROPE_GROUP_ID, groupIntoDailyPosts, groupIntoPosts } from "../src/instagram/postGroups.js";
 import { channelRows } from "../src/instagram/carouselTemplate.js";
 
 function buildMatch(overrides: Partial<MatchView> = {}): MatchView {
@@ -114,5 +114,57 @@ describe("channelRows: balanced rows, never a stranded pair", () => {
     expect(sizes(7)).toEqual([4, 3]);
     expect(sizes(8)).toEqual([4, 4]);
     expect(sizes(9)).toEqual([5, 4]);
+  });
+});
+
+describe("groupIntoDailyPosts: one feed post with the whole day", () => {
+  it("puts every match, of every competition, in a single post", () => {
+    const groups = groupIntoDailyPosts([
+      buildMatch({ id: "eu", competitionId: "premier-league", competitionName: "Premier League" }),
+      buildMatch({ id: "b", competitionId: "brasileirao-serie-b", competitionName: "Campeonato Brasileiro Série B" }),
+      buildMatch({ id: "a" }),
+    ]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].competitionId).toBe(DAILY_GROUP_ID);
+    // Brazilian first, Série A before B, then the rest.
+    expect(groups[0].matches.map((match) => match.id)).toEqual(["a", "b", "eu"]);
+  });
+
+  it("holds cover + 9 slides of two at the default limit of 10 images (18 matches)", () => {
+    const eighteen = Array.from({ length: 18 }, (_, i) => buildMatch({ id: `m${i}` }));
+    expect(groupIntoDailyPosts(eighteen, 10)).toHaveLength(1);
+  });
+
+  it("splits a bigger day evenly, never leaving a lone match for the second post", () => {
+    const nineteen = Array.from({ length: 19 }, (_, i) => buildMatch({ id: `m${i}` }));
+    const groups = groupIntoDailyPosts(nineteen, 10);
+    expect(groups.map((g) => g.matches.length)).toEqual([10, 9]);
+    expect(groups.flatMap((g) => g.matches)).toHaveLength(19);
+  });
+
+  it("holds twice as many when the API takes 20 images", () => {
+    const thirtyEight = Array.from({ length: 38 }, (_, i) => buildMatch({ id: `m${i}` }));
+    expect(groupIntoDailyPosts(thirtyEight, 20)).toHaveLength(1);
+  });
+
+  it("returns nothing for an empty day", () => expect(groupIntoDailyPosts([])).toEqual([]));
+});
+
+describe("buildDailyCaption", () => {
+  const day = [
+    buildMatch({ id: "a" }),
+    buildMatch({ id: "b", competitionId: "brasileirao-serie-b", competitionName: "Campeonato Brasileiro Série B" }),
+  ];
+
+  it("lists each competition with its matches, and each handle once", () => {
+    const caption = buildDailyCaption(day);
+    expect(caption).toContain("Campeonato Brasileiro Série A");
+    expect(caption).toContain("Campeonato Brasileiro Série B");
+    expect(caption.split("@premiere")).toHaveLength(2);
+  });
+
+  it("stays inside Instagram's 2,200 characters on a very full day", () => {
+    const full = Array.from({ length: 60 }, (_, i) => buildMatch({ id: `m${i}`, homeTeamName: `Time Muito Comprido Número ${i}` }));
+    expect(buildDailyCaption(full).length).toBeLessThanOrEqual(2200);
   });
 });
