@@ -34,9 +34,21 @@ describe("groupIntoStories", () => {
     expect(stories[0].matches).toHaveLength(3);
   });
 
-  it("starts another story after three", () => {
+  it("splits four matches into two stories of two, never three and one", () => {
     const stories = groupIntoStories(["1", "2", "3", "4"].map((id) => match(id, "brasileirao-serie-a")));
-    expect(stories.map((story) => story.matches.length)).toEqual([3, 1]);
+    expect(stories.map((story) => story.matches.length)).toEqual([2, 2]);
+    expect(stories.flatMap((story) => story.matches.map((m) => m.id))).toEqual(["1", "2", "3", "4"]);
+  });
+
+  it("splits any number as evenly as it can", () => {
+    const sizes = (count: number): number[] =>
+      groupIntoStories(Array.from({ length: count }, (_, i) => match(`m${i}`, "brasileirao-serie-a"))).map((story) => story.matches.length);
+    expect(sizes(1)).toEqual([1]);
+    expect(sizes(2)).toEqual([2]);
+    expect(sizes(3)).toEqual([3]);
+    expect(sizes(5)).toEqual([3, 2]);
+    expect(sizes(7)).toEqual([3, 2, 2]);
+    expect(sizes(10)).toEqual([3, 3, 2, 2]);
   });
 
   it("holds fewer when the channel rows make the blocks too tall", () => {
