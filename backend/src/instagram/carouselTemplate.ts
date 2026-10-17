@@ -630,11 +630,10 @@ const STORY_TOP_GAP = 24;
 /** The thin rule between two matches, with air above and below it (the crests and logos sat against it). */
 const STORY_DIVIDER_MARGIN = 10;
 export const STORY_DIVIDER_SPACE = 2 + 2 * STORY_DIVIDER_MARGIN;
-/** The smallest crest in a story: a little under the posts' (110), which is what buys the air above while still fitting three matches. */
-export const STORY_MIN_CREST = 96;
-const STORY_FOOTER_HEIGHT = 100;
+/** The smallest crest in a story: the same as in the posts, now that the logo no longer takes a row of its own. */
+export const STORY_MIN_CREST = 110;
 /** Vertical room the match blocks of one story share. */
-export const STORY_BLOCKS_HEIGHT = STORY_HEIGHT - STORY_SAFE_TOP - STORY_SAFE_BOTTOM - STORY_HEADER_HEIGHT - STORY_FOOTER_HEIGHT - STORY_TOP_GAP;
+export const STORY_BLOCKS_HEIGHT = STORY_HEIGHT - STORY_SAFE_TOP - STORY_SAFE_BOTTOM - STORY_HEADER_HEIGHT - STORY_TOP_GAP;
 /** At most this many matches in one story, even when they would fit more. */
 export const MAX_MATCHES_PER_STORY = 3;
 
@@ -656,6 +655,7 @@ export function buildStoryTree(input: StoryInput): SatoriElement {
     "div",
     {
       style: {
+        position: "relative",
         display: "flex",
         flexDirection: "column",
         width: STORY_WIDTH,
@@ -702,9 +702,8 @@ export function buildStoryTree(input: StoryInput): SatoriElement {
               ],
         ),
       ),
-      h("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", height: STORY_FOOTER_HEIGHT } }, [
-        h("img", { src: input.wordmarkDataUri, style: { height: 78 } }),
-      ]),
+      // The logo sits small in the bottom-right corner, in the margin Instagram keeps free, so it takes no height from the matches.
+      h("img", { src: input.wordmarkDataUri, style: { position: "absolute", right: SIDE_PADDING, bottom: STORY_SAFE_BOTTOM - 70, height: 60 } }),
     ],
   );
 }
