@@ -1,5 +1,5 @@
 import { findCompetitionById, groupMatchesByCompetition, type MatchView } from "@ondevaipassar/shared";
-import { MAX_MATCHES_PER_STORY, matchBlockMinHeight, STORY_BLOCKS_HEIGHT } from "./carouselTemplate.js";
+import { MAX_MATCHES_PER_STORY, matchBlockMinHeight, STORY_BLOCKS_HEIGHT, STORY_DIVIDER_SPACE, STORY_MIN_CREST } from "./carouselTemplate.js";
 
 /** One story: a single competition's matches, as many as fit one 9:16 image (never more than three). */
 export interface StoryGroup {
@@ -30,7 +30,8 @@ export function groupIntoStories(matches: MatchView[]): StoryGroup[] {
 /** Does this set of matches fit one story: at most three, and their blocks within the story's height. */
 function fitsOneStory(matches: MatchView[]): boolean {
   if (matches.length > MAX_MATCHES_PER_STORY) return false;
-  return matches.reduce((total, match) => total + matchBlockMinHeight({ channels: match.broadcasts as unknown[] as never[] }), 0) <= STORY_BLOCKS_HEIGHT;
+  const blocks = matches.reduce((total, match) => total + matchBlockMinHeight({ channels: match.broadcasts as unknown[] as never[] }, STORY_MIN_CREST), 0);
+  return blocks + Math.max(0, matches.length - 1) * STORY_DIVIDER_SPACE <= STORY_BLOCKS_HEIGHT;
 }
 
 /**

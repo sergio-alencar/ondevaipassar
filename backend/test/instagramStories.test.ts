@@ -1,6 +1,6 @@
 import type { MatchView } from "@ondevaipassar/shared";
 import { describe, expect, it } from "vitest";
-import { matchBlockMinHeight, STORY_BLOCKS_HEIGHT } from "../src/instagram/carouselTemplate.js";
+import { matchBlockMinHeight, STORY_BLOCKS_HEIGHT, STORY_DIVIDER_SPACE, STORY_MIN_CREST } from "../src/instagram/carouselTemplate.js";
 import { groupIntoStories } from "../src/instagram/storyGroups.js";
 
 const channel = (id: string) => ({ channelId: id, displayName: id, kind: "tv", url: "", logoUrl: "", regionalCaveat: false });
@@ -53,11 +53,11 @@ describe("groupIntoStories", () => {
 
   it("holds fewer when the channel rows make the blocks too tall", () => {
     const eightChannels = ["1", "2", "3"].map((id) => match(id, "libertadores-feminina", 8));
-    const need = eightChannels.reduce((total, m) => total + matchBlockMinHeight({ channels: m.broadcasts as never[] }), 0);
+    const need = eightChannels.reduce((total, m) => total + matchBlockMinHeight({ channels: m.broadcasts as never[] }, STORY_MIN_CREST), 0) + 2 * STORY_DIVIDER_SPACE;
     expect(need).toBeGreaterThan(STORY_BLOCKS_HEIGHT);
     const stories = groupIntoStories(eightChannels);
     for (const story of stories) {
-      expect(story.matches.reduce((total, m) => total + matchBlockMinHeight({ channels: m.broadcasts as never[] }), 0)).toBeLessThanOrEqual(STORY_BLOCKS_HEIGHT);
+      expect(story.matches.reduce((total, m) => total + matchBlockMinHeight({ channels: m.broadcasts as never[] }, STORY_MIN_CREST), 0) + Math.max(0, story.matches.length - 1) * STORY_DIVIDER_SPACE).toBeLessThanOrEqual(STORY_BLOCKS_HEIGHT);
     }
     expect(stories.flatMap((story) => story.matches)).toHaveLength(3);
   });

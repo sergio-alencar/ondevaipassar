@@ -248,14 +248,14 @@ const MAX_CREST = 180;
 const BLOCK_FIXED_NON_STRIP = 60 + 34;
 
 /** The least height a match block needs without overflowing: its fixed lines, its channel strip and the smallest crest. Stories pack matches by this. */
-export function matchBlockMinHeight(match: Pick<SlideMatch, "channels">): number {
-  return BLOCK_FIXED_NON_STRIP + channelStripLayout(match.channels.length).height + MIN_CREST;
+export function matchBlockMinHeight(match: Pick<SlideMatch, "channels">, minCrest: number = MIN_CREST): number {
+  return BLOCK_FIXED_NON_STRIP + channelStripLayout(match.channels.length).height + minCrest;
 }
 
-export function matchBlock(match: SlideMatch, blockHeight: number): SatoriElement {
+export function matchBlock(match: SlideMatch, blockHeight: number, minCrest: number = MIN_CREST): SatoriElement {
   const labelHeight = match.competitionLabel ? 44 : 0;
   const crestBudget = blockHeight - BLOCK_FIXED_NON_STRIP - channelStripLayout(match.channels.length).height - labelHeight;
-  const crestSize = Math.min(MAX_CREST, Math.max(MIN_CREST, crestBudget));
+  const crestSize = Math.min(MAX_CREST, Math.max(minCrest, crestBudget));
 
   return h(
     "div",
@@ -624,10 +624,17 @@ export const STORY_HEIGHT = 1920;
 // Instagram draws its own controls over the top and bottom of a story (profile row, reply bar): content stays out of them.
 const STORY_SAFE_TOP = 250;
 const STORY_SAFE_BOTTOM = 250;
-const STORY_HEADER_HEIGHT = 170;
+const STORY_HEADER_HEIGHT = 150;
+/** Air between the header's rule and the first crest, which sat right against it. */
+const STORY_TOP_GAP = 24;
+/** The thin rule between two matches, with air above and below it (the crests and logos sat against it). */
+const STORY_DIVIDER_MARGIN = 10;
+export const STORY_DIVIDER_SPACE = 2 + 2 * STORY_DIVIDER_MARGIN;
+/** The smallest crest in a story: a little under the posts' (110), which is what buys the air above while still fitting three matches. */
+export const STORY_MIN_CREST = 96;
 const STORY_FOOTER_HEIGHT = 100;
 /** Vertical room the match blocks of one story share. */
-export const STORY_BLOCKS_HEIGHT = STORY_HEIGHT - STORY_SAFE_TOP - STORY_SAFE_BOTTOM - STORY_HEADER_HEIGHT - STORY_FOOTER_HEIGHT;
+export const STORY_BLOCKS_HEIGHT = STORY_HEIGHT - STORY_SAFE_TOP - STORY_SAFE_BOTTOM - STORY_HEADER_HEIGHT - STORY_FOOTER_HEIGHT - STORY_TOP_GAP;
 /** At most this many matches in one story, even when they would fit more. */
 export const MAX_MATCHES_PER_STORY = 3;
 
@@ -642,7 +649,7 @@ export interface StoryInput {
 
 /** One story: one competition's matches (up to three), its name and logo on top. */
 export function buildStoryTree(input: StoryInput): SatoriElement {
-  const dividers = Math.max(0, input.matches.length - 1) * 2;
+  const dividers = Math.max(0, input.matches.length - 1) * STORY_DIVIDER_SPACE;
   const blockHeight = Math.floor((STORY_BLOCKS_HEIGHT - dividers) / Math.max(input.matches.length, 1));
 
   return h(
@@ -685,13 +692,13 @@ export function buildStoryTree(input: StoryInput): SatoriElement {
       ),
       h(
         "div",
-        { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: STORY_BLOCKS_HEIGHT } },
+        { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: STORY_BLOCKS_HEIGHT, marginTop: STORY_TOP_GAP } },
         input.matches.flatMap((match, index) =>
           index === 0
-            ? [matchBlock({ ...match, competitionLabel: null }, blockHeight)]
+            ? [matchBlock({ ...match, competitionLabel: null }, blockHeight, STORY_MIN_CREST)]
             : [
-                h("div", { style: { display: "flex", width: CONTENT_WIDTH * 0.55, height: 2, backgroundColor: GRAY_200 } }),
-                matchBlock({ ...match, competitionLabel: null }, blockHeight),
+                h("div", { style: { display: "flex", width: CONTENT_WIDTH * 0.55, height: 2, backgroundColor: GRAY_200, margin: `${STORY_DIVIDER_MARGIN}px 0` } }),
+                matchBlock({ ...match, competitionLabel: null }, blockHeight, STORY_MIN_CREST),
               ],
         ),
       ),
