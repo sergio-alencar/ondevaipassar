@@ -12,8 +12,14 @@
 
 /** Carousels per run: the rest waits for the next trigger. */
 export const MAX_CAROUSELS_PER_RUN = 1;
-/** Minimum time between two publications. */
+/** Minimum time between two publications when the next one is a feed post. */
 export const MIN_GAP_BETWEEN_POSTS_MS = 15 * 60 * 1000;
+/**
+ * Minimum time before a STORY (after any earlier publication, feed or story). Shorter than the posts': people
+ * post stories in quick succession. Lowered from 15 to 10 minutes on 2026-10-17 as an experiment, to be watched:
+ * if Instagram's "automated behavior" warning comes back, this goes back up.
+ */
+export const MIN_GAP_BETWEEN_STORIES_MS = 10 * 60 * 1000;
 /** Carousels in any rolling 24 hours. A busy day's lowest-priority groups are simply not posted. */
 export const MAX_CAROUSELS_PER_DAY = 6;
 
@@ -38,10 +44,11 @@ export function pacingBlock(
   now: number = Date.now(),
   all: RecentPost[] = recent,
   cap: number = MAX_CAROUSELS_PER_DAY,
+  gapMs: number = MIN_GAP_BETWEEN_POSTS_MS,
 ): PacingBlock | null {
   const publications = new Set(recent.map((post) => post.igMediaId ?? post.postedAt));
   if (publications.size >= cap) return "daily-cap";
   const latest = all.reduce((most, post) => Math.max(most, Date.parse(post.postedAt)), 0);
-  if (latest > 0 && now - latest < MIN_GAP_BETWEEN_POSTS_MS) return "too-soon";
+  if (latest > 0 && now - latest < gapMs) return "too-soon";
   return null;
 }

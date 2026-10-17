@@ -1,7 +1,7 @@
 name: Instagram post
 
-# Posts at most ONE publication per call, with at least 15 minutes between two
-# publications (feed posts and stories alike) and a daily cap — all enforced by
+# Posts at most ONE publication per call, with a minimum wait between two
+# publications (15 for a feed post, 10 for a story) and a daily cap — all enforced by
 # the backend itself (see backend/src/instagram/pacing.ts), so any trigger can
 # fire without ever adding up to a burst.
 #
@@ -9,7 +9,7 @@ name: Instagram post
 #  1. Vercel Cron, 10:05 UTC (07:05 in Brasília), calls the backend once. That
 #     is the one trigger that fires on time. It publishes the day's feed post
 #     and then wakes THIS workflow in "sequence" mode through GitHub's API.
-#  2. The sequence run calls the backend, waits 15 minutes, calls it again, and
+#  2. The sequence run calls the backend, waits 10 minutes, calls it again, and
 #     so on: each call publishes the next story, until nothing is left.
 #  3. The schedule below is only a safety net: GitHub's scheduler is best-effort
 #     and runs hours late (4 to 9 hours, most days), so it cannot be what the
@@ -26,7 +26,7 @@ on:
   workflow_dispatch:
     inputs:
       sequence:
-        description: "Keep going: call, wait 15 minutes, call again, until nothing is left"
+        description: "Keep going: call, wait 10 minutes, call again, until nothing is left"
         type: boolean
         default: false
 
@@ -90,6 +90,6 @@ jobs:
             fi
 
             [ "$call" = "$MAX_CALLS" ] && break
-            echo "Waiting 15 minutes and a few seconds before the next publication..."
-            sleep 905
+            echo "Waiting 10 minutes and a few seconds before the next story..."
+            sleep 605
           done

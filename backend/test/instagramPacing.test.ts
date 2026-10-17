@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_CAROUSELS_PER_DAY, MIN_GAP_BETWEEN_POSTS_MS, pacingBlock } from "../src/instagram/pacing.js";
+import { MAX_CAROUSELS_PER_DAY, MIN_GAP_BETWEEN_POSTS_MS, MIN_GAP_BETWEEN_STORIES_MS, pacingBlock } from "../src/instagram/pacing.js";
 
 const NOW = Date.parse("2026-10-14T13:00:00Z");
 const at = (minutesAgo: number, media: string) => ({ igMediaId: media, postedAt: new Date(NOW - minutesAgo * 60_000).toISOString() });
@@ -10,6 +10,13 @@ describe("pacingBlock", () => {
   it("waits when the last post was too recent", () => {
     expect(pacingBlock([at(5, "a")], NOW)).toBe("too-soon");
     expect(pacingBlock([at(MIN_GAP_BETWEEN_POSTS_MS / 60_000 + 1, "a")], NOW)).toBeNull();
+  });
+
+  it("lets a story follow after 10 minutes, where a feed post needs 15", () => {
+    const eleven = [at(11, "a")];
+    expect(pacingBlock([], NOW, eleven, 12, MIN_GAP_BETWEEN_STORIES_MS)).toBeNull();
+    expect(pacingBlock(eleven, NOW)).toBe("too-soon");
+    expect(pacingBlock([], NOW, [at(9, "a")], 12, MIN_GAP_BETWEEN_STORIES_MS)).toBe("too-soon");
   });
 
   it("counts a carousel once even though it has one row per match", () => {

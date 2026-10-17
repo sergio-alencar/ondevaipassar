@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { MAX_CAROUSELS_PER_RUN, MAX_STORIES_PER_DAY, pacingBlock, type PacingBlock, type RecentPost } from "./pacing.js";
+import { MAX_CAROUSELS_PER_RUN, MAX_STORIES_PER_DAY, MIN_GAP_BETWEEN_STORIES_MS, pacingBlock, type PacingBlock, type RecentPost } from "./pacing.js";
 import { groupIntoStories, type StoryGroup } from "./storyGroups.js";
 import { isTodayInBrasilia, type MatchView } from "@ondevaipassar/shared";
 import { env } from "../config/env.js";
@@ -357,7 +357,7 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
 
 /**
  * Publishes the next story, if one is due and the pacing allows it. One story
- * per run, with the same 15-minute gap as the feed posts (counted across both),
+ * per run, with a 10-minute gap (counted across feed posts and stories),
  * so a morning of stories is spread out like a person's, not fired in a burst.
  * A story is a single image published on its own, so there is no carousel step:
  * container, wait until processed, publish, record. The same ambiguity rule as
@@ -371,7 +371,7 @@ async function runNextStory(summary: PostingSummary, graphApi: GraphApiClient): 
 
   if (!env.INSTAGRAM_DRY_RUN) {
     const recent = await recentPublications();
-    const block = pacingBlock(recent.stories, Date.now(), recent.all, MAX_STORIES_PER_DAY);
+    const block = pacingBlock(recent.stories, Date.now(), recent.all, MAX_STORIES_PER_DAY, MIN_GAP_BETWEEN_STORIES_MS);
     if (block) {
       summary.paced = block;
       summary.skipped = storyMatches(stories);
