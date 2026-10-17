@@ -1,58 +1,95 @@
 name: Instagram post
 
-# Posts at most ONE carousel per call, with at least 15 minutes between two
-# publications and at most 6 a day — all enforced by the backend itself (see
-# backend/src/instagram/pacing.ts), so any trigger (this schedule, the Vercel
-# Cron at 10:05 UTC, a manual run) can fire without ever adding up to a burst.
+# Posts at most ONE publication per call, with at least 15 minutes between two
+# publications (feed posts and stories alike) and a daily cap — all enforced by
+# the backend itself (see backend/src/instagram/pacing.ts), so any trigger can
+# fire without ever adding up to a burst.
 #
-# Why: on 2026-10-13/14 the Instagram account was flagged for "automated
-# behavior" after days when a dozen carousels went out within a minute or two
-# (plus deletions and re-posts in between). This used to be a retry loop that
-# drained everything at once; now it is one call per run, and the schedule
-# spreads the day's posts out.
+# How the day goes:
+#  1. Vercel Cron, 10:05 UTC (07:05 in Brasília), calls the backend once. That
+#     is the one trigger that fires on time. It publishes the day's feed post
+#     and then wakes THIS workflow in "sequence" mode through GitHub's API.
+#  2. The sequence run calls the backend, waits 15 minutes, calls it again, and
+#     so on: each call publishes the next story, until nothing is left.
+#  3. The schedule below is only a safety net: GitHub's scheduler is best-effort
+#     and runs hours late (4 to 9 hours, most days), so it cannot be what the
+#     morning depends on. A late scheduled run is harmless, because the gap is
+#     checked on the server.
 #
-# GitHub's own scheduler is best-effort and often hours late; that only delays
-# a post, it never bunches them, because the gap is checked on the server.
+# History: on 2026-10-13/14 the Instagram account was flagged for "automated
+# behavior" after days when a dozen carousels went out within a minute or two.
+# On 2026-10-17 the feed post went out at 07:05 and no story did, because the
+# stories waited on the late schedule.
 on:
   schedule:
-    # Every 15 minutes between 10:00 and 16:59 UTC (07:00-13:59 in Brasília):
-    # enough slots for the day's cap, early enough that morning posts are not
-    # left for the afternoon. Most runs find nothing to do and end at once.
     - cron: "*/15 10-16 * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      sequence:
+        description: "Keep going: call, wait 15 minutes, call again, until nothing is left"
+        type: boolean
+        default: false
+
+# One at a time: two sequences must never interleave their calls.
+concurrency:
+  group: instagram-post
+  cancel-in-progress: false
 
 jobs:
   post:
     runs-on: ubuntu-latest
+    timeout-minutes: 240
     steps:
-      - name: Post the next carousel, if the pacing allows one
+      - name: Post the next publication(s), if the pacing allows
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SEQUENCE: ${{ inputs.sequence }}
         run: |
-          set -euo pipefail
-          http_code=$(curl -s -o /tmp/response.json -w "%{http_code}" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            "https://api.ondevaipassar.com/api/cron-instagram-post")
-          body=$(cat /tmp/response.json)
-          echo "HTTP $http_code -> $body"
+          set -uo pipefail
+          # A scheduled or plain manual run makes one call; a sequence keeps going.
+          if [ "${SEQUENCE:-false}" = "true" ]; then MAX_CALLS=12; else MAX_CALLS=1; fi
 
-          if [ "$http_code" != "200" ]; then
-            echo "::error::cron-instagram-post returned HTTP $http_code"
-            exit 1
-          fi
+          for call in $(seq 1 "$MAX_CALLS"); do
+            http_code=$(curl -s -m 100 -o /tmp/response.json -w "%{http_code}" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              "https://api.ondevaipassar.com/api/cron-instagram-post")
+            body=$(cat /tmp/response.json)
+            echo "call $call/$MAX_CALLS: HTTP $http_code -> $body"
 
-          # Meta blocked the account: stop and say so (this fails the run, which e-mails).
-          if [ "$(echo "$body" | jq -r '.blocked // false')" = "true" ]; then
-            echo "::error::Meta rate-limited the account. Nothing more will be posted until it is looked at."
-            exit 1
-          fi
+            if [ "$http_code" != "200" ]; then
+              echo "::error::cron-instagram-post returned HTTP $http_code"
+              exit 1
+            fi
+            # Meta blocked the account: stop and say so (this fails the run, which e-mails).
+            if [ "$(echo "$body" | jq -r '.blocked // false')" = "true" ]; then
+              echo "::error::Meta rate-limited the account. Nothing more will be posted until it is looked at."
+              exit 1
+            fi
+            # A publish whose outcome is unknown may be live on the account: never retried automatically.
+            if [ "$(echo "$body" | jq -r '.unknown // 0')" != "0" ]; then
+              echo "::error::A post may or may not be live. Check the Instagram account before anything is reset."
+              exit 1
+            fi
+            if [ "$(echo "$body" | jq -r '.failed // 0')" != "0" ]; then
+              echo "::warning::A publication failed this run; the next call will try it again."
+            fi
 
-          # A publish whose outcome is unknown may be live on the account: never retried automatically.
-          if [ "$(echo "$body" | jq -r '.unknown // 0')" != "0" ]; then
-            echo "::error::A post may or may not be live — check the Instagram account before anything is reset."
-            exit 1
-          fi
+            published=$(echo "$body" | jq -r '.published // 0')
+            pending=$(echo "$body" | jq -r '.pending // 0')
+            paced=$(echo "$body" | jq -r '.paced // "none"')
 
-          if [ "$(echo "$body" | jq -r '.failed // 0')" != "0" ]; then
-            echo "::warning::A carousel failed this run; the next run will try it again."
-          fi
+            # Nothing left to publish and nothing waiting on the gap: the day is done.
+            if [ "$published" = "0" ] && [ "$pending" = "0" ] && [ "$paced" = "none" ]; then
+              echo "Nothing left to post."
+              exit 0
+            fi
+            # Paused, or the daily cap is reached: waiting would change nothing.
+            if [ "$paced" = "paused" ] || [ "$paced" = "daily-cap" ]; then
+              echo "Stopping: $paced."
+              exit 0
+            fi
+
+            [ "$call" = "$MAX_CALLS" ] && break
+            echo "Waiting 15 minutes and a few seconds before the next publication..."
+            sleep 905
+          done

@@ -15,9 +15,34 @@ const querySchema = z.object({
   matchId: z.string().optional(),
   // "stories": run only the stories, leaving the feed post for later.
   only: z.enum(["stories"]).optional(),
+  // "cron": this is the daily Vercel Cron call (vercel.json adds it to the path); after it, the story sequence is started.
+  trigger: z.enum(["cron"]).optional(),
 });
 
 const resetQuerySchema = z.object({ matchId: z.string(), story: z.enum(["true", "false"]).optional() });
+
+/** Starts the "Instagram post" workflow in sequence mode through GitHub's API. True when GitHub accepted it. */
+async function wakeStorySequence(log: { warn: (message: string) => void }): Promise<boolean> {
+  if (!env.GITHUB_DISPATCH_TOKEN) return false;
+  try {
+    const response = await fetch(`https://api.github.com/repos/${env.GITHUB_REPOSITORY}/actions/workflows/instagram-post.yml/dispatches`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.GITHUB_DISPATCH_TOKEN}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "ondevaipassar-api",
+      },
+      body: JSON.stringify({ ref: "main", inputs: { sequence: "true" } }),
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (response.status !== 204) log.warn(`[instagram] waking the story sequence failed: HTTP ${response.status}`);
+    return response.status === 204;
+  } catch (error) {
+    log.warn(`[instagram] waking the story sequence failed: ${error instanceof Error ? error.message : String(error)}`);
+    return false;
+  }
+}
 
 /**
  * Triggered from TWO independent places on purpose, both daily, both
@@ -57,7 +82,11 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
 
     const summary = await runInstagramPosting({ onlyMatchId: parsedQuery.data.matchId, storiesOnly: parsedQuery.data.only === "stories" });
 
-    return { status: "ok", ranAt: new Date().toISOString(), ...summary };
+    // The daily cron call is the one trigger that always fires on time. After it, wake the workflow that spreads the
+    // day's stories out (15 minutes apart); failing to wake it is logged, never an error for the post itself.
+    const woke =
+      parsedQuery.data.trigger === "cron" && summary.paced !== "paused" ? await wakeStorySequence(request.log) : false;
+    return { status: "ok", ranAt: new Date().toISOString(), ...summary, woke };
   });
 
   // Today's posts as the poster would make them (captions and image URLs), for the daily e-mail that replaces automatic posting while the account recovers. Read-only.

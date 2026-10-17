@@ -52,6 +52,11 @@ const envSchema = z.object({
   // says 10, and the 20 is being rolled out account by account: stays at 10 until a test on the real
   // account shows the API takes more (GET /api/instagram-probe). Never above 20.
   INSTAGRAM_MAX_CAROUSEL_ITEMS: z.coerce.number().int().min(2).max(20).default(10),
+  // Fine-grained GitHub token, Actions: read and write on this one repository. The 7:05 cron call uses it to wake
+  // the "Instagram post" workflow, which then posts the day's stories 15 minutes apart (GitHub's own schedule runs
+  // hours late). It can only start workflows. Unset = no wake-up, and the stories wait for the late schedule.
+  GITHUB_DISPATCH_TOKEN: z.string().optional(),
+  GITHUB_REPOSITORY: z.string().default("sergio-alencar/ondevaipassar"),
   INSTAGRAM_DRY_RUN: z
     .string()
     .optional()
