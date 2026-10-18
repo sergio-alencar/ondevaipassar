@@ -33,7 +33,7 @@ async function wakeStorySequence(log: { warn: (message: string) => void }): Prom
         "X-GitHub-Api-Version": "2022-11-28",
         "User-Agent": "ondevaipassar-api",
       },
-      body: JSON.stringify({ ref: "main", inputs: { sequence: "true" } }),
+      body: JSON.stringify({ ref: "main", inputs: { sequence: "true", initial_wait: "120" } }),
       signal: AbortSignal.timeout(8_000),
     });
     if (response.status !== 204) log.warn(`[instagram] waking the story sequence failed: HTTP ${response.status}`);
@@ -80,12 +80,14 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
       return reply.status(400).send({ error: "invalid query params", details: parsedQuery.error.flatten() });
     }
 
+    // The daily cron call wakes the story sequence FIRST, telling it to wait two minutes before its first call: the
+    // post below can take most of a minute, and if this function is ever cut off (it was, 2026-10-18) the sequence
+    // still starts on its own. The wait keeps its first call from overlapping this one.
+    const woke =
+      parsedQuery.data.trigger === "cron" && !env.INSTAGRAM_PAUSED ? await wakeStorySequence(request.log) : false;
+
     const summary = await runInstagramPosting({ onlyMatchId: parsedQuery.data.matchId, storiesOnly: parsedQuery.data.only === "stories" });
 
-    // The daily cron call is the one trigger that always fires on time. After it, wake the workflow that spreads the
-    // day's stories out (15 minutes apart); failing to wake it is logged, never an error for the post itself.
-    const woke =
-      parsedQuery.data.trigger === "cron" && summary.paced !== "paused" ? await wakeStorySequence(request.log) : false;
     return { status: "ok", ranAt: new Date().toISOString(), ...summary, woke };
   });
 
@@ -138,6 +140,31 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
     } catch (error) {
       return { children, childrenCreated: childIds.length, accepted: false, error: error instanceof Error ? error.message : String(error) };
     }
+  });
+
+  // Operator-only: records today's matches as already published WITHOUT posting anything, for when a post is live but its
+  // record was lost (function killed mid-publish). ?all=today, or ?matchIds=a,b; &story=true for stories.
+  app.get("/api/cron-instagram-mark", async (request, reply) => {
+    if (env.CRON_SECRET && request.headers.authorization !== `Bearer ${env.CRON_SECRET}`) {
+      return reply.status(401).send({ error: "unauthorized" });
+    }
+    const query = request.query as { all?: string; matchIds?: string; story?: string };
+    const ids =
+      query.all === "today"
+        ? (await getMatchViews({})).filter((match) => isTodayInBrasilia(match.kickoffUtc) && match.broadcasts.length > 0).map((match) => match.id)
+        : (query.matchIds ?? "").split(",").filter(Boolean);
+    if (ids.length === 0) return reply.status(400).send({ error: "no matches given" });
+    const prefix = query.story === "true" ? STORY_ID_PREFIX : "";
+    const now = new Date().toISOString();
+    const rows = ids.map((id) =>
+      db
+        .insert(instagramPosts)
+        .values({ id: `${prefix}${id}`, matchId: `${prefix}${id}`, status: "published", igMediaId: "recorded-by-hand", postedAt: now, createdAt: now })
+        .onConflictDoUpdate({ target: instagramPosts.id, set: { status: "published", igMediaId: "recorded-by-hand", postedAt: now, errorMessage: null } }),
+    );
+    const [first, ...rest] = rows;
+    await db.batch([first, ...rest]);
+    return { status: "ok", marked: ids.length, story: query.story === "true" };
   });
 
   // Operator-only escape hatch, not part of the daily flow: clears a

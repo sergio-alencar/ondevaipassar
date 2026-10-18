@@ -29,6 +29,10 @@ on:
         description: "Keep going: call, wait 10 minutes, call again, until nothing is left"
         type: boolean
         default: false
+      initial_wait:
+        description: "Seconds to wait before the first call (the 7:05 cron call is still posting)"
+        type: string
+        default: "0"
 
 # One at a time: two sequences must never interleave their calls.
 concurrency:
@@ -44,10 +48,13 @@ jobs:
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           SEQUENCE: ${{ inputs.sequence }}
+          INITIAL_WAIT: ${{ inputs.initial_wait }}
         run: |
           set -uo pipefail
           # A scheduled or plain manual run makes one call; a sequence keeps going.
           if [ "${SEQUENCE:-false}" = "true" ]; then MAX_CALLS=12; else MAX_CALLS=1; fi
+
+          [ "${INITIAL_WAIT:-0}" -gt 0 ] 2>/dev/null && sleep "$INITIAL_WAIT"
 
           for call in $(seq 1 "$MAX_CALLS"); do
             http_code=$(curl -s -m 100 -o /tmp/response.json -w "%{http_code}" \

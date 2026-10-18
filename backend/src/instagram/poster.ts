@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import { mapWithConcurrency } from "../lib/concurrency.js";
 import { MAX_CAROUSELS_PER_RUN, MAX_STORIES_PER_DAY, MIN_GAP_BETWEEN_STORIES_MS, pacingBlock, type PacingBlock, type RecentPost } from "./pacing.js";
 import { groupIntoStories, type StoryGroup } from "./storyGroups.js";
 import { isTodayInBrasilia, type MatchView } from "@ondevaipassar/shared";
@@ -81,6 +82,22 @@ async function excludeAlreadyPublished(matches: MatchView[]): Promise<MatchView[
       .map((row) => row.matchId),
   );
   return matches.filter((match) => !settled.has(match.id));
+}
+
+/** The latest moment (ms into a run) a publish may still start: past it the run gives up cleanly, with the 60-second function limit still ahead. */
+const PUBLISH_DEADLINE_MS = 42_000;
+
+/** Writes "unknown" rows just before a publish call, so a function killed mid-publish can never lead to the same post going out twice. They become "published" (or "failed") right after. */
+async function markPublishing(ids: string[]): Promise<void> {
+  const now = new Date().toISOString();
+  const rows = ids.map((id) =>
+    db
+      .insert(instagramPosts)
+      .values({ id, matchId: id, status: "unknown", errorMessage: "publishing (no answer recorded yet)", createdAt: now })
+      .onConflictDoUpdate({ target: instagramPosts.id, set: { status: "unknown", errorMessage: "publishing (no answer recorded yet)" } }),
+  );
+  const [first, ...rest] = rows;
+  await db.batch([first, ...rest]);
 }
 
 /** Rows of stories live under their own ids ("story:<matchId>", in matchId too), so a story never counts as the match's feed post. */
@@ -274,14 +291,12 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
     // single blocked account turned into dozens of duplicates).
     let phase: "create" | "poll" | "publish" | "record" = "create";
     try {
-      const childIds: string[] = [];
-      for (const imageUrl of imageUrls) {
-        childIds.push(await graphApi.createCarouselItem(imageUrl));
-      }
+      // Every image at once (5 at a time): Instagram fetches each from our render route, and one after another a
+      // 9-image post took longer than the function's 60 seconds (2026-10-18: the post went live, the function died
+      // before recording it). Order matters for a carousel, and mapWithConcurrency keeps it.
+      const childIds = await mapWithConcurrency(imageUrls, 5, (imageUrl) => graphApi.createCarouselItem(imageUrl));
       phase = "poll";
-      for (const childId of childIds) {
-        await graphApi.pollUntilFinished(childId);
-      }
+      await mapWithConcurrency(childIds, 5, (childId) => graphApi.pollUntilFinished(childId));
 
       phase = "create";
       // Always a carousel: the cover is an image of its own, so even a
@@ -292,6 +307,11 @@ export async function runInstagramPosting(options: RunPostingOptions = {}): Prom
       const containerId = await graphApi.createCarousel(childIds, caption);
       phase = "poll";
       await graphApi.pollUntilFinished(containerId);
+      // Out of time: stop BEFORE publishing (nothing is live yet, so this is a plain failure the next call retries).
+      if (Date.now() - runStartedAt > PUBLISH_DEADLINE_MS) throw new Error(`Ran out of time before publishing (${Date.now() - runStartedAt} ms)`);
+      // Mark these matches "unknown" BEFORE the publish call. If the function is killed anywhere from here on, the post may
+      // be live without a record, and the marker is what keeps the next call from publishing it a second time.
+      await markPublishing(group.matches.map((match) => match.id));
       phase = "publish";
       const igMediaId = await graphApi.publishContainer(containerId);
       phase = "record";
@@ -400,6 +420,7 @@ async function runNextStory(summary: PostingSummary, graphApi: GraphApiClient): 
     const containerId = await graphApi.createStory(imageUrl);
     phase = "poll";
     await graphApi.pollUntilFinished(containerId);
+    await markPublishing(story.matches.map((match) => `${STORY_ID_PREFIX}${match.id}`));
     phase = "publish";
     const igMediaId = await graphApi.publishContainer(containerId);
     phase = "record";
