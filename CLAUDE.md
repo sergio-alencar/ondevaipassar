@@ -31,6 +31,10 @@ Não existe API estruturada e gratuita para "que canal transmite esse jogo" no B
 - Ao mexer no frontend, suba o dev server (`npm run dev`) e confira no navegador antes de dar por concluído.
 - Deploy é via `vercel deploy --prod` a partir da raiz do repo (precisa estar linkado ao projeto certo — `vercel link --project ondevaipassar-api` pro backend, `--project ondevaipassar` pro front; só um projeto fica linkado por vez em `.vercel/`). **`CRON_SECRET` vive em dois lugares**: na Vercel (projeto `ondevaipassar-api`) e no segredo `CRON_SECRET` do GitHub (`gh secret set CRON_SECRET`), que o workflow do Instagram usa. Trocar um sem o outro faz o workflow tomar 401 todo dia e o Instagram parar na metade (aconteceu em 12–13/10/2026). Trocou a da Vercel? Atualize o GitHub na mesma hora e faça redeploy. Nunca commitar `.env`/tokens — variáveis de produção ficam só no painel da Vercel (`vercel env`).
 
+## Textos que saem do sistema: sem travessões
+
+Legendas do Instagram e o texto do Canal do WhatsApp (`backend/src/instagram/caption.ts`, `backend/src/digest/digest.ts`) **não usam travessão** (— ou –): o Sérgio os tirou. Entre o jogo e os canais vai a barra vertical (`20h *A x B* | Premiere, SporTV`), o título do digest usa `|` entre o assunto e a data, e as notas viram frase com vírgula. Texto novo que saia para fora do site segue a mesma regra, e há teste que falha se aparecer travessão.
+
 ## Contas opcionais ("Entrar com Google")
 
 O site funciona inteiro sem conta; a conta só **sincroniza** os times e canais favoritos entre aparelhos. As preferências nascem em `localStorage` (`frontend/src/context/PreferencesProvider.tsx`) e a regra de quem vence quando aparelho e conta divergem está em `packages/shared/src/preferences.ts` (`reconcilePreferences`, três casos, com teste).
