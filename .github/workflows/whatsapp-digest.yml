@@ -1,0 +1,65 @@
+name: WhatsApp daily text
+
+# The Canal do WhatsApp has no posting API (Meta's developer documentation lists none), and driving
+# WhatsApp Web with a script would break WhatsApp's terms and risk the phone number. So the text is
+# made ready instead: every morning a GitHub issue opens with today's listing in a block, and GitHub
+# e-mails the @mention. Copy the block (the code block has a copy button), paste it in the channel.
+#
+# The text is the one /digest shows, from the same endpoint (/api/digest), so the two are identical.
+#
+# Woken by the 07:05 Vercel Cron call through GitHub's API (the one trigger that fires on time), with
+# the schedule below as a late safety net; whichever starts first opens the day's issue and the others
+# find it and stop.
+on:
+  schedule:
+    - cron: "35 10 * * *"
+    - cron: "5 11 * * *"
+    - cron: "35 11 * * *"
+    - cron: "5 12 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  issues: write
+
+# One at a time, so two starts together can't both open today's issue.
+concurrency:
+  group: whatsapp-digest
+  cancel-in-progress: false
+
+jobs:
+  text:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open today's issue with the WhatsApp text
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          today=$(TZ=America/Sao_Paulo date +"%d/%m/%Y")
+
+          # An automatic start does nothing when today's issue is already there; a manual one always makes a new one.
+          if [ "$EVENT" != "workflow_dispatch" ]; then
+            found=$(gh issue list --label whatsapp --state all --search "\"Canal do WhatsApp\" \"$today\" in:title" --json number -q 'length')
+            if [ "$found" != "0" ]; then echo "Today's issue already exists."; exit 0; fi
+          fi
+
+          curl -s -f -m 60 "https://api.ondevaipassar.com/api/digest?json=true&dia=hoje" -o /tmp/digest.json
+          count=$(jq '.matchCount' /tmp/digest.json)
+          if [ "$count" = "0" ]; then echo "No matches today; no text to post."; exit 0; fi
+
+          {
+            echo "@sergio-alencar, o texto do Canal do WhatsApp de hoje ($today), $count jogo(s). Copie o bloco abaixo (o botão de copiar fica no canto do bloco) e cole no canal."
+            echo
+            echo '````'
+            jq -r '.posts[0]' /tmp/digest.json
+            echo '````'
+          } > /tmp/body.md
+
+          gh label create whatsapp --color 25D366 --description "Texto do dia para o Canal do WhatsApp" --force >/dev/null 2>&1 || true
+          # Yesterday's issues are done with: keep one open at a time.
+          for old in $(gh issue list --label whatsapp --state open --json number -q '.[].number'); do
+            gh issue close "$old" --comment "Substituída pela de hoje." >/dev/null
+          done
+          gh issue create --title "Canal do WhatsApp — $today" --label whatsapp --body-file /tmp/body.md

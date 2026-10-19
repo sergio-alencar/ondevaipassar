@@ -21,11 +21,11 @@ const querySchema = z.object({
 
 const resetQuerySchema = z.object({ matchId: z.string(), story: z.enum(["true", "false"]).optional() });
 
-/** Starts the "Instagram post" workflow in sequence mode through GitHub's API. True when GitHub accepted it. */
-async function wakeStorySequence(log: { warn: (message: string) => void }): Promise<boolean> {
+/** Starts a workflow of this repository through GitHub's API. True when GitHub accepted it. */
+async function wakeWorkflow(file: string, inputs: Record<string, string>, log: { warn: (message: string) => void }): Promise<boolean> {
   if (!env.GITHUB_DISPATCH_TOKEN) return false;
   try {
-    const response = await fetch(`https://api.github.com/repos/${env.GITHUB_REPOSITORY}/actions/workflows/instagram-post.yml/dispatches`, {
+    const response = await fetch(`https://api.github.com/repos/${env.GITHUB_REPOSITORY}/actions/workflows/${file}/dispatches`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${env.GITHUB_DISPATCH_TOKEN}`,
@@ -33,13 +33,13 @@ async function wakeStorySequence(log: { warn: (message: string) => void }): Prom
         "X-GitHub-Api-Version": "2022-11-28",
         "User-Agent": "ondevaipassar-api",
       },
-      body: JSON.stringify({ ref: "main", inputs: { sequence: "true", initial_wait: "120" } }),
+      body: JSON.stringify({ ref: "main", inputs }),
       signal: AbortSignal.timeout(8_000),
     });
-    if (response.status !== 204) log.warn(`[instagram] waking the story sequence failed: HTTP ${response.status}`);
+    if (response.status !== 204) log.warn(`[instagram] waking ${file} failed: HTTP ${response.status}`);
     return response.status === 204;
   } catch (error) {
-    log.warn(`[instagram] waking the story sequence failed: ${error instanceof Error ? error.message : String(error)}`);
+    log.warn(`[instagram] waking ${file} failed: ${error instanceof Error ? error.message : String(error)}`);
     return false;
   }
 }
@@ -83,8 +83,13 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
     // The daily cron call wakes the story sequence FIRST, telling it to wait two minutes before its first call: the
     // post below can take most of a minute, and if this function is ever cut off (it was, 2026-10-18) the sequence
     // still starts on its own. The wait keeps its first call from overlapping this one.
+    const isDailyCron = parsedQuery.data.trigger === "cron";
     const woke =
-      parsedQuery.data.trigger === "cron" && !env.INSTAGRAM_PAUSED ? await wakeStorySequence(request.log) : false;
+      isDailyCron && !env.INSTAGRAM_PAUSED
+        ? await wakeWorkflow("instagram-post.yml", { sequence: "true", initial_wait: "120" }, request.log)
+        : false;
+    // The day's text for the Canal do WhatsApp: the same wake-up, a different workflow (it makes the issue to copy from).
+    if (isDailyCron) await wakeWorkflow("whatsapp-digest.yml", {}, request.log);
 
     const summary = await runInstagramPosting({ onlyMatchId: parsedQuery.data.matchId, storiesOnly: parsedQuery.data.only === "stories" });
 
