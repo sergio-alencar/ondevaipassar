@@ -28,10 +28,10 @@ describe("buildDigest", () => {
   it("renders one match end to end, with no footnote when nothing needs one", () => {
     expect(buildDigest([buildMatch()], NOW)).toBe(
       [
-        "⚽ *Onde assistir aos jogos de hoje — sábado, 5/set*",
+        "⚽ *Onde assistir aos jogos de hoje | sábado, 5/set*",
         "",
         "*Campeonato Brasileiro Série A*",
-        "18h30 *São Paulo x Atlético-MG* — Premiere",
+        "18h30 *São Paulo x Atlético-MG* | Premiere",
         "",
         "Mais detalhes: https://ondevaipassar.com",
       ].join("\n"),
@@ -60,7 +60,7 @@ describe("buildDigest", () => {
 
   it("says 'Transmissão a confirmar' for a match with no broadcast, matching the site's own wording", () => {
     expect(buildDigest([buildMatch({ broadcasts: [] })], NOW)).toContain(
-      "18h30 *São Paulo x Atlético-MG* — Transmissão a confirmar",
+      "18h30 *São Paulo x Atlético-MG* | Transmissão a confirmar",
     );
   });
 
@@ -75,7 +75,7 @@ describe("buildDigest", () => {
       ],
       NOW,
     );
-    expect(digest).toContain("— Globo 🆓");
+    expect(digest).toContain("| Globo 🆓");
     expect(digest).toContain("   📍 Globo em: RJ, ES, MG e BA");
     expect(digest).not.toContain("(regional)");
   });
@@ -89,7 +89,7 @@ describe("buildDigest", () => {
     } as Partial<MatchView>);
     const digest = buildDigest([withCaveat, { ...withCaveat, id: "b", kickoffUtc: "2026-09-05T23:00:00.000Z" }], NOW);
 
-    expect(digest).toContain("— Globo 🆓 (regional), Premiere");
+    expect(digest).toContain("| Globo 🆓 (regional), Premiere");
     expect(digest.match(/A transmissão pela Globo pode variar/g)).toHaveLength(1);
   });
 
@@ -119,7 +119,7 @@ describe("buildDigest", () => {
       ],
       NOW,
     );
-    expect(digest).toContain("— ge TV 🆓, Premiere");
+    expect(digest).toContain("| ge TV 🆓, Premiere");
     expect(digest.match(/dá pra assistir de graça/g)).toHaveLength(1);
   });
 
@@ -128,7 +128,7 @@ describe("buildDigest", () => {
       [buildMatch({ broadcasts: [{ channelId: "globo", displayName: "Globo", kind: "tv" as const, free: true, url: "", logoUrl: "", regionalCaveat: true }] } as Partial<MatchView>)],
       NOW,
     );
-    expect(digest).toContain("— Globo 🆓 (regional)");
+    expect(digest).toContain("| Globo 🆓 (regional)");
   });
 
   it("leaves the free footnote out entirely when nothing on the day is free", () => {
@@ -142,18 +142,42 @@ describe("buildDigest", () => {
   });
 
   it("says 'amanhã' in the header when the digest is about tomorrow, not just a different date", () => {
-    expect(buildDigest([], NOW, "amanhã")).toContain("⚽ *Onde assistir aos jogos de amanhã — sábado, 5/set*");
+    expect(buildDigest([], NOW, "amanhã")).toContain("⚽ *Onde assistir aos jogos de amanhã | sábado, 5/set*");
   });
 
   it("still renders the header date on a day with no matches", () => {
     expect(buildDigest([], NOW)).toBe(
       [
-        "⚽ *Onde assistir aos jogos de hoje — sábado, 5/set*",
+        "⚽ *Onde assistir aos jogos de hoje | sábado, 5/set*",
         "",
         "Nenhum jogo hoje.",
         "",
         "https://ondevaipassar.com",
       ].join("\n"),
     );
+  });
+});
+
+describe("buildDigest: no dashes", () => {
+  it("has no em dash anywhere, including the footnotes", () => {
+    const match = {
+      id: "a",
+      competitionId: "brasileirao-serie-a",
+      competitionName: "Campeonato Brasileiro Série A",
+      homeTeamId: "sao_paulo",
+      homeTeamName: "São Paulo",
+      awayTeamId: "atletico_mineiro",
+      awayTeamName: "Atlético-MG",
+      kickoffUtc: "2026-09-05T21:30:00.000Z",
+      kickoffTimeConfirmed: true,
+      status: "scheduled",
+      broadcasts: [
+        { channelId: "globo", displayName: "Globo", free: true, regionalCaveat: true, kind: "tv", url: "", logoUrl: "" },
+        { channelId: "premiere", displayName: "Premiere", free: false, regionalCaveat: false, kind: "tv", url: "", logoUrl: "" },
+      ],
+    } as unknown as Parameters<typeof buildDigest>[0][number];
+    const digest = buildDigest([match], new Date("2026-09-05T12:00:00Z"));
+    expect(digest).not.toMatch(/[—–]/);
+    expect(digest).toContain("🆓 dá pra assistir de graça");
   });
 });

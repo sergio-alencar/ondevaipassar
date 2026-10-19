@@ -34,11 +34,11 @@ const FREE_MARK = "🆓";
  */
 export type DigestDay = "hoje" | "amanhã";
 
-const REGIONAL_FOOTNOTE = `${REGIONAL_MARK} — ${REGIONAL_CAVEAT_TEXT}`;
+const REGIONAL_FOOTNOTE = `${REGIONAL_MARK} ${REGIONAL_CAVEAT_TEXT.replace(/\s+—\s+/g, ", ")}`;
 // Spelled out once per digest, and only when something actually carried
 // the mark — the emoji reads as "FREE", which is close enough to guess but
 // not close enough to leave unsaid.
-const FREE_FOOTNOTE = `${FREE_MARK} — dá pra assistir de graça`;
+const FREE_FOOTNOTE = `${FREE_MARK} dá pra assistir de graça`;
 
 interface MatchLine {
   text: string;
@@ -58,7 +58,7 @@ function buildMatchLine(match: MatchView, bold: boolean): MatchLine {
   const pairing = bold ? `*${match.homeTeamName} x ${match.awayTeamName}*` : `${match.homeTeamName} x ${match.awayTeamName}`;
 
   if (match.broadcasts.length === 0) {
-    return { text: `${time} ${pairing} — ${NO_BROADCAST_TEXT}`, regionalDetail: null, usedRegionalMark: false, usedFreeMark: false };
+    return { text: `${time} ${pairing} | ${NO_BROADCAST_TEXT}`, regionalDetail: null, usedRegionalMark: false, usedFreeMark: false };
   }
 
   // Handled per broadcast, not per match (unlike the Instagram caption):
@@ -97,7 +97,7 @@ function buildMatchLine(match: MatchView, bold: boolean): MatchLine {
   // No dash after the time either (Sérgio's call): one dash separating the
   // match from its channels reads cleanly, two made the line look like
   // three equal parts.
-  return { text: `${time} ${pairing} — ${channels.join(", ")}`, regionalDetail, usedRegionalMark, usedFreeMark };
+  return { text: `${time} ${pairing} | ${channels.join(", ")}`, regionalDetail, usedRegionalMark, usedFreeMark };
 }
 
 /**
@@ -107,7 +107,7 @@ function buildMatchLine(match: MatchView, bold: boolean): MatchLine {
  * header date and is needed even when there are no matches at all.
  */
 export function buildDigest(matches: MatchView[], date: Date = new Date(), day: DigestDay = "hoje"): string {
-  const header = `⚽ *Onde assistir aos jogos de ${day} — ${formatDateLabel(date.toISOString())}*`;
+  const header = `⚽ *Onde assistir aos jogos de ${day} | ${formatDateLabel(date.toISOString())}*`;
 
   if (matches.length === 0) {
     return [header, "", `Nenhum jogo ${day}.`, "", SITE_URL].join("\n");
