@@ -38,6 +38,8 @@ const REGIONAL_FOOTNOTE = `${REGIONAL_MARK} ${REGIONAL_CAVEAT_TEXT.replace(/\s+�
 // Spelled out once per digest, and only when something actually carried
 // the mark — the emoji reads as "FREE", which is close enough to guess but
 // not close enough to leave unsaid.
+/** Said once at the foot of the digest for every per-state note above it. */
+const REGIONAL_DETAIL_FOOTNOTE = `📍 nos estados indicados, a Globo pode transmitir só em parte da rede, e isso ${REGIONAL_PRACA_CAVEAT}`;
 const FREE_FOOTNOTE = `${FREE_MARK} dá pra assistir de graça`;
 
 interface MatchLine {
@@ -79,7 +81,9 @@ function buildMatchLine(match: MatchView, bold: boolean): MatchLine {
       name = `${name} ${FREE_MARK}`;
     }
     if (broadcast.regionalDetail) {
-      regionalDetail ??= `   📍 ${broadcast.displayName} em: ${broadcast.regionalDetail} (${REGIONAL_PRACA_CAVEAT})`;
+      // Only the states here: the caveat about the rede and the praça is said ONCE, in the footnote (REGIONAL_DETAIL_FOOTNOTE),
+      // because repeating it under every Globo match filled the digest with the same sentence.
+      regionalDetail ??= `   📍 ${broadcast.displayName} em: ${broadcast.regionalDetail.replace(/,?\s*parte da rede/i, "").trim()}`;
       return name;
     }
     if (broadcast.regionalCaveat) {
@@ -116,13 +120,17 @@ export function buildDigest(matches: MatchView[], date: Date = new Date(), day: 
   const sections: string[] = [];
   let anyRegionalMark = false;
   let anyFreeMark = false;
+  let anyRegionalDetail = false;
 
   for (const group of groupMatchesByCompetition(matches)) {
     const lines = [`*${group.name}*`];
     for (const match of group.matches) {
       const line = buildMatchLine(match, true);
       lines.push(line.text);
-      if (line.regionalDetail) lines.push(line.regionalDetail);
+      if (line.regionalDetail) {
+        lines.push(line.regionalDetail);
+        anyRegionalDetail = true;
+      }
       if (line.usedRegionalMark) anyRegionalMark = true;
       if (line.usedFreeMark) anyFreeMark = true;
     }
@@ -132,6 +140,7 @@ export function buildDigest(matches: MatchView[], date: Date = new Date(), day: 
   const parts = [header, "", sections.join("\n\n")];
   const footnotes = [
     ...(anyFreeMark ? [FREE_FOOTNOTE] : []),
+    ...(anyRegionalDetail ? [REGIONAL_DETAIL_FOOTNOTE] : []),
     ...(anyRegionalMark ? [REGIONAL_FOOTNOTE] : []),
   ];
   if (footnotes.length > 0) parts.push("", footnotes.join("\n"));

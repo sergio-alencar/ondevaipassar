@@ -181,3 +181,34 @@ describe("buildDigest: no dashes", () => {
     expect(digest).toContain("🆓 dá pra assistir de graça");
   });
 });
+
+describe("buildDigest: the regional caveat is said once", () => {
+  const globoIn = (states: string) =>
+    ({ channelId: "globo", displayName: "Globo", free: true, regionalCaveat: false, regionalDetail: states, kind: "tv", url: "", logoUrl: "" });
+  const game = (id: string, home: string, away: string, states: string) =>
+    ({
+      id,
+      competitionId: "brasileirao-serie-a",
+      competitionName: "Campeonato Brasileiro Série A",
+      homeTeamId: null,
+      homeTeamName: home,
+      awayTeamId: null,
+      awayTeamName: away,
+      kickoffUtc: "2026-09-05T19:30:00.000Z",
+      kickoffTimeConfirmed: true,
+      status: "scheduled",
+      broadcasts: [globoIn(states)],
+    }) as unknown as Parameters<typeof buildDigest>[0][number];
+
+  it("lists each Globo match's states and puts the praça/rede note once at the foot", () => {
+    const digest = buildDigest(
+      [game("a", "Inter", "Botafogo", "RJ e RS, parte da rede"), game("b", "Mirassol", "São Paulo", "SP, parte da rede"), game("c", "Vitória", "Athletico-PR", "PR")],
+      new Date("2026-09-05T12:00:00Z"),
+    );
+    expect(digest).toContain("📍 Globo em: RJ e RS\n");
+    expect(digest).toContain("📍 Globo em: SP\n");
+    expect(digest).toContain("📍 Globo em: PR\n");
+    expect(digest.split("parte da rede")).toHaveLength(2);
+    expect(digest.split("pode variar por praça").length).toBe(2);
+  });
+});
