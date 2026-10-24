@@ -7,8 +7,10 @@ const NOW = "2026-10-06T12:00:00.000Z";
 const { matchRows, broadcastRows } = expandManualFixtures(MANUAL_FIXTURES, NOW);
 
 describe("the hand-seeded fixtures", () => {
-  it("has the nine games with a club this site follows, not the whole 24-game group stage", () => {
-    expect(matchRows).toHaveLength(9);
+  it("has the nine group-stage games with a club this site follows, not the whole 24-game group stage, plus the quarterfinal still waiting on its preview article", () => {
+    expect(matchRows.filter((row) => row.kickoffUtc < "2026-10-25")).toHaveLength(9);
+    const quarter = matchRows.find((row) => row.homeTeamId === "cruzeiro_feminino" && row.awayTeamId === "libertad_feminino");
+    expect(quarter?.kickoffUtc).toBe("2026-10-26T00:00:00.000Z");
   });
 
   // Colombia's champion (Deportivo Cali) goes to Group D, the runner-up (Santa
@@ -61,7 +63,9 @@ describe("the hand-seeded fixtures", () => {
   // Sourced per game, never inferred from who holds the rights: a 2023 Terra
   // piece names Globo, Band and Paramount without naming a single game.
   it("does not attach channels that merely hold rights to the competition", () => {
-    const used = new Set(broadcastRows.map((b) => b.channelId));
+    // The group-stage seed only; the quarterfinal's channels come from ge's own round-up (see its comment).
+    const groupStage = new Set(matchRows.filter((row) => row.kickoffUtc < "2026-10-25").map((row) => row.id));
+    const used = new Set(broadcastRows.filter((b) => groupStage.has(b.matchId)).map((b) => b.channelId));
     for (const unsourced of ["globo", "band", "bandsports", "sportv", "paramountplus"]) expect(used.has(unsourced)).toBe(false);
   });
 

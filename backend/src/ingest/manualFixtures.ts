@@ -96,7 +96,31 @@ const LIBERTADORES_FEMININA_FIRST_PHASE: ManualFixture[] = [
   channelIds: ["uol", "pluto", ...(palmeiras ? ["tvpalmeiras"] : [])],
 }));
 
-export const MANUAL_FIXTURES: ManualFixture[] = [...LIBERTADORES_FEMININA_FIRST_PHASE];
+/**
+ * Libertadores Feminina 2026, quartas de final: only the games with a club this site follows, and only the ones whose
+ * day-of preview article (ge.globo, read by geFemininoEnrichment.ts) has not come out yet. Palmeiras x Santa Fe and
+ * Corinthians x Independiente Dragonas (24/10) were created by that article; the day-before gap is what this fills.
+ *
+ * Source: ge.globo's round-up of 23/10, "Libertadores Feminina: veja jogos, datas, horários e onde assistir às quartas
+ * de final": "Cruzeiro x Libertad (PAR), domingo (25), às 21h (de Brasília), no Estádio Banco Guayaquil", and "Os jogos têm
+ * transmissão de sportv, NSports, Cazé TV, Xsports, UOL, TV Palmeiras (jogos do Palmeiras), Meu Timão (jogos do Corinthians),
+ * Gol Brasil e Pluto TV". Cruzeiro's game gets the channels that are not tied to another club. The day's own article
+ * replaces this list the moment it exists (ge's channels win over the seed's).
+ */
+const LIBERTADORES_FEMININA_QUARTERFINALS: ManualFixture[] = [
+  {
+    competitionId: "libertadores-feminina",
+    homeTeamId: "cruzeiro_feminino",
+    homeTeamNameRaw: "Cruzeiro",
+    awayTeamId: "libertad_feminino",
+    awayTeamNameRaw: "Libertad",
+    date: "2026-10-25",
+    time: "21:00",
+    channelIds: ["sportv", "nsports", "cazetv", "xsports", "uol", "golbrasil", "pluto"],
+  },
+];
+
+export const MANUAL_FIXTURES: ManualFixture[] = [...LIBERTADORES_FEMININA_FIRST_PHASE, ...LIBERTADORES_FEMININA_QUARTERFINALS];
 
 export interface ManualRows {
   matchRows: (typeof matches.$inferInsert)[];
