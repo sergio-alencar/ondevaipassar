@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { env } from "../../config/env.js";
 import { runStagesWithinBudget, type IngestStage } from "../../ingest/budget.js";
+import { maybeRefreshInstagramToken } from "../../instagram/tokenManager.js";
 import { runChannelMirroring } from "../../ingest/channelMirroring.js";
 import { runFemininoEnrichment } from "../../ingest/femininoEnrichment.js";
 import { runManualFixtures } from "../../ingest/manualFixtures.js";
@@ -82,6 +83,13 @@ export async function cronRoutes(app: FastifyInstance): Promise<void> {
 
     const { skipped } = await runStagesWithinBudget(stages, startedAt);
 
-    return { status: skipped.length > 0 ? "partial" : "ok", ranAt: new Date().toISOString(), skipped };
+    // Runs after ingest since it's not time-critical and the ingest budget
+    // already accounts for the main work. Never fails the cron response.
+    const tokenRefresh = await maybeRefreshInstagramToken().catch((err) => {
+      console.error("[cron-ingest] instagram token refresh threw:", err);
+      return { refreshed: false, error: String(err) };
+    });
+
+    return { status: skipped.length > 0 ? "partial" : "ok", ranAt: new Date().toISOString(), skipped, tokenRefresh };
   });
 }

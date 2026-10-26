@@ -1,4 +1,5 @@
 import { env } from "../config/env.js";
+import { getInstagramToken } from "./tokenManager.js";
 
 // "Instagram API with Instagram Login" — the newer of Meta's two content
 // publishing flows, live on graph.instagram.com. Doesn't need a linked
@@ -63,7 +64,7 @@ async function fetchJson(url: string, init?: RequestInit): Promise<Record<string
 export const realGraphApiClient: GraphApiClient = {
   async createCarouselItem(imageUrl) {
     const accountId = env.INSTAGRAM_USER_ID;
-    const token = env.INSTAGRAM_ACCESS_TOKEN;
+    const token = await getInstagramToken();
     if (!accountId || !token) throw new Error("INSTAGRAM_USER_ID/INSTAGRAM_ACCESS_TOKEN not configured");
 
     const params = new URLSearchParams({ image_url: imageUrl, is_carousel_item: "true", access_token: token });
@@ -75,7 +76,7 @@ export const realGraphApiClient: GraphApiClient = {
 
   async createStory(imageUrl) {
     const accountId = env.INSTAGRAM_USER_ID;
-    const token = env.INSTAGRAM_ACCESS_TOKEN;
+    const token = await getInstagramToken();
     if (!accountId || !token) throw new Error("INSTAGRAM_USER_ID/INSTAGRAM_ACCESS_TOKEN not configured");
 
     const params = new URLSearchParams({ image_url: imageUrl, media_type: "STORIES", access_token: token });
@@ -87,7 +88,7 @@ export const realGraphApiClient: GraphApiClient = {
 
   async createCarousel(childIds, caption) {
     const accountId = env.INSTAGRAM_USER_ID;
-    const token = env.INSTAGRAM_ACCESS_TOKEN;
+    const token = await getInstagramToken();
     if (!accountId || !token) throw new Error("INSTAGRAM_USER_ID/INSTAGRAM_ACCESS_TOKEN not configured");
     if (childIds.length < 2) throw new Error(`A carousel needs at least 2 items, got ${childIds.length}`);
     if (childIds.length > MAX_CAROUSEL_ITEMS) throw new Error(`A carousel takes at most ${MAX_CAROUSEL_ITEMS} items, got ${childIds.length}`);
@@ -100,7 +101,7 @@ export const realGraphApiClient: GraphApiClient = {
   },
 
   async pollUntilFinished(containerId) {
-    const token = env.INSTAGRAM_ACCESS_TOKEN;
+    const token = await getInstagramToken();
     if (!token) throw new Error("INSTAGRAM_ACCESS_TOKEN not configured");
 
     const deadline = Date.now() + POLL_TIMEOUT_MS;
@@ -120,7 +121,7 @@ export const realGraphApiClient: GraphApiClient = {
 
   async publishContainer(containerId) {
     const accountId = env.INSTAGRAM_USER_ID;
-    const token = env.INSTAGRAM_ACCESS_TOKEN;
+    const token = await getInstagramToken();
     if (!accountId || !token) throw new Error("INSTAGRAM_USER_ID/INSTAGRAM_ACCESS_TOKEN not configured");
 
     const params = new URLSearchParams({ creation_id: containerId, access_token: token });

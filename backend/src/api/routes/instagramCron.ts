@@ -5,6 +5,7 @@ import { env } from "../../config/env.js";
 import { db } from "../../db/client.js";
 import { instagramPosts } from "../../db/schema.js";
 import { realGraphApiClient } from "../../instagram/graphApiClient.js";
+import { bootstrapInstagramToken } from "../../instagram/tokenManager.js";
 import { buildStoryPlan, getTodaysPostPlans, groupIntoStories, runInstagramPosting, STORY_ID_PREFIX } from "../../instagram/poster.js";
 import { getMatchViews } from "../../matches/getMatchViews.js";
 import { isTodayInBrasilia } from "@ondevaipassar/shared";
@@ -192,5 +193,20 @@ export async function instagramCronRoutes(app: FastifyInstance): Promise<void> {
     const id = parsedQuery.data.story === "true" ? `${STORY_ID_PREFIX}${parsedQuery.data.matchId}` : parsedQuery.data.matchId;
     await db.delete(instagramPosts).where(eq(instagramPosts.id, id));
     return { status: "ok", reset: id };
+  });
+
+  // Seed the database with a freshly obtained token (e.g. after a manual
+  // rotation via the Meta dashboard). The DB value takes precedence over the
+  // INSTAGRAM_ACCESS_TOKEN env var, so calling this once establishes the
+  // baseline for the auto-refresh that the daily ingest cron runs.
+  // Usage: GET /api/cron-instagram-bootstrap?token=IGAAA...
+  app.get("/api/cron-instagram-bootstrap", async (request, reply) => {
+    if (env.CRON_SECRET && request.headers.authorization !== `Bearer ${env.CRON_SECRET}`) {
+      return reply.status(401).send({ error: "unauthorized" });
+    }
+    const { token } = request.query as { token?: string };
+    if (!token) return reply.status(400).send({ error: "token query param required" });
+    await bootstrapInstagramToken(token);
+    return { status: "ok", bootstrapped: true };
   });
 }

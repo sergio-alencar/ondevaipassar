@@ -121,3 +121,13 @@ export const sessions = sqliteTable("sessions", {
   createdAt: text("created_at").notNull(),
   expiresAt: text("expires_at").notNull(),
 });
+
+// Generic key/value store for runtime-managed secrets and configuration that
+// need to survive across serverless invocations without a redeploy. The only
+// current use is the Instagram access token, which is refreshed in-place
+// every 30 days by the daily ingest cron (see instagram/tokenManager.ts).
+export const systemConfig = sqliteTable("system_config", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});

@@ -127,6 +127,12 @@ export function ensureSchema(): Promise<unknown> {
         expires_at TEXT NOT NULL
       );
       CREATE INDEX IF NOT EXISTS sessions_user_idx ON sessions (user_id);
+
+      CREATE TABLE IF NOT EXISTS system_config (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
     `)
       .then(() => addColumnIfMissing("matches", "kickoff_time_confirmed INTEGER NOT NULL DEFAULT 1"))
       .then(() => addColumnIfMissing("broadcasts", "watch_url TEXT"))
